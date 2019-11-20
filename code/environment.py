@@ -19,9 +19,9 @@ class Environment:
 
     Methods
     -------
-    plot :
+    plot
         Draws the environnement using matplotlib
-    is_free :
+    is_free
         Returns False if a point is within an obstacle or outside of the
         boundaries of the environnement.
     """

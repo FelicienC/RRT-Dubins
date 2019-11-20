@@ -64,10 +64,19 @@ class RRT:
     goal_rate : float
         The frequency at which the randomly selected node is choosen among
         the goal zone.
+
     Methods
     -------
-    run :
-
+    in_goal_region
+        Method helping to determine if a point is within a goal region or not.
+    run
+        Executes the algorithm with an empty graph, initialized with the start
+        position at least.
+    plot_tree
+        Displays the RRT using matplotlib.
+    select_options
+        Explores the existing nodes of the tree to find the best option to grow
+        from.
     """
 
     def __init__(self, environment):
@@ -165,7 +174,8 @@ class RRT:
 
     def select_options(self, sample, nb_options, metric='local'):
         """
-        Chooses the best node for the expansion of the tree.
+        Chooses the best nodes for the expansion of the tree, and returns
+        them in a list ordered by increasing cost.
 
         Parameters
         ----------
@@ -181,7 +191,7 @@ class RRT:
         Returns
         -------
         options : list
-            Sorted list of the options
+            Sorted list of the options, by increasing cost.
         """
         if metric == 'local':
             # The local planner is used to measure the real distance needed

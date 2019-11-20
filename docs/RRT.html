@@ -1,0 +1,442 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Rapidly Exploring Random Tree &mdash; RRT-Dubins 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'./',
+              VERSION:'0.0.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: white" >
+          
+
+          
+            <a href="contents.html" class="icon icon-home"> RRT-Dubins
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Dubins.html">Dubins</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Rapidly Exploring Random Tree</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Environment.html">Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Obstacles.html">Obstacles</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="contents.html">RRT-Dubins</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="contents.html">Docs</a> &raquo;</li>
+        
+      <li>Rapidly Exploring Random Tree</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/RRT.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-rrt">
+<span id="rapidly-exploring-random-tree"></span><h1>Rapidly Exploring Random Tree<a class="headerlink" href="#module-rrt" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="rrt.Edge">
+<em class="property">class </em><code class="descclassname">rrt.</code><code class="descname">Edge</code><span class="sig-paren">(</span><em>node_from</em>, <em>node_to</em>, <em>path</em>, <em>cost</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rrt.html#Edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.Edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Edge of the rapidly exploring random tree</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>node_from:</strong></dt>
+<dd><p class="first last">Id of the starting node of the edge.</p>
+</dd>
+<dt><strong>node_to:</strong></dt>
+<dd><p class="first last">Id of the end node of the edge.</p>
+</dd>
+<dt><strong>path:</strong></dt>
+<dd><p class="first last">The successive positions yielded by the local planner representing the
+path between the nodes.</p>
+</dd>
+<dt><strong>cost:</strong></dt>
+<dd><p class="first last">Cost associated to the transition between the two nodes.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="rrt.Node">
+<em class="property">class </em><code class="descclassname">rrt.</code><code class="descname">Node</code><span class="sig-paren">(</span><em>position</em>, <em>time</em>, <em>cost</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rrt.html#Node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.Node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node of the rapidly exploring random tree</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>destination_list:</strong></dt>
+<dd><p class="first last">The reachable nodes from the current one</p>
+</dd>
+<dt><strong>position:</strong></dt>
+<dd><p class="first last">The position of the node</p>
+</dd>
+<dt><strong>time:</strong></dt>
+<dd><p class="first last">The instant at which this node is reached</p>
+</dd>
+<dt><strong>cost:</strong></dt>
+<dd><p class="first last">The cost needed to reach this node</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="rrt.RRT">
+<em class="property">class </em><code class="descclassname">rrt.</code><code class="descname">RRT</code><span class="sig-paren">(</span><em>environment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rrt.html#RRT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class implementing a Rapidely Exploring Random Tree in two dimensions using
+dubins paths as an expansion method. The state space considered here is
+straightforward, as every state can be represented by a simple tuple made
+of three continuous variables: (x, y, psi)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>nodes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">Dictionnary containing all the nodes of the tree. The keys are hence
+simply the reached state, i.e. tuples of the form (x, y, psi).</p>
+</dd>
+<dt><strong>environement</strong> <span class="classifier-delimiter">:</span> <span class="classifier">instance of the environment class</span></dt>
+<dd></dd>
+<dt><strong>goal_rate</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The frequency at which the randomly selected node is choosen among
+the goal zone.</p>
+</dd>
+<dt><strong>Methods</strong></dt>
+<dd></dd>
+<dt><strong>——-</strong></dt>
+<dd></dd>
+<dt><a class="reference internal" href="#rrt.RRT.in_goal_region" title="rrt.RRT.in_goal_region"><code class="xref py py-obj docutils literal notranslate"><span class="pre">in_goal_region</span></code></a></dt>
+<dd><p class="first last">Method helping to determine if a point is within a goal region or not.</p>
+</dd>
+<dt><a class="reference internal" href="#rrt.RRT.run" title="rrt.RRT.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a></dt>
+<dd><p class="first last">Executes the algorithm with an empty graph, initialized with the start position at least.</p>
+</dd>
+<dt><a class="reference internal" href="#rrt.RRT.plot_tree" title="rrt.RRT.plot_tree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_tree</span></code></a></dt>
+<dd><p class="first last">Displays the tree using matplotlib</p>
+</dd>
+<dt><a class="reference internal" href="#rrt.RRT.select_options" title="rrt.RRT.select_options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_options</span></code></a></dt>
+<dd><p class="first last">Chooses the best node for the expansion of the tree.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#rrt.RRT.in_goal_region" title="rrt.RRT.in_goal_region"><code class="xref py py-obj docutils literal notranslate"><span class="pre">in_goal_region</span></code></a>(sample)</td>
+<td>Method helping to determine if a point is within a goal region or not.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#rrt.RRT.plot_tree" title="rrt.RRT.plot_tree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_tree</span></code></a>()</td>
+<td>Displays the tree using matplotlib</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#rrt.RRT.run" title="rrt.RRT.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>(goal,&nbsp;precision[,&nbsp;nb_iteration,&nbsp;metric])</td>
+<td>Executes the algorithm with an empty graph, initialized with the start position at least.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#rrt.RRT.select_options" title="rrt.RRT.select_options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_options</span></code></a>(sample,&nbsp;nb_options[,&nbsp;metric])</td>
+<td>Chooses the best node for the expansion of the tree.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#rrt.RRT.set_start" title="rrt.RRT.set_start"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_start</span></code></a>(start)</td>
+<td>Resets the graph, and sets the start node as root of the tree</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="rrt.RRT.in_goal_region">
+<code class="descname">in_goal_region</code><span class="sig-paren">(</span><em>sample</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rrt.html#RRT.in_goal_region"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.in_goal_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method helping to determine if a point is within a goal region or not.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>sample</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y, psi) the position of the point which needs to be tested</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rrt.RRT.plot_tree">
+<code class="descname">plot_tree</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rrt.html#RRT.plot_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.plot_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Displays the tree using matplotlib</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rrt.RRT.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>goal</em>, <em>precision</em>, <em>nb_iteration=100</em>, <em>metric='local'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rrt.html#RRT.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the algorithm with an empty graph, initialized with the start
+position at least.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>goal</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">The final requested position (x, y, psi)</p>
+</dd>
+<dt><strong>precision</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">The precision needed to stop the algorithm. In the form
+(delta_x, delta_y, delta_psi)</p>
+</dd>
+<dt><strong>nb_iteration</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">The number of maximal iterations (not using the number of nodes as
+potentialy the start is in a region of unavoidable collision)</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>It is not necessary to use several nodes to try and connect a sample to
+the existing graph; The closest node only could be choosen. The notion
+of “closest” can also be simpy the euclidian distance, which would make
+the computation faster and the code a simpler.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rrt.RRT.select_options">
+<code class="descname">select_options</code><span class="sig-paren">(</span><em>sample</em>, <em>nb_options</em>, <em>metric='local'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rrt.html#RRT.select_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.select_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Chooses the best node for the expansion of the tree.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>sample</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">The (x, y, psi) coordinates of the node we wish to connect to the
+tree</p>
+</dd>
+<dt><strong>nb_options</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">The number of options requested.</p>
+</dd>
+<dt><strong>metric</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">One of ‘local’, ‘euclidian’. The euclidian metric is a lot faster
+but is also less precise and can’t be used with an RRTS.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>options</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd><p class="first last">Sorted list of the options</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rrt.RRT.set_start">
+<code class="descname">set_start</code><span class="sig-paren">(</span><em>start</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rrt.html#RRT.set_start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.set_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the graph, and sets the start node as root of the tree</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>start: tuple</strong></dt>
+<dd><p class="first last">The initial position (x, y, psi)</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Félicien Cantalloube
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

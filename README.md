@@ -3,7 +3,7 @@
 
 Simple implementation of a **Rapidly Exploring Random Tree** using **Dubins path** as an expansion method, in a 2D environment filled with polygonal obstacles.
 <p align="center">
-  <img src="doc/example.gif">
+  <img src="docs/img/example.gif">
 </p>
 
 ## Requirements
@@ -28,7 +28,7 @@ As we want to have the shortest path among the 6 potential candidates, we comput
   
 #### 1) Two turns in the same direction separated by a straight segment
 <p align="center">
-  <img src="doc/twoturnssame.svg">
+  <img src="docs/img/twoturnssame.svg">
 </p>
 We start by finding the centers of the turns at the start and end of the trajectory, describing the circles C1 and C2. This is direct as we know the direction and radius of these turns.
 
@@ -37,13 +37,13 @@ Because we have the same radius on both C1 and C2, the tangent to both circles i
 
 #### 2) Two turns in opposite directions separated by a straight segment
 <p align="center">
-  <img src="doc/twoturnsopposite.svg">
+  <img src="docs/img/twoturnsopposite.svg">
 </p>
 This case is a litle more complex than the previous one, but starts in a similar way, by finding the centers of the turns at the start and end of the trajectory, C1 and C2. We however then need to introduce the rectangle triangle ABX in order to compute the lenght of the straight segment. Calculating the angles beta0 and beta2 is then straightforward. 
 
 #### 3) Three turns
 <p align="center">
-  <img src="doc/threeturns.svg">
+  <img src="docs/img/threeturns.svg">
 </p>
 This situation is only possible when the centers of the two circles C1 and C2 are separated by less than 4 radii. If it is the case, the trajectory is completly described by 3 angles, beta0, beta1 and beta2. 
 
@@ -73,7 +73,7 @@ import matplotlib.pyplot as plt
 plt.plot(path[:, 0], path[:, 1])
 ```
 <p align="center">
-  <img src="doc/LSL_example.png">
+  <img src="docs/img/LSL_example.png">
 </p>
 
 ## RRT
@@ -99,7 +99,7 @@ env = Environment((100, 100), 100)
 env.plot()
 ```
 <p align="center">
-  <img src="doc/environment.png">
+  <img src="docs/img/environment.png">
 </p>
 
 ```python
