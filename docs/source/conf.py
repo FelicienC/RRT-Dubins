@@ -30,11 +30,19 @@ autosummary_generate = True
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.imgmath', 'numpydoc',
-              'sphinx.ext.intersphinx', 'sphinx.ext.coverage','sphinx.ext.viewcode',
-              'sphinx.ext.autosummary', 'matplotlib.sphinxext.plot_directive']
+extensions = ['sphinx.ext.autodoc',
+              'sphinx.ext.imgmath',
+              'numpydoc',
+              'sphinx.ext.intersphinx',
+              'sphinx.ext.coverage',
+              'sphinx.ext.viewcode',
+              'sphinx.ext.autosummary',
+              'matplotlib.sphinxext.plot_directive',
+              'sphinx.ext.githubpages']
 
 source_suffix = '.rst'
+# The master toctree document.
+master_doc = 'index'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -50,20 +58,14 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'scipy'
+html_theme_path = ['_theme']
+html_logo = '_static/scipyshiny_small.png'
+html_static_path = ['_static']
 html_theme_options = {
-    'canonical_url': '',
-    'logo_only': True,
-    'display_version': True,
-    'prev_next_buttons_location': 'bottom',
-    'style_external_links': False,
-    'vcs_pageview_mode': '',
-    'style_nav_header_background': 'white',
-    # Toc options
-    'collapse_navigation': True,
-    'sticky_navigation': True,
-    'navigation_depth': 4,
-    'includehidden': True,
-    'titles_only': False
+    "edit_link": "true",
+    "sidebar": "right",
+    "scipy_org_logo": "true",
+    "rootlinks": [("https://github.com/FelicienC/RRT-Dubins", "Github"),
+                  ("https://felicienc.github.io/RRT-Dubins/", "Docs")]
 }
-

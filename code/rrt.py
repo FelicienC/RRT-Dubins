@@ -4,18 +4,18 @@ from dubins import Dubins, dist
 
 class Node:
     """
-    Node of the rapidly exploring random tree
+    Node of the rapidly exploring random tree.
 
     Attributes
     ----------
-    destination_list:
-        The reachable nodes from the current one
-    position:
-        The position of the node
-    time:
-        The instant at which this node is reached
-    cost:
-        The cost needed to reach this node
+    destination_list : list
+        The reachable nodes from the current one.
+    position : tuple
+        The position of the node.
+    time : float
+        The instant at which this node is reached.
+    cost : float
+        The cost needed to reach this node.
     """
 
     def __init__(self, position, time, cost):
@@ -26,18 +26,18 @@ class Node:
 
 class Edge:
     """
-    Edge of the rapidly exploring random tree
+    Edge of the rapidly exploring random tree.
 
     Attributes
     ----------
-    node_from:
+    node_from : tuple
         Id of the starting node of the edge.
-    node_to:
+    node_to : tuple
         Id of the end node of the edge.
-    path:
+    path : list
         The successive positions yielded by the local planner representing the
         path between the nodes.
-    cost:
+    cost : float
         Cost associated to the transition between the two nodes.
 
     """
@@ -60,7 +60,8 @@ class RRT:
     nodes : dict
         Dictionnary containing all the nodes of the tree. The keys are hence
         simply the reached state, i.e. tuples of the form (x, y, psi).
-    environement : instance of the environment class
+    environment : Environment
+        Instance of the Environment class.
     goal_rate : float
         The frequency at which the randomly selected node is choosen among
         the goal zone.
@@ -70,8 +71,8 @@ class RRT:
     in_goal_region
         Method helping to determine if a point is within a goal region or not.
     run
-        Executes the algorithm with an empty graph, initialized with the start
-        position at least.
+        Executes the algorithm with an empty graph, which needs to be
+        initialized with the start position at least before.
     plot_tree
         Displays the RRT using matplotlib.
     select_options
@@ -91,12 +92,12 @@ class RRT:
 
     def set_start(self, start):
         """
-        Resets the graph, and sets the start node as root of the tree
+        Resets the graph, and sets the start node as root of the tree.
 
         Parameters
         ----------
         start: tuple
-            The initial position (x, y, psi)
+            The initial position (x, y, psi), used as root.
 
         """
         self.nodes = {}
@@ -112,20 +113,22 @@ class RRT:
         Parameters
         ----------
         goal : tuple
-            The final requested position (x, y, psi)
+            The final requested position (x, y, psi).
         precision : tuple
             The precision needed to stop the algorithm. In the form
-            (delta_x, delta_y, delta_psi)
+            (delta_x, delta_y, delta_psi).
         nb_iteration : int
             The number of maximal iterations (not using the number of nodes as
-            potentialy the start is in a region of unavoidable collision)
+            potentialy the start is in a region of unavoidable collision).
 
         Notes
         -----
         It is not necessary to use several nodes to try and connect a sample to
         the existing graph; The closest node only could be choosen. The notion
         of "closest" can also be simpy the euclidian distance, which would make
-        the computation faster and the code a simpler.
+        the computation faster and the code a simpler, this is why several
+        metrics are available.
+        
         """
         assert len(goal) == len(precision)
         self.goal = goal
@@ -181,12 +184,12 @@ class RRT:
         ----------
         sample : tuple
             The (x, y, psi) coordinates of the node we wish to connect to the
-            tree
+            tree.
         nb_options : int
             The number of options requested.
         metric : str
             One of 'local', 'euclidian'. The euclidian metric is a lot faster
-            but is also less precise and can't be used with an RRTS.
+            but is also less precise and can't be used with an RRT star.
 
         Returns
         -------
@@ -217,7 +220,7 @@ class RRT:
 
     def in_goal_region(self, sample):
         """
-        Method helping to determine if a point is within a goal region or not.
+        Method to determine if a point is within a goal region or not.
 
         Parameters
         ----------

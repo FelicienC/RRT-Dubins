@@ -22,7 +22,7 @@ class Obstacle:
     Methods
     -------
     plot
-        Displays the polygon on screen
+        Displays the polygon on screen.
 
     """
 

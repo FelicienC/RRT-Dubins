@@ -10,6 +10,8 @@ def dist(pt_a, pt_b):
 
 class Dubins:
     """
+    Class implementing a Dubins path planner with a constant turn radius.
+    
     Attributes
     ----------
     radius : float
@@ -22,7 +24,7 @@ class Dubins:
     Methods
     -------
     dubins_path
-        Computes the shortest dubins path between the given points
+        Computes the shortest dubins path between two given points.
     generate_points_straight
         Turns a path into a set of point representing the trajectory, for
         dubins paths when the path is one of LSL, LSR, RSL, RSR.
@@ -30,7 +32,7 @@ class Dubins:
         Turns a path into a set of point representing the trajectory, for
         dubins paths when the path is one of RLR or LRL.
     find_center
-        Compute the center of the circle described by a turn
+        Compute the center of the circle described by a turn.
     lsl
         Dubins path with a left straight left trajectory.
     rsr
@@ -51,7 +53,9 @@ class Dubins:
 
     def all_options(self, start, end, sort=False):
         """
-        Computes all the possible Dubin's path and returns them
+        Computes all the possible Dubin's path and returns them, in the form
+        of a list of tuples representing each option: (path_length,
+        dubins_path, straight).
 
         Parameters
         ----------
@@ -68,7 +72,6 @@ class Dubins:
         -------
         The shortest list of points (x, y) linking the initial and final points
         given as input with only turns of a defined radius and straight line.
-        In the form of a (2xn) numpy array.
 
         """
         center_0_left = self.find_center(start, 'L')
@@ -125,8 +128,8 @@ class Dubins:
         dubins_path: tuple
             The representation of the dubins path in the form of a tuple
             containing:
-                - the angle of the turn in the first circle, in rads
-                - the angle of the turn in the last circle, in rads
+                - the angle of the turn in the first circle, in rads.
+                - the angle of the turn in the last circle, in rads.
                 - the angle of the turn in the central circle, in rads, or the
                 length of the central segment if straight is true.
         straight: bool
@@ -148,25 +151,28 @@ class Dubins:
         Left-Straight-Left trajectories.
         First computes the poisition of the centers of the turns, and then uses
         the fact that the vector defined by the distance between the centers
-        gives the direction and distance of the straight segment
+        gives the direction and distance of the straight segment.
+
+        .. image:: img/twoturnssame.svg
 
         Parameters
         ----------
         start : tuple
-            (x, y, psi) coordinates of the inital point
+            (x, y, psi) coordinates of the inital point.
         end : tuple
-            (x, y, psi) coordinates of the final point
+            (x, y, psi) coordinates of the final point.
         center_0 : tuple
-            (x, y) coordinates of the center of the first turn
+            (x, y) coordinates of the center of the first turn.
         center_2 : tuple
-            (x, y) coordinates of the center of the last turn
+            (x, y) coordinates of the center of the last turn.
 
         Returns
         -------
         total_len : float
-            The total distance of this path
+            The total distance of this path.
         (beta_0, beta_2, straight_dist) : tuple
-            The dubins path
+            The dubins path, i.e. the angle of the first turn, the angle of the
+            last turn, and the length of the straight segment.
         straight : bool
             True, to indicate that this path contains a straight segment.
         """
@@ -182,25 +188,28 @@ class Dubins:
         Right-Straight-Right trajectories.
         First computes the poisition of the centers of the turns, and then uses
         the fact that the vector defined by the distance between the centers
-        gives the direction and distance of the straight segment
+        gives the direction and distance of the straight segment.
+        
+        .. image:: img/twoturnssame.svg
 
         Parameters
         ----------
         start : tuple
-            (x, y, psi) coordinates of the inital point
+            (x, y, psi) coordinates of the inital point.
         end : tuple
-            (x, y, psi) coordinates of the final point
+            (x, y, psi) coordinates of the final point.
         center_0 : tuple
-            (x, y) coordinates of the center of the first turn
+            (x, y) coordinates of the center of the first turn.
         center_2 : tuple
-            (x, y) coordinates of the center of the last turn
+            (x, y) coordinates of the center of the last turn.
 
         Returns
         -------
         total_len : float
-            The total distance of this path
+            The total distance of this path.
         (beta_0, beta_2, straight_dist) : tuple
-            The dubins path
+            The dubins path, i.e. the angle of the first turn, the angle of the
+            last turn, and the length of the straight segment.
         straight : bool
             True, to indicate that this path contains a straight segment.
 
@@ -222,23 +231,26 @@ class Dubins:
         and the tangeancy point of this circle to compute the straight segment
         distance.
 
+        .. image:: img/twoturnsopposite.svg
+
         Parameters
         ----------
         start : tuple
-            (x, y, psi) coordinates of the inital point
+            (x, y, psi) coordinates of the inital point.
         end : tuple
-            (x, y, psi) coordinates of the final point
+            (x, y, psi) coordinates of the final point.
         center_0 : tuple
-            (x, y) coordinates of the center of the first turn
+            (x, y) coordinates of the center of the first turn.
         center_2 : tuple
-            (x, y) coordinates of the center of the last turn
+            (x, y) coordinates of the center of the last turn.
 
         Returns
         -------
         total_len : float
-            The total distance of this path
+            The total distance of this path.
         (beta_0, beta_2, straight_dist) : tuple
-            The dubins path
+            The dubins path, i.e. the angle of the first turn, the angle of the
+            last turn, and the length of the straight segment.
         straight : bool
             True, to indicate that this path contains a straight segment.
 
@@ -265,23 +277,26 @@ class Dubins:
         and the tangeancy point of this circle to compute the straight segment
         distance.
 
+        .. image:: img/twoturnsopposite.svg
+        
         Parameters
         ----------
         start : tuple
-            (x, y, psi) coordinates of the inital point
+            (x, y, psi) coordinates of the inital point.
         end : tuple
-            (x, y, psi) coordinates of the final point
+            (x, y, psi) coordinates of the final point.
         center_0 : tuple
-            (x, y) coordinates of the center of the first turn
+            (x, y) coordinates of the center of the first turn.
         center_2 : tuple
-            (x, y) coordinates of the center of the last turn
+            (x, y) coordinates of the center of the last turn.
 
         Returns
         -------
         total_len : float
-            The total distance of this path
+            The total distance of this path.
         (beta_0, beta_2, straight_dist) : tuple
-            The dubins path
+            The dubins path, i.e. the angle of the first turn, the angle of the
+            last turn, and the length of the straight segment.
         straight : bool
             True, to indicate that this path contains a straight segment.
 
@@ -300,27 +315,30 @@ class Dubins:
 
     def lrl(self, start, end, center_0, center_2):
         """
-        Left right Left
+        Left-right-Left trajectories.
         Using the isocele triangle made by the centers of the three circles,
         computes the required angles.
+
+        .. image:: img/threeturns.svg
 
         Parameters
         ----------
         start : tuple
-            (x, y, psi) coordinates of the inital point
+            (x, y, psi) coordinates of the inital point.
         end : tuple
-            (x, y, psi) coordinates of the final point
+            (x, y, psi) coordinates of the final point.
         center_0 : tuple
-            (x, y) coordinates of the center of the first turn
+            (x, y) coordinates of the center of the first turn.
         center_2 : tuple
-            (x, y) coordinates of the center of the last turn
+            (x, y) coordinates of the center of the last turn.
 
         Returns
         -------
         total_len : float
-            The total distance of this path
+            The total distance of this path.
         (beta_0, beta_2, straight_dist) : tuple
-            The dubins path
+            The dubins path, i.e. the angle of the first turn, the angle of the
+            last turn, and the length of the straight segment.
         straight : bool
             False, to indicate that this path does not contain a straight part.
         """
@@ -339,9 +357,11 @@ class Dubins:
 
     def rlr(self, start, end, center_0, center_2):
         """
-        Right left right
+        Right-left-right trajectories.
         Using the isocele triangle made by the centers of the three circles,
         computes the required angles.
+
+        .. image:: img/threeturns.svg
 
         Parameters
         ----------
@@ -350,16 +370,17 @@ class Dubins:
         end : tuple
             (x, y, psi) coordinates of the final point.
         center_0 : tuple
-            (x, y) coordinates of the center of the first turn
+            (x, y) coordinates of the center of the first turn.
         center_2 : tuple
-            (x, y) coordinates of the center of the last turn
+            (x, y) coordinates of the center of the last turn.
 
         Returns
         -------
         total_len : float
-            The total distance of this path
+            The total distance of this path.
         (beta_0, beta_2, straight_dist) : tuple
-            The dubins path
+            The dubins path, i.e. the angle of the first turn, the angle of the
+            last turn, and the length of the straight segment.
         straight : bool
             False, to indicate that this path does not contain a straight part.
         """
@@ -381,7 +402,7 @@ class Dubins:
         """
         Given an initial position, and the direction of the turn, computes the
         center of the circle with turn radius self.radius passing by the intial
-        point
+        point.
 
         Parameters
         ----------
@@ -389,12 +410,12 @@ class Dubins:
             In the form (x, y, psi), with psi in radians.
             The representation of the inital point.
         side : Char
-            Either 'L' to indicate a left turn, or 'R' for a right turn
+            Either 'L' to indicate a left turn, or 'R' for a right turn.
 
         Returns
         -------
         coordinates : 2x1 Array Like
-            Coordinates of the circle describing the turn
+            Coordinates of the center of the circle describing the turn.
 
         """
         assert side in 'LR'

@@ -20,7 +20,7 @@ class Environment:
     Methods
     -------
     plot
-        Draws the environnement using matplotlib
+        Draws the environnement using matplotlib.
     is_free
         Returns False if a point is within an obstacle or outside of the
         boundaries of the environnement.
@@ -34,7 +34,7 @@ class Environment:
 
     def plot(self):
         """
-        Creates a figure and plots the environement
+        Creates a figure and plots the environement on it.
         """
         for obstacle in self.obstacles:
             obstacle.plot()
@@ -64,14 +64,14 @@ class Environment:
         could yield to a collision, the relation between the size of the
         obstacles and the considered radius for search must be verified:
             R_search > R_obs_Max
-        Whit R_obs_Max the maximum distance between the center of an obstacle
+        With R_obs_Max the maximum distance between the center of an obstacle
         and one of its vertices.
         """
         return self.kdtree.query((x, y), 1)
 
     def random_free_space(self):
         """
-        Returns a point in the free space randomly selected
+        Returns a randomly selected point in the free space.
         """
         x = np.random.rand()*self.dimensions[0]
         y = np.random.rand()*self.dimensions[1]
