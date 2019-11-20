@@ -1,4 +1,5 @@
 # RRT-Dubins
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/FelicienC/RRT-Dubins.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/FelicienC/RRT-Dubins/context:python)
 
 Simple implementation of a **Rapidly Exploring Random Tree** using **Dubins path** as an expansion method, in a 2D environment filled with polygonal obstacles.
 <p align="center">
