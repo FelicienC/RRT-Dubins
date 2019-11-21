@@ -1,5 +1,6 @@
 # RRT-Dubins
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/FelicienC/RRT-Dubins.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/FelicienC/RRT-Dubins/context:python)
+[![CodeFactor](https://www.codefactor.io/repository/github/felicienc/rrt-dubins/badge)](https://www.codefactor.io/repository/github/felicienc/rrt-dubins)
 [![Build Status](https://travis-ci.org/FelicienC/RRT-Dubins.svg?branch=master)](https://travis-ci.org/FelicienC/RRT-Dubins)
 [![Coverage Status](https://coveralls.io/repos/github/FelicienC/RRT-Dubins/badge.svg?branch=master)](https://coveralls.io/github/FelicienC/RRT-Dubins?branch=master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
