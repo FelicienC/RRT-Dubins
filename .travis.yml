@@ -23,9 +23,10 @@ install:
   - conda install matplotlib
   - conda install shapely
   - conda install coveralls
+  - conda install coverage
 
 script:
-  - python code/test.py coveralls -v --cov coveralls --cov-report
+  - coverage run code/test.py
 
 after_success:
   - coveralls
