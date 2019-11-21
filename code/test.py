@@ -1,9 +1,20 @@
 from dubins import Dubins
 from environment import Environment
+from rrt import RRT
 
 import unittest
 
 class TestSum(unittest.TestCase):
+
+    def test_rrt(self):
+        """
+	    Test that the RRT class works
+	    """
+        myEnv = Environment((100, 100), 200)
+        myRRT = RRT(myEnv)
+        start = myEnv.random_free_space()
+        end = myEnv.random_free_space()
+        myRRT.run(start, end, (5, 5, 1), 100)
     
     def test_dubins(self):
         """
