@@ -37,8 +37,8 @@ As we want to have the shortest path among the 6 potential candidates, we comput
 </p>
 We start by finding the centers of the turns at the start and end of the trajectory, describing the circles C1 and C2. This is direct as we know the direction and radius of these turns.
 
-The second step is to find the position of the two tangent points on these circles, where the straight segment starts and end.
-Because we have the same radius on both C1 and C2, the tangent to both circles is parallel to the line passing by both centers. By simply translating the vector defined by these center in the orthogonal direction from one radius, we obtain the straight segment. We can then use this vector to compute the two angles beta1 and beta2.
+The second step is to find the position of the two tangent points on these circles, where the straight segment starts and ends.
+Because we have the same radius on both C1 and C2, the tangent to both circles is parallel to the line passing by both centers. By simply translating the vector defined by these center in the orthogonal direction from one radius, we obtain the straight segment. We can then use this vector to compute the two angles beta0 and beta2.
 
 #### 2) Two turns in opposite directions separated by a straight segment
 <p align="center">
