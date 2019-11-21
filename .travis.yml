@@ -25,8 +25,7 @@ install:
   - conda install coveralls
 
 script:
-  - python --version
-  - ./runtests.sh
+  - python code/test.py
 
 after_success:
   - coveralls
