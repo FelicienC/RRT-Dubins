@@ -25,7 +25,7 @@ install:
   - conda install coveralls
 
 script:
-  - python code/test.py
+  - python code/test.py coveralls -v --cov coveralls --cov-report
 
 after_success:
   - coveralls
