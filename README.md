@@ -2,7 +2,7 @@
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/FelicienC/RRT-Dubins.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/FelicienC/RRT-Dubins/context:python)
 [![CodeFactor](https://www.codefactor.io/repository/github/felicienc/rrt-dubins/badge)](https://www.codefactor.io/repository/github/felicienc/rrt-dubins)
 [![Build Status](https://travis-ci.org/FelicienC/RRT-Dubins.svg?branch=master)](https://travis-ci.org/FelicienC/RRT-Dubins)
-[![Coverage Status](https://coveralls.io/repos/github/FelicienC/RRT-Dubins/badge.svg?branch=master)](https://coveralls.io/github/FelicienC/RRT-Dubins?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/FelicienC/RRT-Dubins/badge.svg?branch=master&service=github)](https://coveralls.io/github/FelicienC/RRT-Dubins?branch=master&service=github)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
@@ -38,8 +38,8 @@ As we want to have the shortest path among the 6 potential candidates, we comput
 </p>
 We start by finding the centers of the turns at the start and end of the trajectory, describing the circles C1 and C2. This is direct as we know the direction and radius of these turns.
 
-The second step is to find the position of the two tangent points on these circles, where the straight segment starts and end.
-Because we have the same radius on both C1 and C2, the tangent to both circles is parallel to the line passing by both centers. By simply translating the vector defined by these center in the orthogonal direction from one radius, we obtain the straight segment. We can then use this vector to compute the two angles beta1 and beta2.
+The second step is to find the position of the two tangent points on these circles, where the straight segment starts and ends.
+Because we have the same radius on both C1 and C2, the tangent to both circles is parallel to the line passing by both centers. By simply translating the vector defined by these center in the orthogonal direction from one radius, we obtain the straight segment. We can then use this vector to compute the two angles beta0 and beta2.
 
 #### 2) Two turns in opposite directions separated by a straight segment
 <p align="center">
