@@ -6,10 +6,10 @@
     
     <title>rrt &mdash; RRT-Dubins 0.0.1 documentation</title>
     
-    <link rel="stylesheet" type="text/css" href="../_static/css/spc-bootstrap.css">
-    <link rel="stylesheet" type="text/css" href="../_static/css/spc-extend.css">
-    <link rel="stylesheet" href="../_static/scipy.css" type="text/css" >
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" type="text/css" href="../static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/spc-extend.css">
+    <link rel="stylesheet" href="../static/scipy.css" type="text/css" >
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" >
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,10 +20,10 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/js/copybutton.js"></script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../static/js/copybutton.js"></script>
     <link rel="index" title="Index" href="../genindex.html" >
     <link rel="search" title="Search" href="../search.html" >
     <link rel="top" title="RRT-Dubins 0.0.1 documentation" href="../index.html" >
@@ -34,7 +34,7 @@
 <div class="container">
   <div class="top-scipy-org-logo-header">
     <a href="../index.html">
-      <img style="border: 0;" alt="Volocopter" src="../_static/img/logo.png"></a>
+      <img style="border: 0;" alt="Volocopter" src="../static/img/logo.png"></a>
     </div>
   </div>
 </div>
@@ -80,7 +80,11 @@
           <div class="body" id="spc-section-body">
             
   <h1>Source code for rrt</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Construction of the Rapidely Exploring Random Tree</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">deque</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">dubins</span> <span class="k">import</span> <span class="n">Dubins</span><span class="p">,</span> <span class="n">dist</span>
 
@@ -127,7 +131,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_from</span><span class="p">,</span> <span class="n">node_to</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">cost</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">node_from</span> <span class="o">=</span> <span class="n">node_from</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">node_to</span> <span class="o">=</span> <span class="n">node_to</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">=</span> <span class="n">cost</span></div>
 
 <div class="viewcode-block" id="RRT"><a class="viewcode-back" href="../RRT.html#rrt.RRT">[docs]</a><span class="k">class</span> <span class="nc">RRT</span><span class="p">:</span>
@@ -147,6 +151,18 @@
 <span class="sd">    goal_rate : float</span>
 <span class="sd">        The frequency at which the randomly selected node is choosen among</span>
 <span class="sd">        the goal zone.</span>
+<span class="sd">    precision : tuple</span>
+<span class="sd">            The precision needed to stop the algorithm. In the form</span>
+<span class="sd">            (delta_x, delta_y, delta_psi).</span>
+<span class="sd">    goal : tuple</span>
+<span class="sd">        The position of the goal (the center of the goal zone), in the form of</span>
+<span class="sd">        a tuple (x, y, psi).</span>
+<span class="sd">    root : tuple</span>
+<span class="sd">        The position of the root of the tree, (the initial position of the</span>
+<span class="sd">        vehicle), in the form of a tuple (x, y, psi).</span>
+<span class="sd">    local_planner : Planner</span>
+<span class="sd">        The planner used for the expansion of the tree, here it is a Dubins</span>
+<span class="sd">        path planner.</span>
 
 <span class="sd">    Methods</span>
 <span class="sd">    -------</span>
@@ -162,15 +178,14 @@
 <span class="sd">        from.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environment</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environment</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">)):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">edges</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">environment</span> <span class="o">=</span> <span class="n">environment</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">local_planner</span> <span class="o">=</span> <span class="n">Dubins</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_planner</span> <span class="o">=</span> <span class="n">Dubins</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">goal</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">precision</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">goal_rate</span> <span class="o">=</span> <span class="o">.</span><span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">precision</span> <span class="o">=</span> <span class="n">precision</span>
 
 <div class="viewcode-block" id="RRT.set_start"><a class="viewcode-back" href="../RRT.html#rrt.RRT.set_start">[docs]</a>    <span class="k">def</span> <span class="nf">set_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -180,14 +195,14 @@
 <span class="sd">        ----------</span>
 <span class="sd">        start: tuple</span>
 <span class="sd">            The initial position (x, y, psi), used as root.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">edges</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">start</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">start</span></div>
 
-<div class="viewcode-block" id="RRT.run"><a class="viewcode-back" href="../RRT.html#rrt.RRT.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">goal</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">nb_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;local&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="RRT.run"><a class="viewcode-back" href="../RRT.html#rrt.RRT.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">goal</span><span class="p">,</span> <span class="n">nb_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">goal_rate</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;local&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the algorithm with an empty graph, initialized with the start</span>
 <span class="sd">        position at least.</span>
@@ -196,12 +211,16 @@
 <span class="sd">        ----------</span>
 <span class="sd">        goal : tuple</span>
 <span class="sd">            The final requested position (x, y, psi).</span>
-<span class="sd">        precision : tuple</span>
-<span class="sd">            The precision needed to stop the algorithm. In the form</span>
-<span class="sd">            (delta_x, delta_y, delta_psi).</span>
 <span class="sd">        nb_iteration : int</span>
 <span class="sd">            The number of maximal iterations (not using the number of nodes as</span>
 <span class="sd">            potentialy the start is in a region of unavoidable collision).</span>
+<span class="sd">        goal_rate : float</span>
+<span class="sd">            The probability to expand towards the goal rather than towards a</span>
+<span class="sd">            randomly selected sample.</span>
+<span class="sd">        metric : string</span>
+<span class="sd">            One of &#39;local&#39; or &#39;euclidian&#39;.</span>
+<span class="sd">            The method used to select the closest node on the tree from which a</span>
+<span class="sd">            path will be grown towards a sample.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -210,19 +229,18 @@
 <span class="sd">        of &quot;closest&quot; can also be simpy the euclidian distance, which would make</span>
 <span class="sd">        the computation faster and the code a simpler, this is why several</span>
 <span class="sd">        metrics are available.</span>
-<span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">goal</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">precision</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">goal</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">goal</span> <span class="o">=</span> <span class="n">goal</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">precision</span> <span class="o">=</span> <span class="n">precision</span>
+
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_iteration</span><span class="p">):</span>
             <span class="c1"># Select sample : either the goal, or a sample of free space</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">goal_rate</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">goal_rate</span><span class="p">:</span>
                 <span class="n">sample</span> <span class="o">=</span> <span class="n">goal</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment</span><span class="o">.</span><span class="n">random_free_space</span><span class="p">()</span>
-            <span class="c1"># Find the closest Node in the tree, with the cost defined by the</span>
-            <span class="c1"># local planner (here we use the lenght of the path as cost)</span>
+            <span class="c1"># Find the closest Node in the tree, with the selected metric</span>
             <span class="n">options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_options</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">metric</span><span class="p">)</span>
 
             <span class="c1"># Now that all the options are sorted from the shortest to the</span>
@@ -235,27 +253,25 @@
                                                           <span class="n">sample</span><span class="p">,</span>
                                                           <span class="n">option</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                                                           <span class="n">option</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-                <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment</span><span class="o">.</span><span class="n">is_free</span><span class="p">(</span><span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">point</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment</span><span class="o">.</span><span class="n">is_free</span><span class="p">(</span><span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                    <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="o">+</span><span class="n">i</span><span class="p">):</span>
                         <span class="k">break</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="c1"># Adding the node</span>
                     <span class="c1"># To compute the time, we use a constant speed of 1 m/s</span>
-                    <span class="n">sample_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">option</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="c1"># We use the distance as the cost, to keep it simple</span>
-                    <span class="n">sample_cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">cost</span> <span class="o">+</span> <span class="n">option</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="c1"># As the cost, we use the distance</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">sample</span><span class="p">]</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span>
-                                              <span class="n">sample_time</span><span class="p">,</span>
-                                              <span class="n">sample_cost</span><span class="p">)</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="o">+</span><span class="n">option</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">cost</span><span class="o">+</span><span class="n">option</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">destination_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
                     <span class="c1"># Adding the Edge</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">node</span><span class="p">,</span> <span class="n">sample</span><span class="p">]</span> <span class="o">=</span> \
                         <span class="n">Edge</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">option</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_goal_region</span><span class="p">(</span><span class="n">sample</span><span class="p">):</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">sample</span><span class="p">]</span><span class="o">.</span><span class="n">cost</span><span class="p">)</span>
                         <span class="k">return</span>
-                    <span class="k">break</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Failure&#39;</span><span class="p">)</span></div>
+                    <span class="k">break</span></div>
 
 <div class="viewcode-block" id="RRT.select_options"><a class="viewcode-back" href="../RRT.html#rrt.RRT.select_options">[docs]</a>    <span class="k">def</span> <span class="nf">select_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">nb_options</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;local&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -278,6 +294,7 @@
 <span class="sd">        options : list</span>
 <span class="sd">            Sorted list of the options, by increasing cost.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="n">metric</span> <span class="o">==</span> <span class="s1">&#39;local&#39;</span><span class="p">:</span>
             <span class="c1"># The local planner is used to measure the real distance needed</span>
             <span class="n">options</span> <span class="o">=</span> <span class="p">[]</span>
@@ -307,26 +324,91 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        sample : tuple</span>
-<span class="sd">            (x, y, psi) the position of the point which needs to be tested</span>
-
+<span class="sd">            (x, y, psi) the position of the point which needs to be tested.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sample</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">goal</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
                 <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="RRT.plot_tree"><a class="viewcode-back" href="../RRT.html#rrt.RRT.plot_tree">[docs]</a>    <span class="k">def</span> <span class="nf">plot_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RRT.plot"><a class="viewcode-back" href="../RRT.html#rrt.RRT.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nodes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Displays the tree using matplotlib</span>
+<span class="sd">        Displays the tree using matplotlib, on a currently open figure.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file_name : string</span>
+<span class="sd">            The name of the file used to save an image of the tree.</span>
+<span class="sd">        close : bool</span>
+<span class="sd">            If the plot needs to be automaticaly closed after the drawing.</span>
+<span class="sd">        nodes : bool</span>
+<span class="sd">            If the nodes need to be displayed as well.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">nodes</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
             <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">nodes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">nodes</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">goal</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">goal</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">path</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">val</span><span class="o">.</span><span class="n">path</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span></div></div>
+            <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">path</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">path</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">file_name</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">close</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RRT.select_best_edge"><a class="viewcode-back" href="../RRT.html#rrt.RRT.select_best_edge">[docs]</a>    <span class="k">def</span> <span class="nf">select_best_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Selects the best edge of the tree among the ones leaving from the root.</span>
+<span class="sd">        Uses the number of children to determine the best option.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        edge :Edge</span>
+<span class="sd">            The best edge.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">node</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([(</span><span class="n">child</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">children_count</span><span class="p">(</span><span class="n">child</span><span class="p">))</span>\
+                    <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">]</span><span class="o">.</span><span class="n">destination_list</span><span class="p">],</span>
+                   <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">best_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">node</span><span class="p">)]</span>
+        <span class="c1"># we update the tree to remove all the other siblings of the old root</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">]</span><span class="o">.</span><span class="n">destination_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">child</span> <span class="o">==</span> <span class="n">node</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">pop</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">child</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delete_all_children</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">node</span>
+        <span class="k">return</span> <span class="n">best_edge</span></div>
+
+<div class="viewcode-block" id="RRT.delete_all_children"><a class="viewcode-back" href="../RRT.html#rrt.RRT.delete_all_children">[docs]</a>    <span class="k">def</span> <span class="nf">delete_all_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes all the nodes of the tree below the requested node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">destination_list</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">destination_list</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">pop</span><span class="p">((</span><span class="n">node</span><span class="p">,</span> <span class="n">child</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">delete_all_children</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">node</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RRT.children_count"><a class="viewcode-back" href="../RRT.html#rrt.RRT.children_count">[docs]</a>    <span class="k">def</span> <span class="nf">children_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Not optimal at all as it recounts a lot of the tree every time a path</span>
+<span class="sd">        needs to b selected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">destination_list</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">destination_list</span><span class="p">:</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">children_count</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">total</span></div></div>
+            
 </pre></div>
 
           </div>
@@ -335,7 +417,7 @@
       <div class="spc-rightsidebar span3">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="../index.html">
-              <img class="logo" src="../_static/scipyshiny_small.png" alt="Logo">
+              <img class="logo" src="../static/scipyshiny_small.png" alt="Logo">
             </a></p>
 
         </div>

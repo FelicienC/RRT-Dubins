@@ -79,9 +79,10 @@
             
   <div class="section" id="module-rrt">
 <span id="rapidly-exploring-random-tree"></span><h1>Rapidly Exploring Random Tree<a class="headerlink" href="#module-rrt" title="Permalink to this headline">¶</a></h1>
+<p>Construction of the Rapidely Exploring Random Tree</p>
 <dl class="class">
 <dt id="rrt.Edge">
-<em class="property">class </em><code class="descclassname">rrt.</code><code class="descname">Edge</code><span class="sig-paren">(</span><em>node_from</em>, <em>node_to</em>, <em>path</em>, <em>cost</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rrt.html#Edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.Edge" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">rrt.</code><code class="descname">Edge</code><span class="sig-paren">(</span><em>node_from</em>, <em>node_to</em>, <em>path</em>, <em>cost</em><span class="sig-paren">)</span><a class="reference internal" href="modules/rrt.html#Edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.Edge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Edge of the rapidly exploring random tree.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -110,7 +111,7 @@ path between the nodes.</p>
 
 <dl class="class">
 <dt id="rrt.Node">
-<em class="property">class </em><code class="descclassname">rrt.</code><code class="descname">Node</code><span class="sig-paren">(</span><em>position</em>, <em>time</em>, <em>cost</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rrt.html#Node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.Node" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">rrt.</code><code class="descname">Node</code><span class="sig-paren">(</span><em>position</em>, <em>time</em>, <em>cost</em><span class="sig-paren">)</span><a class="reference internal" href="modules/rrt.html#Node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.Node" title="Permalink to this definition">¶</a></dt>
 <dd><p>Node of the rapidly exploring random tree.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -138,7 +139,7 @@ path between the nodes.</p>
 
 <dl class="class">
 <dt id="rrt.RRT">
-<em class="property">class </em><code class="descclassname">rrt.</code><code class="descname">RRT</code><span class="sig-paren">(</span><em>environment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rrt.html#RRT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">rrt.</code><code class="descname">RRT</code><span class="sig-paren">(</span><em>environment</em>, <em>precision=(5</em>, <em>5</em>, <em>1)</em><span class="sig-paren">)</span><a class="reference internal" href="modules/rrt.html#RRT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class implementing a Rapidely Exploring Random Tree in two dimensions using
 dubins paths as an expansion method. The state space considered here is
 straightforward, as every state can be represented by a simple tuple made
@@ -159,6 +160,22 @@ simply the reached state, i.e. tuples of the form (x, y, psi).</p>
 <dd><p class="first last">The frequency at which the randomly selected node is choosen among
 the goal zone.</p>
 </dd>
+<dt><strong>precision</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">The precision needed to stop the algorithm. In the form
+(delta_x, delta_y, delta_psi).</p>
+</dd>
+<dt><strong>goal</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">The position of the goal (the center of the goal zone), in the form of
+a tuple (x, y, psi).</p>
+</dd>
+<dt><strong>root</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">The position of the root of the tree, (the initial position of the
+vehicle), in the form of a tuple (x, y, psi).</p>
+</dd>
+<dt><strong>local_planner</strong> <span class="classifier-delimiter">:</span> <span class="classifier">Planner</span></dt>
+<dd><p class="first last">The planner used for the expansion of the tree, here it is a Dubins
+path planner.</p>
+</dd>
 </dl>
 </td>
 </tr>
@@ -174,20 +191,41 @@ the goal zone.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#rrt.RRT.in_goal_region" title="rrt.RRT.in_goal_region"><code class="xref py py-obj docutils literal notranslate"><span class="pre">in_goal_region</span></code></a>(sample)</td>
 <td>Method to determine if a point is within a goal region or not.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#rrt.RRT.run" title="rrt.RRT.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>(goal,&nbsp;precision[,&nbsp;nb_iteration,&nbsp;metric])</td>
+<tr class="row-even"><td><a class="reference internal" href="#rrt.RRT.run" title="rrt.RRT.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>(goal[,&nbsp;nb_iteration,&nbsp;goal_rate,&nbsp;metric])</td>
 <td>Executes the algorithm with an empty graph, initialized with the start position at least.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#rrt.RRT.plot_tree" title="rrt.RRT.plot_tree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_tree</span></code></a>()</td>
-<td>Displays the tree using matplotlib</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#rrt.RRT.select_options" title="rrt.RRT.select_options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_options</span></code></a>(sample,&nbsp;nb_options[,&nbsp;metric])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#rrt.RRT.select_options" title="rrt.RRT.select_options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_options</span></code></a>(sample,&nbsp;nb_options[,&nbsp;metric])</td>
 <td>Chooses the best nodes for the expansion of the tree, and returns them in a list ordered by increasing cost.</td>
 </tr>
 </tbody>
 </table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="28%" />
+<col width="72%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>plot_tree</strong></td>
+<td>Displays the RRT using matplotlib.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="rrt.RRT.children_count">
+<code class="descname">children_count</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="modules/rrt.html#RRT.children_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.children_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not optimal at all as it recounts a lot of the tree every time a path
+needs to b selected.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rrt.RRT.delete_all_children">
+<code class="descname">delete_all_children</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="modules/rrt.html#RRT.delete_all_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.delete_all_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes all the nodes of the tree below the requested node.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="rrt.RRT.in_goal_region">
-<code class="descname">in_goal_region</code><span class="sig-paren">(</span><em>sample</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rrt.html#RRT.in_goal_region"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.in_goal_region" title="Permalink to this definition">¶</a></dt>
+<code class="descname">in_goal_region</code><span class="sig-paren">(</span><em>sample</em><span class="sig-paren">)</span><a class="reference internal" href="modules/rrt.html#RRT.in_goal_region"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.in_goal_region" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to determine if a point is within a goal region or not.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -195,7 +233,7 @@ the goal zone.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
 <dt><strong>sample</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
-<dd><p class="first last">(x, y, psi) the position of the point which needs to be tested</p>
+<dd><p class="first last">(x, y, psi) the position of the point which needs to be tested.</p>
 </dd>
 </dl>
 </td>
@@ -205,14 +243,33 @@ the goal zone.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="rrt.RRT.plot_tree">
-<code class="descname">plot_tree</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rrt.html#RRT.plot_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.plot_tree" title="Permalink to this definition">¶</a></dt>
-<dd><p>Displays the tree using matplotlib</p>
+<dt id="rrt.RRT.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>file_name=''</em>, <em>close=False</em>, <em>nodes=False</em><span class="sig-paren">)</span><a class="reference internal" href="modules/rrt.html#RRT.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Displays the tree using matplotlib, on a currently open figure.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>file_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">The name of the file used to save an image of the tree.</p>
+</dd>
+<dt><strong>close</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">If the plot needs to be automaticaly closed after the drawing.</p>
+</dd>
+<dt><strong>nodes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">If the nodes need to be displayed as well.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="rrt.RRT.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>goal</em>, <em>precision</em>, <em>nb_iteration=100</em>, <em>metric='local'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rrt.html#RRT.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.run" title="Permalink to this definition">¶</a></dt>
+<code class="descname">run</code><span class="sig-paren">(</span><em>goal</em>, <em>nb_iteration=100</em>, <em>goal_rate=0.1</em>, <em>metric='local'</em><span class="sig-paren">)</span><a class="reference internal" href="modules/rrt.html#RRT.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executes the algorithm with an empty graph, initialized with the start
 position at least.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -223,13 +280,18 @@ position at least.</p>
 <dt><strong>goal</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
 <dd><p class="first last">The final requested position (x, y, psi).</p>
 </dd>
-<dt><strong>precision</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
-<dd><p class="first last">The precision needed to stop the algorithm. In the form
-(delta_x, delta_y, delta_psi).</p>
-</dd>
 <dt><strong>nb_iteration</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
 <dd><p class="first last">The number of maximal iterations (not using the number of nodes as
 potentialy the start is in a region of unavoidable collision).</p>
+</dd>
+<dt><strong>goal_rate</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The probability to expand towards the goal rather than towards a
+randomly selected sample.</p>
+</dd>
+<dt><strong>metric</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">One of ‘local’ or ‘euclidian’.
+The method used to select the closest node on the tree from which a
+path will be grown towards a sample.</p>
 </dd>
 </dl>
 </td>
@@ -245,8 +307,28 @@ metrics are available.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="rrt.RRT.select_best_edge">
+<code class="descname">select_best_edge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="modules/rrt.html#RRT.select_best_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.select_best_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Selects the best edge of the tree among the ones leaving from the root.
+Uses the number of children to determine the best option.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>edge :Edge</strong></dt>
+<dd><p class="first last">The best edge.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="rrt.RRT.select_options">
-<code class="descname">select_options</code><span class="sig-paren">(</span><em>sample</em>, <em>nb_options</em>, <em>metric='local'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rrt.html#RRT.select_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.select_options" title="Permalink to this definition">¶</a></dt>
+<code class="descname">select_options</code><span class="sig-paren">(</span><em>sample</em>, <em>nb_options</em>, <em>metric='local'</em><span class="sig-paren">)</span><a class="reference internal" href="modules/rrt.html#RRT.select_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.select_options" title="Permalink to this definition">¶</a></dt>
 <dd><p>Chooses the best nodes for the expansion of the tree, and returns
 them in a list ordered by increasing cost.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -281,7 +363,7 @@ but is also less precise and can’t be used with an RRT star.</p>
 
 <dl class="method">
 <dt id="rrt.RRT.set_start">
-<code class="descname">set_start</code><span class="sig-paren">(</span><em>start</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rrt.html#RRT.set_start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.set_start" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_start</code><span class="sig-paren">(</span><em>start</em><span class="sig-paren">)</span><a class="reference internal" href="modules/rrt.html#RRT.set_start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rrt.RRT.set_start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Resets the graph, and sets the start node as root of the tree.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -313,7 +395,7 @@ but is also less precise and can’t be used with an RRT star.</p>
             </a></p>
   <h3>This Page</h3>
   <div>
-    <a href="_sources/RRT.rst.txt"
+    <a href="sources/RRT.rst.txt"
        rel="nofollow">Show Source</a>
   </div>
 <div class="this-page-menu">

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    
+    <title>rrt &mdash; RRT-Dubins 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/spc-extend.css">
+    <link rel="stylesheet" href="../static/scipy.css" type="text/css" >
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" >
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../static/js/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" >
+    <link rel="search" title="Search" href="../search.html" >
+    <link rel="top" title="RRT-Dubins 0.0.1 documentation" href="../index.html" >
+    <link rel="up" title="Module code" href="index.html" > 
+  </head>
+  <body>
+
+<div class="container">
+  <div class="top-scipy-org-logo-header">
+    <a href="../index.html">
+      <img style="border: 0;" alt="Volocopter" src="../static/img/logo.png"></a>
+    </div>
+  </div>
+</div>
+
+
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+        <li class="active"><a href="https://github.com/FelicienC/RRT-Dubins">Github</a></li>
+        <li class="active"><a href="https://felicienc.github.io/RRT-Dubins/">Docs</a></li>
+	
+        <li class="active"><a href="../index.html">RRT-Dubins 0.0.1 documentation</a></li>
+	
+          <li class="active"><a href="index.html" accesskey="U">Module code</a></li> 
+    </ul>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="../genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="../py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
+
+	<div class="row-fluid">
+          <div class="span9">
+            
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body">
+            
+  <h1>Source code for rrt</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Construction of the Rapidely Exploring Random Tree</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">deque</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">dubins</span> <span class="k">import</span> <span class="n">Dubins</span><span class="p">,</span> <span class="n">dist</span>
+
+<div class="viewcode-block" id="Node"><a class="viewcode-back" href="../RRT.html#rrt.Node">[docs]</a><span class="k">class</span> <span class="nc">Node</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Node of the rapidly exploring random tree.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    destination_list : list</span>
+<span class="sd">        The reachable nodes from the current one.</span>
+<span class="sd">    position : tuple</span>
+<span class="sd">        The position of the node.</span>
+<span class="sd">    time : float</span>
+<span class="sd">        The instant at which this node is reached.</span>
+<span class="sd">    cost : float</span>
+<span class="sd">        The cost needed to reach this node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">cost</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">destination_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">position</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">=</span> <span class="n">cost</span></div>
+
+<div class="viewcode-block" id="Edge"><a class="viewcode-back" href="../RRT.html#rrt.Edge">[docs]</a><span class="k">class</span> <span class="nc">Edge</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Edge of the rapidly exploring random tree.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    node_from : tuple</span>
+<span class="sd">        Id of the starting node of the edge.</span>
+<span class="sd">    node_to : tuple</span>
+<span class="sd">        Id of the end node of the edge.</span>
+<span class="sd">    path : list</span>
+<span class="sd">        The successive positions yielded by the local planner representing the</span>
+<span class="sd">        path between the nodes.</span>
+<span class="sd">    cost : float</span>
+<span class="sd">        Cost associated to the transition between the two nodes.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_from</span><span class="p">,</span> <span class="n">node_to</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">cost</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_from</span> <span class="o">=</span> <span class="n">node_from</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_to</span> <span class="o">=</span> <span class="n">node_to</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">=</span> <span class="n">cost</span></div>
+
+<div class="viewcode-block" id="RRT"><a class="viewcode-back" href="../RRT.html#rrt.RRT">[docs]</a><span class="k">class</span> <span class="nc">RRT</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class implementing a Rapidely Exploring Random Tree in two dimensions using</span>
+<span class="sd">    dubins paths as an expansion method. The state space considered here is</span>
+<span class="sd">    straightforward, as every state can be represented by a simple tuple made</span>
+<span class="sd">    of three continuous variables: (x, y, psi)</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nodes : dict</span>
+<span class="sd">        Dictionnary containing all the nodes of the tree. The keys are hence</span>
+<span class="sd">        simply the reached state, i.e. tuples of the form (x, y, psi).</span>
+<span class="sd">    environment : Environment</span>
+<span class="sd">        Instance of the Environment class.</span>
+<span class="sd">    goal_rate : float</span>
+<span class="sd">        The frequency at which the randomly selected node is choosen among</span>
+<span class="sd">        the goal zone.</span>
+<span class="sd">    precision : tuple</span>
+<span class="sd">            The precision needed to stop the algorithm. In the form</span>
+<span class="sd">            (delta_x, delta_y, delta_psi).</span>
+<span class="sd">    goal : tuple</span>
+<span class="sd">        The position of the goal (the center of the goal zone), in the form of</span>
+<span class="sd">        a tuple (x, y, psi).</span>
+<span class="sd">    root : tuple</span>
+<span class="sd">        The position of the root of the tree, (the initial position of the</span>
+<span class="sd">        vehicle), in the form of a tuple (x, y, psi).</span>
+<span class="sd">    local_planner : Planner</span>
+<span class="sd">        The planner used for the expansion of the tree, here it is a Dubins</span>
+<span class="sd">        path planner.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    in_goal_region</span>
+<span class="sd">        Method helping to determine if a point is within a goal region or not.</span>
+<span class="sd">    run</span>
+<span class="sd">        Executes the algorithm with an empty graph, which needs to be</span>
+<span class="sd">        initialized with the start position at least before.</span>
+<span class="sd">    plot_tree</span>
+<span class="sd">        Displays the RRT using matplotlib.</span>
+<span class="sd">    select_options</span>
+<span class="sd">        Explores the existing nodes of the tree to find the best option to grow</span>
+<span class="sd">        from.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environment</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">)):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edges</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">environment</span> <span class="o">=</span> <span class="n">environment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_planner</span> <span class="o">=</span> <span class="n">Dubins</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">goal</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">precision</span> <span class="o">=</span> <span class="n">precision</span>
+
+<div class="viewcode-block" id="RRT.set_start"><a class="viewcode-back" href="../RRT.html#rrt.RRT.set_start">[docs]</a>    <span class="k">def</span> <span class="nf">set_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets the graph, and sets the start node as root of the tree.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        start: tuple</span>
+<span class="sd">            The initial position (x, y, psi), used as root.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edges</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">start</span></div>
+
+<div class="viewcode-block" id="RRT.run"><a class="viewcode-back" href="../RRT.html#rrt.RRT.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">goal</span><span class="p">,</span> <span class="n">nb_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">goal_rate</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;local&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the algorithm with an empty graph, initialized with the start</span>
+<span class="sd">        position at least.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        goal : tuple</span>
+<span class="sd">            The final requested position (x, y, psi).</span>
+<span class="sd">        nb_iteration : int</span>
+<span class="sd">            The number of maximal iterations (not using the number of nodes as</span>
+<span class="sd">            potentialy the start is in a region of unavoidable collision).</span>
+<span class="sd">        goal_rate : float</span>
+<span class="sd">            The probability to expand towards the goal rather than towards a</span>
+<span class="sd">            randomly selected sample.</span>
+<span class="sd">        metric : string</span>
+<span class="sd">            One of &#39;local&#39; or &#39;euclidian&#39;.</span>
+<span class="sd">            The method used to select the closest node on the tree from which a</span>
+<span class="sd">            path will be grown towards a sample.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        It is not necessary to use several nodes to try and connect a sample to</span>
+<span class="sd">        the existing graph; The closest node only could be choosen. The notion</span>
+<span class="sd">        of &quot;closest&quot; can also be simpy the euclidian distance, which would make</span>
+<span class="sd">        the computation faster and the code a simpler, this is why several</span>
+<span class="sd">        metrics are available.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">goal</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">goal</span> <span class="o">=</span> <span class="n">goal</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_iteration</span><span class="p">):</span>
+            <span class="c1"># Select sample : either the goal, or a sample of free space</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">goal_rate</span><span class="p">:</span>
+                <span class="n">sample</span> <span class="o">=</span> <span class="n">goal</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment</span><span class="o">.</span><span class="n">random_free_space</span><span class="p">()</span>
+            <span class="c1"># Find the closest Node in the tree, with the selected metric</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_options</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">metric</span><span class="p">)</span>
+
+            <span class="c1"># Now that all the options are sorted from the shortest to the</span>
+            <span class="c1"># longest, we can try to connect one node after the other. We stop</span>
+            <span class="c1"># after 20 in order to reduce the number of computations.</span>
+            <span class="k">for</span> <span class="n">node</span><span class="p">,</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">option</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">):</span>
+                    <span class="k">break</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_planner</span><span class="o">.</span><span class="n">generate_points</span><span class="p">(</span><span class="n">node</span><span class="p">,</span>
+                                                          <span class="n">sample</span><span class="p">,</span>
+                                                          <span class="n">option</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                                          <span class="n">option</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">point</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment</span><span class="o">.</span><span class="n">is_free</span><span class="p">(</span><span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                    <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="o">+</span><span class="n">i</span><span class="p">):</span>
+                        <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Adding the node</span>
+                    <span class="c1"># To compute the time, we use a constant speed of 1 m/s</span>
+                    <span class="c1"># As the cost, we use the distance</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">sample</span><span class="p">]</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="o">+</span><span class="n">option</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">cost</span><span class="o">+</span><span class="n">option</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">destination_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+                    <span class="c1"># Adding the Edge</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">node</span><span class="p">,</span> <span class="n">sample</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="n">Edge</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">option</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_goal_region</span><span class="p">(</span><span class="n">sample</span><span class="p">):</span>
+                        <span class="k">return</span>
+                    <span class="k">break</span></div>
+
+<div class="viewcode-block" id="RRT.select_options"><a class="viewcode-back" href="../RRT.html#rrt.RRT.select_options">[docs]</a>    <span class="k">def</span> <span class="nf">select_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">nb_options</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;local&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Chooses the best nodes for the expansion of the tree, and returns</span>
+<span class="sd">        them in a list ordered by increasing cost.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sample : tuple</span>
+<span class="sd">            The (x, y, psi) coordinates of the node we wish to connect to the</span>
+<span class="sd">            tree.</span>
+<span class="sd">        nb_options : int</span>
+<span class="sd">            The number of options requested.</span>
+<span class="sd">        metric : str</span>
+<span class="sd">            One of &#39;local&#39;, &#39;euclidian&#39;. The euclidian metric is a lot faster</span>
+<span class="sd">            but is also less precise and can&#39;t be used with an RRT star.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        options : list</span>
+<span class="sd">            Sorted list of the options, by increasing cost.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">metric</span> <span class="o">==</span> <span class="s1">&#39;local&#39;</span><span class="p">:</span>
+            <span class="c1"># The local planner is used to measure the real distance needed</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+                <span class="n">options</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                    <span class="p">[(</span><span class="n">node</span><span class="p">,</span> <span class="n">opt</span><span class="p">)</span>\
+                     <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_planner</span><span class="o">.</span><span class="n">all_options</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">sample</span><span class="p">)])</span>
+            <span class="c1"># sorted by cost</span>
+            <span class="n">options</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="n">options</span><span class="p">[:</span><span class="n">nb_options</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Euclidian distance as a metric</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="p">[(</span><span class="n">node</span><span class="p">,</span> <span class="n">dist</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">sample</span><span class="p">))</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">]</span>
+            <span class="n">options</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="n">options</span><span class="p">[:</span><span class="n">nb_options</span><span class="p">]</span>
+            <span class="n">new_opt</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">node</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                <span class="n">db_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_planner</span><span class="o">.</span><span class="n">all_options</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>
+                <span class="n">new_opt</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">db_options</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="n">new_opt</span>
+        <span class="k">return</span> <span class="n">options</span></div>
+
+<div class="viewcode-block" id="RRT.in_goal_region"><a class="viewcode-back" href="../RRT.html#rrt.RRT.in_goal_region">[docs]</a>    <span class="k">def</span> <span class="nf">in_goal_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to determine if a point is within a goal region or not.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sample : tuple</span>
+<span class="sd">            (x, y, psi) the position of the point which needs to be tested.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sample</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">goal</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="RRT.plot"><a class="viewcode-back" href="../RRT.html#rrt.RRT.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nodes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays the tree using matplotlib, on a currently open figure.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file_name : string</span>
+<span class="sd">            The name of the file used to save an image of the tree.</span>
+<span class="sd">        close : bool</span>
+<span class="sd">            If the plot needs to be automaticaly closed after the drawing.</span>
+<span class="sd">        nodes : bool</span>
+<span class="sd">            If the nodes need to be displayed as well.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">nodes</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">nodes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">nodes</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">goal</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">goal</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">path</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">path</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">file_name</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">close</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RRT.select_best_edge"><a class="viewcode-back" href="../RRT.html#rrt.RRT.select_best_edge">[docs]</a>    <span class="k">def</span> <span class="nf">select_best_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Selects the best edge of the tree among the ones leaving from the root.</span>
+<span class="sd">        Uses the number of children to determine the best option.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        edge :Edge</span>
+<span class="sd">            The best edge.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">node</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([(</span><span class="n">child</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">children_count</span><span class="p">(</span><span class="n">child</span><span class="p">))</span>\
+                    <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">]</span><span class="o">.</span><span class="n">destination_list</span><span class="p">],</span>
+                   <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">best_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">node</span><span class="p">)]</span>
+        <span class="c1"># we update the tree to remove all the other siblings of the old root</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">]</span><span class="o">.</span><span class="n">destination_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">child</span> <span class="o">==</span> <span class="n">node</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">pop</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">child</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delete_all_children</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">node</span>
+        <span class="k">return</span> <span class="n">best_edge</span></div>
+
+<div class="viewcode-block" id="RRT.delete_all_children"><a class="viewcode-back" href="../RRT.html#rrt.RRT.delete_all_children">[docs]</a>    <span class="k">def</span> <span class="nf">delete_all_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes all the nodes of the tree below the requested node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">destination_list</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">destination_list</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">pop</span><span class="p">((</span><span class="n">node</span><span class="p">,</span> <span class="n">child</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">delete_all_children</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">node</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RRT.children_count"><a class="viewcode-back" href="../RRT.html#rrt.RRT.children_count">[docs]</a>    <span class="k">def</span> <span class="nf">children_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Not optimal at all as it recounts a lot of the tree every time a path</span>
+<span class="sd">        needs to b selected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">destination_list</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">destination_list</span><span class="p">:</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">children_count</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">total</span></div></div>
+            
+</pre></div>
+
+          </div>
+        </div>
+          </div>
+      <div class="spc-rightsidebar span3">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../static/scipyshiny_small.png" alt="Logo">
+            </a></p>
+
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
+    </div>
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2019, Félicien Cantalloube.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.7.4.
+      </li>
+    </ul>
+    </div>
+    </div>
+    </div>
+  </body>
+</html>

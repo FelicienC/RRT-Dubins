@@ -9,6 +9,7 @@
 Simple implementation of a **Rapidly Exploring Random Tree** using **Dubins path** as an expansion method, in a 2D environment filled with polygonal obstacles. Check the documentation [here](https://felicienc.github.io/RRT-Dubins/index.html).
 <p align="center">
   <img src="docs/img/example.gif">
+  <img src="docs/img/moving.gif">
 </p>
 
 ## Requirements
@@ -94,6 +95,8 @@ With uniform sampling of the search space, the probability of expanding an exist
 The rapidly exploring random tree is implemented in the RRT class.
 In order to use it, the environment needs to be defined first. Here the obstacles are stored in a binary search tree in order to increase the speed of the colision checking. 
 
+#### Static Obstacles
+
 ```python
 from environment import Environment
 from rrt import RRT
@@ -122,6 +125,53 @@ myRRT.set_start(start)
 myRRT.run(end, precision=(5, 5, 1), nb_iteration=100)
 myRRT.plot_tree()
 ```
+
+#### Dynamic Obstacles
+
+```python
+from dynamic_environment import DynamicEnvironment
+
+env = DynamicEnvironment((100, 100), 5, moving=False)
+rrt = RRT(env)
+        
+```
+
+```python
+start = (50, 1, 1.57)
+end = (50, 99, 1.57)
+
+# Initialisation of the tree, to have a first edge
+rrt.set_start(start)
+rrt.run(end, 200, metric='local')
+
+# Initialisation of the position of the vehicle
+position = start[:2]
+current_edge = rrt.select_best_edge()
+
+# We let it run for a few steps
+time = 0
+for i in range(500):
+    time += 1
+    # We check if we are on an edge or if we have to choose a new edge
+    if not current_edge.path:
+        time = rrt.nodes[current_edge.node_to].time
+        current_edge = rrt.select_best_edge()
+    # Update the position of the vehicle
+    position = current_edge.path.popleft()
+    # Update the environment
+    #   The frontiers of the sampling and the obstacles
+    env.update(position)
+    #   The position of the goal
+    end = (50, position[1]+90, 1.57)
+    # Continue the growth of the tree
+    rrt.run(end, 2, metric='local')
+    env.plot(time)
+    rrt.plot(file_name='moving'+str(i)+'.png', close=True)
+```
+
+<p align="center">
+  <img src="docs/img/dyn_RRT.gif">
+</p>
 
 ### Performance
 
