@@ -2,14 +2,13 @@
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/FelicienC/RRT-Dubins.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/FelicienC/RRT-Dubins/context:python)
 [![CodeFactor](https://www.codefactor.io/repository/github/felicienc/rrt-dubins/badge)](https://www.codefactor.io/repository/github/felicienc/rrt-dubins)
 [![Build Status](https://travis-ci.org/FelicienC/RRT-Dubins.svg?branch=master)](https://travis-ci.org/FelicienC/RRT-Dubins)
-[![Coverage Status](https://coveralls.io/repos/github/FelicienC/RRT-Dubins/badge.svg?branch=master&service=github)](https://coveralls.io/github/FelicienC/RRT-Dubins?branch=master&service=github)
+[![Coverage Status](https://coveralls.io/repos/github/FelicienC/RRT-Dubins/badge.svg?branch=master)](https://coveralls.io/github/FelicienC/RRT-Dubins?branch=master&service=github)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
 Simple implementation of a **Rapidly Exploring Random Tree** using **Dubins path** as an expansion method, in a 2D environment filled with polygonal obstacles. Check the documentation [here](https://felicienc.github.io/RRT-Dubins/index.html).
 <p align="center">
-  <img src="docs/img/example.gif">
-  <img src="docs/img/moving.gif">
+  <img src="docs/img/example.gif", width=400><img src="docs/img/moving.gif", width=400>
 </p>
 
 ## Requirements
@@ -122,7 +121,7 @@ end = env.random_free_space()
 myRRT.set_start(start)
 
 # We run 100 iterations of growth
-myRRT.run(end, precision=(5, 5, 1), nb_iteration=100)
+myRRT.run(end, nb_iteration=100)
 myRRT.plot_tree()
 ```
 
@@ -163,19 +162,18 @@ for i in range(500):
     env.update(position)
     #   The position of the goal
     end = (50, position[1]+90, 1.57)
-    # Continue the growth of the tree
+    # Continue the growth of the tree, we try to add only 2 nodes
     rrt.run(end, 2, metric='local')
-    env.plot(time)
+    # Ploting and generating an image (the most time consuming step)
+    env.plot(time, display=False)
     rrt.plot(file_name='moving'+str(i)+'.png', close=True)
 ```
+
+Here is the result obtained by concatenating all the produced images into one gif file.
 
 <p align="center">
   <img src="docs/img/dyn_RRT.gif">
 </p>
-
-### Performance
-
-In the current implementation, the default metric used to search for the closest node on the tree uses the local planner in order to measure the real distance needed to link the sample to all the nodes in the tree. To increase the computation speed, it is also possible to use instead the euclidian distance. 
 
 ## References
 
