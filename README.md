@@ -92,57 +92,70 @@ With uniform sampling of the search space, the probability of expanding an exist
 ### Usage
 
 The rapidly exploring random tree is implemented in the RRT class.
-In order to use it, the environment needs to be defined first. Here the obstacles are stored in a binary search tree in order to increase the speed of the colision checking. 
+In order to use it, the environment needs to be defined first. To start, two types of environments can be used.
 
-#### Static Obstacles
+#### Static Environment
 
+In the static environment, the obstacles are polygonal, and are stored in a binary search tree in order to increase the speed of the colision check.
+The following code initializes an Environment:
 ```python
-from environment import Environment
+from environment import StaticEnvironment
 from rrt import RRT
 
 # We create an environment of 100x100 meters, with 100 obstacles
-env = Environment((100, 100), 100)
-
+env = StaticEnvironment((100, 100), 100)
 env.plot()
 ```
 <p align="center">
-  <img src="docs/img/environment.png">
+  <img src="docs/img/without_nodes.png">
 </p>
 
 ```python
 # We initialize the tree with the environment
-myRRT = RRT(env)
+rrt = RRT(env)
 
 # We select two random points in the free space as a start and final node
 start = env.random_free_space()
 end = env.random_free_space()
 
 # We initialize an empty tree
-myRRT.set_start(start)
+rrt.set_start(start)
 
 # We run 100 iterations of growth
-myRRT.run(end, nb_iteration=100)
-myRRT.plot_tree()
-```
+rrt.run(end, nb_iteration=100)
 
-#### Dynamic Obstacles
+env.plot()
+rrt.plot(nodes=True)
+```
+<p align="center">
+  <img src="docs/img/with_nodes.png">
+</p>
+
+#### Dynamic Environment
 
 ```python
 from dynamic_environment import DynamicEnvironment
+from rrt import RRT
 
 env = DynamicEnvironment((100, 100), 5, moving=False)
-rrt = RRT(env)
-        
+
 ```
 
 ```python
-start = (50, 1, 1.57)
-end = (50, 99, 1.57)
+# We initialize the tree with the environment
+rrt = RRT(env)
+
+start = (50, 1, 1.57) # At the bottom of the environment
+end = (50, 99, 1.57) # At the top of the environment
 
 # Initialisation of the tree, to have a first edge
 rrt.set_start(start)
 rrt.run(end, 200, metric='local')
 
+```
+
+However, to display several frames at different timestamps, a small loop is required, as follows:
+```python
 # Initialisation of the position of the vehicle
 position = start[:2]
 current_edge = rrt.select_best_edge()

@@ -50,7 +50,7 @@ class DynamicEnvironment:
                                        thickness=5, moving=moving))
         self.center = [dimensions[0]/2, dimensions[1]/2]
 
-    def plot(self, time=0, close=False):
+    def plot(self, time=0, close=False, display=True):
         """
         Creates a figure and plots the environement on it.
 
@@ -60,8 +60,10 @@ class DynamicEnvironment:
             The instant at which the environment must be drawn.
         close : bool
             If the plot needs to be automaticaly closed after the drawing.
+        display : bool
+            If the view pops up or not (used when generating many images)
         """
-
+        plt.ion() if display else plt.ioff()
         plt.figure()
         for obstacle in self.obstacles:
             obstacle.plot(time)

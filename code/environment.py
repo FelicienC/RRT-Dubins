@@ -38,16 +38,19 @@ class StaticEnvironment:
                           for _ in range(nb_obstacles)]
         self.kdtree = KDTree([obs.center for obs in self.obstacles])
 
-    def plot(self, close=False):
+    def plot(self, close=False, display=True):
         """
         Creates a figure and plots the environement on it.
 
         Parameters
         ----------
         close : bool
-            If the plot needs to be automaticaly closed after the drawing.
+            If the plot needs to be automatically closed after the drawing.
+        display : bool
+            If the view pops up or not (used when generating many images)
         """
-
+        
+        plt.ion() if display else plt.ioff()
         for obstacle in self.obstacles:
             obstacle.plot()
         plt.gca().set_xlim(0, self.dimensions[0])
