@@ -122,27 +122,5 @@ class TestSum(unittest.TestCase):
             rrt.plot(file_name='moving'+str(i)+'.png', close=True)
         print('Dynamic RRT with moving obstacles OK')
 
-#if __name__ == '__main__':
-#    unittest.main()
-
-from environment import StaticEnvironment
-from rrt import RRT
-
-# We create an environment of 100x100 meters, with 100 obstacles
-env = StaticEnvironment((100, 100), 100)
-
-# We initialize the tree with the environment
-myRRT = RRT(env)
-
-# We select two random points in the free space as a start and final node
-start = env.random_free_space()
-end = env.random_free_space()
-
-# We initialize an empty tree
-myRRT.set_start(start)
-
-# We run 100 iterations of growth
-myRRT.run(end, nb_iteration=100)
-
-env.plot()
-myRRT.plot(nodes=True)
+if __name__ == '__main__':
+    unittest.main()
