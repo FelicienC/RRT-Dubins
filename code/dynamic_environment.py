@@ -1,5 +1,5 @@
 """
-The environement where the obstacles can moving
+The environement where the obstacles can move
 """
 from collections import deque
 import numpy as np
