@@ -131,7 +131,7 @@ class Dubins:
                 - the angle of the turn in the first circle, in rads.
                 - the angle of the turn in the last circle, in rads.
                 - the angle of the turn in the central circle, in rads, or the
-                length of the central segment if straight is true.
+                  length of the central segment if straight is true.
         straight: bool
             True if their is a central segment in the dubins path.
 

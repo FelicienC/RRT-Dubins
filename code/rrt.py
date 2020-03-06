@@ -163,7 +163,7 @@ class RRT:
 
             # Now that all the options are sorted from the shortest to the
             # longest, we can try to connect one node after the other. We stop
-            # after 20 in order to reduce the number of computations.
+            # after 10 in order to limit computations.
             for node, option in options:
                 if option[0] == float('inf'):
                     break

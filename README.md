@@ -28,29 +28,6 @@ As we want to have the shortest path among the 6 potential candidates, we comput
   1. **LSL** and **RSR** : Two turns in the same direction separated by a straight segment
   2. **LSR** and **RSL** : Two turns in opposite directions separated by a straight segment
   3. **RLR** and **LRL** : Three turns
-  
-*In order to furthermore simplify the following steps, we consider here that all the turns in one trajectory are done using the same turn radius*
-  
-#### 1) Two turns in the same direction separated by a straight segment
-<p align="center">
-  <img src="docs/img/twoturnssame.svg">
-</p>
-We start by finding the centers of the turns at the start and end of the trajectory, describing the circles C1 and C2. This is direct as we know the direction and radius of these turns.
-
-The second step is to find the position of the two tangent points on these circles, where the straight segment starts and ends.
-Because we have the same radius on both C1 and C2, the tangent to both circles is parallel to the line passing by both centers. By simply translating the vector defined by these center in the orthogonal direction from one radius, we obtain the straight segment. We can then use this vector to compute the two angles beta0 and beta2.
-
-#### 2) Two turns in opposite directions separated by a straight segment
-<p align="center">
-  <img src="docs/img/twoturnsopposite.svg">
-</p>
-This case is a litle more complex than the previous one, but starts in a similar way, by finding the centers of the turns at the start and end of the trajectory, C1 and C2. We however then need to introduce the rectangle triangle ABX in order to compute the lenght of the straight segment. Calculating the angles beta0 and beta2 is then straightforward. 
-
-#### 3) Three turns
-<p align="center">
-  <img src="docs/img/threeturns.svg">
-</p>
-This situation is only possible when the centers of the two circles C1 and C2 are separated by less than 4 radii. If it is the case, the trajectory is completly described by 3 angles, beta0, beta1 and beta2. 
 
 ### Usage 
 
@@ -96,7 +73,7 @@ In order to use it, the environment needs to be defined first. To start, two typ
 
 #### Static Environment
 
-In the static environment, the obstacles are polygonal, and are stored in a binary search tree in order to increase the speed of the colision check.
+In the static environment, the obstacles are polygonal and are stored in a binary search tree in order to increase the speed of the colision check.
 The following code initializes an Environment:
 ```python
 from environment import StaticEnvironment
@@ -132,6 +109,7 @@ rrt.plot(nodes=True)
 </p>
 
 #### Dynamic Environment
+In the dynamic environement, two options are available: the obstacles can either move or stay static. In both cases, the tree is pruned of the unreachable nodes once they are passed.
 
 ```python
 from dynamic_environment import DynamicEnvironment
@@ -181,7 +159,7 @@ for i in range(500):
     env.plot(time, display=False)
     rrt.plot(file_name='moving'+str(i)+'.png', close=True)
 ```
-
+This code executes relatively slowly due to the time needed to plot every single frame with matplotlib.
 Here is the result obtained by concatenating all the produced images into one gif file.
 
 <p align="center">
