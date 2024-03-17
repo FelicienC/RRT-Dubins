@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    
+    <title>Environment &mdash; RRT-Dubins 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="static/css/spc-extend.css">
+    <link rel="stylesheet" href="static/scipy.css" type="text/css" >
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" >
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="static/js/copybutton.js"></script>
+    <link rel="index" title="Index" href="genindex.html" >
+    <link rel="search" title="Search" href="search.html" >
+    <link rel="top" title="RRT-Dubins 0.0.1 documentation" href="index.html" > 
+  </head>
+  <body>
+
+<div class="container">
+  <div class="top-scipy-org-logo-header">
+    <a href="index.html">
+      <img style="border: 0;" alt="Volocopter" src="static/img/logo.png"></a>
+    </div>
+  </div>
+</div>
+
+
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+        <li class="active"><a href="https://github.com/FelicienC/RRT-Dubins">Github</a></li>
+        <li class="active"><a href="https://felicienc.github.io/RRT-Dubins/">Docs</a></li>
+	
+        <li class="active"><a href="index.html">RRT-Dubins 0.0.1 documentation</a></li>
+	 
+    </ul>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
+
+	<div class="row-fluid">
+          <div class="span9">
+            
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body">
+            
+  <div class="section" id="environment">
+<h1>Environment<a class="headerlink" href="#environment" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="static-environment">
+<h2>Static Environment<a class="headerlink" href="#static-environment" title="Permalink to this headline">¶</a></h2>
+<img alt="img/environment.png" src="img/environment.png" />
+<span class="target" id="module-environment"></span><p>The environment with static polygonal obstacles</p>
+<dl class="class">
+<dt id="environment.StaticEnvironment">
+<em class="property">class </em><code class="descclassname">environment.</code><code class="descname">StaticEnvironment</code><span class="sig-paren">(</span><em>dimensions</em>, <em>nb_obstacles</em><span class="sig-paren">)</span><a class="reference internal" href="modules/environment.html#StaticEnvironment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#environment.StaticEnvironment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class implementing a very simple bounded 2D world, containing polygonal
+obstacles stored in an appropriate data structure for rapid access to close
+obstacles, even with a large amount of them.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dimensions</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(dim_x, dim_y) The x and y dimension of the rectangular world.</p>
+</dd>
+<dt><strong>obstacles</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd><p class="first last">List of obstacles, instances of the obstacle class.</p>
+</dd>
+<dt><strong>kdtree</strong> <span class="classifier-delimiter">:</span> <span class="classifier">KDTree</span></dt>
+<dd><p class="first last">The binary search tree used to have a rapid access to the obstacles,
+even with a large amount of them.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#environment.StaticEnvironment.plot" title="environment.StaticEnvironment.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([close])</td>
+<td>Creates a figure and plots the environement on it.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#environment.StaticEnvironment.is_free" title="environment.StaticEnvironment.is_free"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_free</span></code></a>(x,&nbsp;y[,&nbsp;time])</td>
+<td>Returns False if a point is within an obstacle or outside of the boundaries of the environnement.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="environment.StaticEnvironment.close_obstacles">
+<code class="descname">close_obstacles</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>nb_obstacles=1</em><span class="sig-paren">)</span><a class="reference internal" href="modules/environment.html#StaticEnvironment.close_obstacles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#environment.StaticEnvironment.close_obstacles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the list of all the obstacles close enough to be considered.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>x</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The x coordinate of the point requested</p>
+</dd>
+<dt><strong>y</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The y coordinate of the point requested</p>
+</dd>
+<dt><strong>nb_obstacles</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">The number of obstacles to return, has to be less than the total
+number of obstacles of the environment.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="environment.StaticEnvironment.is_free">
+<code class="descname">is_free</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>time=0</em><span class="sig-paren">)</span><a class="reference internal" href="modules/environment.html#StaticEnvironment.is_free"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#environment.StaticEnvironment.is_free" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns False if a point is within an obstacle or outside of the
+boundaries of the environnement.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="environment.StaticEnvironment.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>close=False</em><span class="sig-paren">)</span><a class="reference internal" href="modules/environment.html#StaticEnvironment.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#environment.StaticEnvironment.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a figure and plots the environement on it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>close</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">If the plot needs to be automaticaly closed after the drawing.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="environment.StaticEnvironment.random_free_space">
+<code class="descname">random_free_space</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="modules/environment.html#StaticEnvironment.random_free_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#environment.StaticEnvironment.random_free_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a randomly selected point in the free space.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="dynamic-environment">
+<h2>Dynamic Environment<a class="headerlink" href="#dynamic-environment" title="Permalink to this headline">¶</a></h2>
+<img alt="img/moving.gif" src="img/moving.gif" />
+<span class="target" id="module-dynamic_environment"></span><p>The environement where the obstacles can moving</p>
+<dl class="class">
+<dt id="dynamic_environment.DynamicEnvironment">
+<em class="property">class </em><code class="descclassname">dynamic_environment.</code><code class="descname">DynamicEnvironment</code><span class="sig-paren">(</span><em>dimensions</em>, <em>nb_walls</em>, <em>moving=False</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dynamic_environment.html#DynamicEnvironment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dynamic_environment.DynamicEnvironment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class implementing a simple dynamic bounded 2D world, containing square
+obstacles placed in an ordered manner in order to always permit passage
+from the bottom to the top of the space.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dimensions</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(dim_x, dim_y) The x and y dimension of the rectangular world.</p>
+</dd>
+<dt><strong>obstacles</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd><p class="first last">List of walls, instances of the Wall class.</p>
+</dd>
+<dt><strong>moving</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">If the position of the holes in the walls is variying over time.</p>
+</dd>
+<dt><strong>center</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd><p class="first last">The coordinates of the center of the current scene.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#dynamic_environment.DynamicEnvironment.plot" title="dynamic_environment.DynamicEnvironment.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([time,&nbsp;close])</td>
+<td>Creates a figure and plots the environement on it.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dynamic_environment.DynamicEnvironment.is_free" title="dynamic_environment.DynamicEnvironment.is_free"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_free</span></code></a>(x,&nbsp;y[,&nbsp;time])</td>
+<td>Returns False if a point is within an obstacle or outside of the boundaries of the environnement.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dynamic_environment.DynamicEnvironment.random_free_space" title="dynamic_environment.DynamicEnvironment.random_free_space"><code class="xref py py-obj docutils literal notranslate"><span class="pre">random_free_space</span></code></a>()</td>
+<td>Returns a randomly selected point in the free space.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dynamic_environment.DynamicEnvironment.update" title="dynamic_environment.DynamicEnvironment.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(position)</td>
+<td>Refreshs the active walls as well as the position of the camera.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="dynamic_environment.DynamicEnvironment.is_free">
+<code class="descname">is_free</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>time=0</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dynamic_environment.html#DynamicEnvironment.is_free"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dynamic_environment.DynamicEnvironment.is_free" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns False if a point is within an obstacle or outside of the
+boundaries of the environnement.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dynamic_environment.DynamicEnvironment.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>time=0</em>, <em>close=False</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dynamic_environment.html#DynamicEnvironment.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dynamic_environment.DynamicEnvironment.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a figure and plots the environement on it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>time</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The instant at which the environment must be drawn.</p>
+</dd>
+<dt><strong>close</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">If the plot needs to be automaticaly closed after the drawing.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dynamic_environment.DynamicEnvironment.random_free_space">
+<code class="descname">random_free_space</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="modules/dynamic_environment.html#DynamicEnvironment.random_free_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dynamic_environment.DynamicEnvironment.random_free_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a randomly selected point in the free space.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dynamic_environment.DynamicEnvironment.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>position</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dynamic_environment.html#DynamicEnvironment.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dynamic_environment.DynamicEnvironment.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Refreshs the active walls as well as the position of the camera.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>position</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The position of the vehicle in the environment.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+          </div>
+      <div class="spc-rightsidebar span3">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="static/scipyshiny_small.png" alt="Logo">
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Environment</a><ul>
+<li><a class="reference internal" href="#static-environment">Static Environment</a></li>
+<li><a class="reference internal" href="#dynamic-environment">Dynamic Environment</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <div>
+    <a href="sources/Environment.rst.txt"
+       rel="nofollow">Show Source</a>
+  </div>
+<div class="this-page-menu">
+  <a href="/scipy/docs/scipy-docs/Environment.rst.rst">Edit page</a>
+</div>
+
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
+    </div>
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2019, Félicien Cantalloube.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.7.4.
+      </li>
+    </ul>
+    </div>
+    </div>
+    </div>
+  </body>
+</html>

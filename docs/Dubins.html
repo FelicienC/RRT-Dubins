@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    
+    <title>Dubins &mdash; RRT-Dubins 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="static/css/spc-extend.css">
+    <link rel="stylesheet" href="static/scipy.css" type="text/css" >
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" >
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="static/js/copybutton.js"></script>
+    <link rel="index" title="Index" href="genindex.html" >
+    <link rel="search" title="Search" href="search.html" >
+    <link rel="top" title="RRT-Dubins 0.0.1 documentation" href="index.html" >
+    <link rel="prev" title="RRT-Dubins’ documentation" href="index.html" > 
+  </head>
+  <body>
+
+<div class="container">
+  <div class="top-scipy-org-logo-header">
+    <a href="index.html">
+      <img style="border: 0;" alt="Volocopter" src="static/img/logo.png"></a>
+    </div>
+  </div>
+</div>
+
+
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+        <li class="active"><a href="https://github.com/FelicienC/RRT-Dubins">Github</a></li>
+        <li class="active"><a href="https://felicienc.github.io/RRT-Dubins/">Docs</a></li>
+	
+        <li class="active"><a href="index.html">RRT-Dubins 0.0.1 documentation</a></li>
+	 
+    </ul>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+      <li class="active">
+        <a href="index.html" title="RRT-Dubins’ documentation"
+           accesskey="P">previous</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
+
+	<div class="row-fluid">
+          <div class="span9">
+            
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body">
+            
+  <div class="section" id="dubins">
+<h1>Dubins<a class="headerlink" href="#dubins" title="Permalink to this headline">¶</a></h1>
+<img alt="img/twoturnssame.svg" src="img/twoturnssame.svg" /><span class="target" id="module-dubins"></span><dl class="class">
+<dt id="dubins.Dubins">
+<em class="property">class </em><code class="descclassname">dubins.</code><code class="descname">Dubins</code><span class="sig-paren">(</span><em>radius</em>, <em>point_separation</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dubins.html#Dubins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dubins.Dubins" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class implementing a Dubins path planner with a constant turn radius.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>radius</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The radius of the turn used in all the potential trajectories.</p>
+</dd>
+<dt><strong>point_separation</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The distance between points of the trajectories. More points increases
+the precision of the path but also augments the computation time of the
+colision check.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#dubins.Dubins.dubins_path" title="dubins.Dubins.dubins_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dubins_path</span></code></a>(start,&nbsp;end)</td>
+<td>Computes all the possible Dubin’s path and returns the sequence of points representing the shortest option.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dubins.Dubins.generate_points_straight" title="dubins.Dubins.generate_points_straight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_points_straight</span></code></a>(start,&nbsp;end,&nbsp;path)</td>
+<td>For the 4 first classes of dubins paths, containing in the middle a straight section.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dubins.Dubins.generate_points_curve" title="dubins.Dubins.generate_points_curve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_points_curve</span></code></a>(start,&nbsp;end,&nbsp;path)</td>
+<td>For the two last paths, where the trajectory is a succession of 3 turns.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dubins.Dubins.find_center" title="dubins.Dubins.find_center"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_center</span></code></a>(point,&nbsp;side)</td>
+<td>Given an initial position, and the direction of the turn, computes the center of the circle with turn radius self.radius passing by the intial point.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dubins.Dubins.lsl" title="dubins.Dubins.lsl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lsl</span></code></a>(start,&nbsp;end,&nbsp;center_0,&nbsp;center_2)</td>
+<td>Left-Straight-Left trajectories.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dubins.Dubins.rsr" title="dubins.Dubins.rsr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rsr</span></code></a>(start,&nbsp;end,&nbsp;center_0,&nbsp;center_2)</td>
+<td>Right-Straight-Right trajectories.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dubins.Dubins.rsl" title="dubins.Dubins.rsl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rsl</span></code></a>(start,&nbsp;end,&nbsp;center_0,&nbsp;center_2)</td>
+<td>Right-Straight-Left trajectories.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dubins.Dubins.lsr" title="dubins.Dubins.lsr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lsr</span></code></a>(start,&nbsp;end,&nbsp;center_0,&nbsp;center_2)</td>
+<td>Left-Straight-Right trajectories.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dubins.Dubins.lrl" title="dubins.Dubins.lrl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lrl</span></code></a>(start,&nbsp;end,&nbsp;center_0,&nbsp;center_2)</td>
+<td>Left-right-Left trajectories.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dubins.Dubins.rlr" title="dubins.Dubins.rlr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rlr</span></code></a>(start,&nbsp;end,&nbsp;center_0,&nbsp;center_2)</td>
+<td>Right-left-right trajectories.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="dubins.Dubins.all_options">
+<code class="descname">all_options</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>sort=False</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dubins.html#Dubins.all_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dubins.Dubins.all_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes all the possible Dubin’s path and returns them, in the form
+of a list of tuples representing each option: (path_length,
+dubins_path, straight).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>start</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">In the form (x, y, psi), with psi in radians.
+The representation of the inital point.</p>
+</dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">In the form (x, y, psi), with psi in radians.
+The representation of the final point.</p>
+</dd>
+<dt><strong>sort</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">If the list of option has to be sorted by decreasing cost or not.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>The shortest list of points (x, y) linking the initial and final points</strong></dt>
+<dd></dd>
+<dt><strong>given as input with only turns of a defined radius and straight line.</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dubins.Dubins.circle_arc">
+<code class="descname">circle_arc</code><span class="sig-paren">(</span><em>reference</em>, <em>beta</em>, <em>center</em>, <em>x</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dubins.html#Dubins.circle_arc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dubins.Dubins.circle_arc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the point located on the circle of center center and radius
+defined by the class, at the angle x.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>reference</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">Angular starting point, in radians.</p>
+</dd>
+<dt><strong>beta</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">Used actually only to know the direction of the rotation, and hence
+to know if the path needs to be added or substracted from the
+reference angle.</p>
+</dd>
+<dt><strong>center</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y) coordinates of the center of the circle from which we need a
+point on the circumference.</p>
+</dd>
+<dt><strong>x</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The lenght of the path on the circle.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>The coordinates of the point on the circle, in the form of a tuple.</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dubins.Dubins.dubins_path">
+<code class="descname">dubins_path</code><span class="sig-paren">(</span><em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dubins.html#Dubins.dubins_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dubins.Dubins.dubins_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes all the possible Dubin’s path and returns the sequence of
+points representing the shortest option.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>start</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">In the form (x, y, psi), with psi in radians.
+The representation of the inital point.</p>
+</dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">In the form (x, y, psi), with psi in radians.
+The representation of the final point.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>The shortest list of points (x, y) linking the initial and final points</strong></dt>
+<dd></dd>
+<dt><strong>given as input with only turns of a defined radius and straight line.</strong></dt>
+<dd></dd>
+<dt><strong>In the form of a (2xn) numpy array.</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dubins.Dubins.find_center">
+<code class="descname">find_center</code><span class="sig-paren">(</span><em>point</em>, <em>side</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dubins.html#Dubins.find_center"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dubins.Dubins.find_center" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an initial position, and the direction of the turn, computes the
+center of the circle with turn radius self.radius passing by the intial
+point.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>point</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">In the form (x, y, psi), with psi in radians.
+The representation of the inital point.</p>
+</dd>
+<dt><strong>side</strong> <span class="classifier-delimiter">:</span> <span class="classifier">Char</span></dt>
+<dd><p class="first last">Either ‘L’ to indicate a left turn, or ‘R’ for a right turn.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>coordinates</strong> <span class="classifier-delimiter">:</span> <span class="classifier">2x1 Array Like</span></dt>
+<dd><p class="first last">Coordinates of the center of the circle describing the turn.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dubins.Dubins.generate_points">
+<code class="descname">generate_points</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>dubins_path</em>, <em>straight</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dubins.html#Dubins.generate_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dubins.Dubins.generate_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms the dubins path in a succession of points in the 2D plane.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>start: tuple</strong></dt>
+<dd><p class="first last">In the form (x, y, psi), with psi in radians.
+The representation of the inital point.</p>
+</dd>
+<dt><strong>end: tuple</strong></dt>
+<dd><p class="first last">In the form (x, y, psi), with psi in radians.
+The representation of the final point.</p>
+</dd>
+<dt><strong>dubins_path: tuple</strong></dt>
+<dd><p class="first">The representation of the dubins path in the form of a tuple
+containing:</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li>the angle of the turn in the first circle, in rads.</li>
+<li>the angle of the turn in the last circle, in rads.</li>
+<li>the angle of the turn in the central circle, in rads, or the</li>
+</ul>
+<p>length of the central segment if straight is true.</p>
+</div></blockquote>
+</dd>
+<dt><strong>straight: bool</strong></dt>
+<dd><p class="first last">True if their is a central segment in the dubins path.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>The shortest list of points (x, y) linking the initial and final points</strong></dt>
+<dd></dd>
+<dt><strong>given as input with only turns of a defined radius and straight line.</strong></dt>
+<dd></dd>
+<dt><strong>In the form of a (2xn) numpy array.</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dubins.Dubins.generate_points_curve">
+<code class="descname">generate_points_curve</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>path</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dubins.html#Dubins.generate_points_curve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dubins.Dubins.generate_points_curve" title="Permalink to this definition">¶</a></dt>
+<dd><p>For the two last paths, where the trajectory is a succession of 3
+turns. First computing the position of the center of the central turn,
+then using the three circles to apply the angles given in the path
+argument.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>start</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">Start position in the form (x, y, psi).</p>
+</dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">End position in the form (x, y, psi).</p>
+</dd>
+<dt><strong>path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><dl class="first docutils">
+<dt>The computed dubins path, a tuple containing:</dt>
+<dd><ul class="first last simple">
+<li>the angle of the turn in the first circle, in rads</li>
+<li>the angle of the turn in the last circle, in rads</li>
+<li>the angle of the turn in the central circle, in rads</li>
+</ul>
+</dd>
+</dl>
+<p class="last">A negative angle means a right turn (antitrigonometric), and a
+positive angle represents a left turn.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>The shortest list of points (x, y) linking the initial and final points</strong></dt>
+<dd></dd>
+<dt><strong>given as input with only turns of a defined radius. In the form of a</strong></dt>
+<dd></dd>
+<dt><strong>(2xn) numpy array.</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dubins.Dubins.generate_points_straight">
+<code class="descname">generate_points_straight</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>path</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dubins.html#Dubins.generate_points_straight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dubins.Dubins.generate_points_straight" title="Permalink to this definition">¶</a></dt>
+<dd><p>For the 4 first classes of dubins paths, containing in the middle a
+straight section.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>start</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">Start position in the form (x, y, psi).</p>
+</dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">End position in the form (x, y, psi).</p>
+</dd>
+<dt><strong>path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><dl class="first docutils">
+<dt>The computed dubins path, a tuple containing:</dt>
+<dd><ul class="first last simple">
+<li>the angle of the turn in the first circle, in rads</li>
+<li>the angle of the turn in the last circle, in rads</li>
+<li>the length of the straight line in between</li>
+</ul>
+</dd>
+</dl>
+<p class="last">A negative angle means a right turn (antitrigonometric), and a
+positive angle represents a left turn.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>The shortest list of points (x, y) linking the initial and final points</strong></dt>
+<dd></dd>
+<dt><strong>given as input with only turns of a defined radius and straight line.</strong></dt>
+<dd></dd>
+<dt><strong>In the form of a (2xn) numpy array.</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dubins.Dubins.lrl">
+<code class="descname">lrl</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>center_0</em>, <em>center_2</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dubins.html#Dubins.lrl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dubins.Dubins.lrl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Left-right-Left trajectories.
+Using the isocele triangle made by the centers of the three circles,
+computes the required angles.</p>
+<img alt="img/threeturns.svg" src="img/threeturns.svg" /><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>start</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y, psi) coordinates of the inital point.</p>
+</dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y, psi) coordinates of the final point.</p>
+</dd>
+<dt><strong>center_0</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y) coordinates of the center of the first turn.</p>
+</dd>
+<dt><strong>center_2</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y) coordinates of the center of the last turn.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>total_len</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The total distance of this path.</p>
+</dd>
+<dt><strong>(beta_0, beta_2, straight_dist)</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">The dubins path, i.e. the angle of the first turn, the angle of the
+last turn, and the length of the straight segment.</p>
+</dd>
+<dt><strong>straight</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">False, to indicate that this path does not contain a straight part.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dubins.Dubins.lsl">
+<code class="descname">lsl</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>center_0</em>, <em>center_2</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dubins.html#Dubins.lsl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dubins.Dubins.lsl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Left-Straight-Left trajectories.
+First computes the poisition of the centers of the turns, and then uses
+the fact that the vector defined by the distance between the centers
+gives the direction and distance of the straight segment.</p>
+<img alt="img/twoturnssame.svg" src="img/twoturnssame.svg" /><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>start</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y, psi) coordinates of the inital point.</p>
+</dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y, psi) coordinates of the final point.</p>
+</dd>
+<dt><strong>center_0</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y) coordinates of the center of the first turn.</p>
+</dd>
+<dt><strong>center_2</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y) coordinates of the center of the last turn.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>total_len</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The total distance of this path.</p>
+</dd>
+<dt><strong>(beta_0, beta_2, straight_dist)</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">The dubins path, i.e. the angle of the first turn, the angle of the
+last turn, and the length of the straight segment.</p>
+</dd>
+<dt><strong>straight</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">True, to indicate that this path contains a straight segment.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dubins.Dubins.lsr">
+<code class="descname">lsr</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>center_0</em>, <em>center_2</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dubins.html#Dubins.lsr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dubins.Dubins.lsr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Left-Straight-Right trajectories.
+Because of the change in turn direction, it is a little more complex to
+compute than in the RSR or LSL cases. First computes the poisition of
+the centers of the turns, and then uses the rectangle triangle defined
+by the point between the two circles, the center point of one circle
+and the tangeancy point of this circle to compute the straight segment
+distance.</p>
+<img alt="img/twoturnsopposite.svg" src="img/twoturnsopposite.svg" /><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>start</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y, psi) coordinates of the inital point.</p>
+</dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y, psi) coordinates of the final point.</p>
+</dd>
+<dt><strong>center_0</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y) coordinates of the center of the first turn.</p>
+</dd>
+<dt><strong>center_2</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y) coordinates of the center of the last turn.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>total_len</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The total distance of this path.</p>
+</dd>
+<dt><strong>(beta_0, beta_2, straight_dist)</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">The dubins path, i.e. the angle of the first turn, the angle of the
+last turn, and the length of the straight segment.</p>
+</dd>
+<dt><strong>straight</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">True, to indicate that this path contains a straight segment.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dubins.Dubins.rlr">
+<code class="descname">rlr</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>center_0</em>, <em>center_2</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dubins.html#Dubins.rlr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dubins.Dubins.rlr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Right-left-right trajectories.
+Using the isocele triangle made by the centers of the three circles,
+computes the required angles.</p>
+<img alt="img/threeturns.svg" src="img/threeturns.svg" /><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>start</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y, psi) coordinates of the inital point.</p>
+</dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y, psi) coordinates of the final point.</p>
+</dd>
+<dt><strong>center_0</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y) coordinates of the center of the first turn.</p>
+</dd>
+<dt><strong>center_2</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y) coordinates of the center of the last turn.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>total_len</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The total distance of this path.</p>
+</dd>
+<dt><strong>(beta_0, beta_2, straight_dist)</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">The dubins path, i.e. the angle of the first turn, the angle of the
+last turn, and the length of the straight segment.</p>
+</dd>
+<dt><strong>straight</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">False, to indicate that this path does not contain a straight part.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dubins.Dubins.rsl">
+<code class="descname">rsl</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>center_0</em>, <em>center_2</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dubins.html#Dubins.rsl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dubins.Dubins.rsl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Right-Straight-Left trajectories.
+Because of the change in turn direction, it is a little more complex to
+compute than in the RSR or LSL cases. First computes the position of
+the centers of the turns, and then uses the rectangle triangle defined
+by the point between the two circles, the center point of one circle
+and the tangeancy point of this circle to compute the straight segment
+distance.</p>
+<img alt="img/twoturnsopposite.svg" src="img/twoturnsopposite.svg" /><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>start</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y, psi) coordinates of the inital point.</p>
+</dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y, psi) coordinates of the final point.</p>
+</dd>
+<dt><strong>center_0</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y) coordinates of the center of the first turn.</p>
+</dd>
+<dt><strong>center_2</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y) coordinates of the center of the last turn.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>total_len</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The total distance of this path.</p>
+</dd>
+<dt><strong>(beta_0, beta_2, straight_dist)</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">The dubins path, i.e. the angle of the first turn, the angle of the
+last turn, and the length of the straight segment.</p>
+</dd>
+<dt><strong>straight</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">True, to indicate that this path contains a straight segment.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dubins.Dubins.rsr">
+<code class="descname">rsr</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>center_0</em>, <em>center_2</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dubins.html#Dubins.rsr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dubins.Dubins.rsr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Right-Straight-Right trajectories.
+First computes the poisition of the centers of the turns, and then uses
+the fact that the vector defined by the distance between the centers
+gives the direction and distance of the straight segment.</p>
+<img alt="img/twoturnssame.svg" src="img/twoturnssame.svg" /><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>start</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y, psi) coordinates of the inital point.</p>
+</dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y, psi) coordinates of the final point.</p>
+</dd>
+<dt><strong>center_0</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y) coordinates of the center of the first turn.</p>
+</dd>
+<dt><strong>center_2</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">(x, y) coordinates of the center of the last turn.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>total_len</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The total distance of this path.</p>
+</dd>
+<dt><strong>(beta_0, beta_2, straight_dist)</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">The dubins path, i.e. the angle of the first turn, the angle of the
+last turn, and the length of the straight segment.</p>
+</dd>
+<dt><strong>straight</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">True, to indicate that this path contains a straight segment.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="dubins.dist">
+<code class="descclassname">dubins.</code><code class="descname">dist</code><span class="sig-paren">(</span><em>pt_a</em>, <em>pt_b</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dubins.html#dist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dubins.dist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Euclidian distance between two (x, y) points</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dubins.ortho">
+<code class="descclassname">dubins.</code><code class="descname">ortho</code><span class="sig-paren">(</span><em>vect2d</em><span class="sig-paren">)</span><a class="reference internal" href="modules/dubins.html#ortho"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dubins.ortho" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes an orthogonal vector to the one given</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+          </div>
+      <div class="spc-rightsidebar span3">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="static/scipyshiny_small.png" alt="Logo">
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">RRT-Dubins’ documentation</a></p>
+  <h3>This Page</h3>
+  <div>
+    <a href="sources/Dubins.rst.txt"
+       rel="nofollow">Show Source</a>
+  </div>
+<div class="this-page-menu">
+  <a href="/scipy/docs/scipy-docs/Dubins.rst.rst">Edit page</a>
+</div>
+
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
+    </div>
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2019, Félicien Cantalloube.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.7.4.
+      </li>
+    </ul>
+    </div>
+    </div>
+    </div>
+  </body>
+</html>

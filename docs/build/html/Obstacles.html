@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    
+    <title>Obstacles &mdash; RRT-Dubins 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="static/css/spc-extend.css">
+    <link rel="stylesheet" href="static/scipy.css" type="text/css" >
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" >
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="static/js/copybutton.js"></script>
+    <link rel="index" title="Index" href="genindex.html" >
+    <link rel="search" title="Search" href="search.html" >
+    <link rel="top" title="RRT-Dubins 0.0.1 documentation" href="index.html" > 
+  </head>
+  <body>
+
+<div class="container">
+  <div class="top-scipy-org-logo-header">
+    <a href="index.html">
+      <img style="border: 0;" alt="Volocopter" src="static/img/logo.png"></a>
+    </div>
+  </div>
+</div>
+
+
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+        <li class="active"><a href="https://github.com/FelicienC/RRT-Dubins">Github</a></li>
+        <li class="active"><a href="https://felicienc.github.io/RRT-Dubins/">Docs</a></li>
+	
+        <li class="active"><a href="index.html">RRT-Dubins 0.0.1 documentation</a></li>
+	 
+    </ul>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
+
+	<div class="row-fluid">
+          <div class="span9">
+            
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body">
+            
+  <div class="section" id="module-obstacle">
+<span id="obstacles"></span><h1>Obstacles<a class="headerlink" href="#module-obstacle" title="Permalink to this headline">¶</a></h1>
+<p>Implementation of the polygonal obstacles as well as of the walls</p>
+<dl class="class">
+<dt id="obstacle.Obstacle">
+<em class="property">class </em><code class="descclassname">obstacle.</code><code class="descname">Obstacle</code><span class="sig-paren">(</span><em>map_dimensions</em>, <em>size</em>, <em>nb_pts</em><span class="sig-paren">)</span><a class="reference internal" href="modules/obstacle.html#Obstacle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#obstacle.Obstacle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class implementing simple 2D polygonal obstacles.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>points</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd><p class="first last">List of (x, y) coordinates in the frame of the environnement
+representing the obstacle.</p>
+</dd>
+<dt><strong>bounding_box</strong> <span class="classifier-delimiter">:</span> <span class="classifier">4-tuple</span></dt>
+<dd><p class="first last">Coordinates of the lower left and upper right corners of the bounding
+box containing the obstacle.</p>
+</dd>
+<dt><strong>center</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">Coordinates of the center of the bounding box.</p>
+</dd>
+<dt><strong>polygon</strong> <span class="classifier-delimiter">:</span> <span class="classifier">shapely.geometry.Polygon</span></dt>
+<dd><p class="first last">The polygon representing the obstacle.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#obstacle.Obstacle.plot" title="obstacle.Obstacle.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>()</td>
+<td>Draws the polygon on screen.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="obstacle.Obstacle.colides">
+<code class="descname">colides</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="modules/obstacle.html#Obstacle.colides"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#obstacle.Obstacle.colides" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the given point is in the obstacle or not.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="obstacle.Obstacle.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="modules/obstacle.html#Obstacle.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#obstacle.Obstacle.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws the polygon on screen.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="obstacle.Wall">
+<em class="property">class </em><code class="descclassname">obstacle.</code><code class="descname">Wall</code><span class="sig-paren">(</span><em>width</em>, <em>bottom_y</em>, <em>thickness</em>, <em>moving=False</em><span class="sig-paren">)</span><a class="reference internal" href="modules/obstacle.html#Wall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#obstacle.Wall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class implementing a wall with a moving hole in it</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>width</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The total width of the wall.</p>
+</dd>
+<dt><strong>bottom_y</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The position of the bottom of the wall.</p>
+</dd>
+<dt><strong>hole</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The position of the hole in the wall.</p>
+</dd>
+<dt><strong>thickness</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The thickness of the wall.</p>
+</dd>
+<dt><strong>speed</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The speed of the hole, if the obstacles are choosen to be dynamic.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#obstacle.Wall.colides" title="obstacle.Wall.colides"><code class="xref py py-obj docutils literal notranslate"><span class="pre">colides</span></code></a>(x,&nbsp;y[,&nbsp;time])</td>
+<td>Checks if the given point is in the obstacle or not.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#obstacle.Wall.plot" title="obstacle.Wall.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([time,&nbsp;x_scale,&nbsp;y_scale])</td>
+<td>Draws the wall on screen.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#obstacle.Wall.visible" title="obstacle.Wall.visible"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visible</span></code></a>(view_top,&nbsp;view_bottom)</td>
+<td>Checks if the wall is in the field of view</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="obstacle.Wall.colides">
+<code class="descname">colides</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>time=0</em><span class="sig-paren">)</span><a class="reference internal" href="modules/obstacle.html#Wall.colides"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#obstacle.Wall.colides" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the given point is in the obstacle or not.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="obstacle.Wall.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>time=0</em>, <em>x_scale=1</em>, <em>y_scale=1</em><span class="sig-paren">)</span><a class="reference internal" href="modules/obstacle.html#Wall.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#obstacle.Wall.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws the wall on screen.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="obstacle.Wall.visible">
+<code class="descname">visible</code><span class="sig-paren">(</span><em>view_top</em>, <em>view_bottom</em><span class="sig-paren">)</span><a class="reference internal" href="modules/obstacle.html#Wall.visible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#obstacle.Wall.visible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the wall is in the field of view</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+          </div>
+      <div class="spc-rightsidebar span3">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="static/scipyshiny_small.png" alt="Logo">
+            </a></p>
+  <h3>This Page</h3>
+  <div>
+    <a href="sources/Obstacles.rst.txt"
+       rel="nofollow">Show Source</a>
+  </div>
+<div class="this-page-menu">
+  <a href="/scipy/docs/scipy-docs/Obstacles.rst.rst">Edit page</a>
+</div>
+
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
+    </div>
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2019, Félicien Cantalloube.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.7.4.
+      </li>
+    </ul>
+    </div>
+    </div>
+    </div>
+  </body>
+</html>

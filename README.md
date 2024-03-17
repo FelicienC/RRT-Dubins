@@ -1,8 +1,14 @@
 # RRT-Dubins
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/FelicienC/RRT-Dubins.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/FelicienC/RRT-Dubins/context:python)
+[![CodeFactor](https://www.codefactor.io/repository/github/felicienc/rrt-dubins/badge)](https://www.codefactor.io/repository/github/felicienc/rrt-dubins)
+[![Build Status](https://travis-ci.org/FelicienC/RRT-Dubins.svg?branch=master)](https://travis-ci.org/FelicienC/RRT-Dubins)
+[![Coverage Status](https://coveralls.io/repos/github/FelicienC/RRT-Dubins/badge.svg?branch=master)](https://coveralls.io/github/FelicienC/RRT-Dubins?branch=master&service=github)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Simple implementation of a **Rapidly Exploring Random Tree** using **Dubins path** as an expansion method, in a 2D environment filled with polygonal obstacles.
+
+Simple implementation of a **Rapidly Exploring Random Tree** using **Dubins path** as an expansion method, in a 2D environment filled with polygonal obstacles. Check the documentation [here](https://felicienc.github.io/RRT-Dubins/index.html).
 <p align="center">
-  <img src="doc/example.gif">
+  <img src="docs/img/example.gif", width=400><img src="docs/img/moving.gif", width=400>
 </p>
 
 ## Requirements
@@ -22,29 +28,6 @@ As we want to have the shortest path among the 6 potential candidates, we comput
   1. **LSL** and **RSR** : Two turns in the same direction separated by a straight segment
   2. **LSR** and **RSL** : Two turns in opposite directions separated by a straight segment
   3. **RLR** and **LRL** : Three turns
-  
-*In order to furthermore simplify the following steps, we consider here that all the turns in one trajectory are done using the same turn radius*
-  
-#### 1) Two turns in the same direction separated by a straight segment
-<p align="center">
-  <img src="doc/twoturnssame.svg">
-</p>
-We start by finding the centers of the turns at the start and end of the trajectory, describing the circles C1 and C2. This is direct as we know the direction and radius of these turns.
-
-The second step is to find the position of the two tangent points on these circles, where the straight segment starts and end.
-Because we have the same radius on both C1 and C2, the tangent to both circles is parallel to the line passing by both centers. By simply translating the vector defined by these center in the orthogonal direction from one radius, we obtain the straight segment. We can then use this vector to compute the two angles beta1 and beta2.
-
-#### 2) Two turns in opposite directions separated by a straight segment
-<p align="center">
-  <img src="doc/twoturnsopposite.svg">
-</p>
-This case is a litle more complex than the previous one, but starts in a similar way, by finding the centers of the turns at the start and end of the trajectory, C1 and C2. We however then need to introduce the rectangle triangle ABX in order to compute the lenght of the straight segment. Calculating the angles beta0 and beta2 is then straightforward. 
-
-#### 3) Three turns
-<p align="center">
-  <img src="doc/threeturns.svg">
-</p>
-This situation is only possible when the centers of the two circles C1 and C2 are separated by less than 4 radii. If it is the case, the trajectory is completly described by 3 angles, beta0, beta1 and beta2. 
 
 ### Usage 
 
@@ -72,7 +55,7 @@ import matplotlib.pyplot as plt
 plt.plot(path[:, 0], path[:, 1])
 ```
 <p align="center">
-  <img src="doc/LSL_example.png">
+  <img src="docs/img/LSL_example.png">
 </p>
 
 ## RRT
@@ -86,40 +69,102 @@ With uniform sampling of the search space, the probability of expanding an exist
 ### Usage
 
 The rapidly exploring random tree is implemented in the RRT class.
-In order to use it, the environment needs to be defined first. Here the obstacles are stored in a binary search tree in order to increase the speed of the colision checking. 
+In order to use it, the environment needs to be defined first. To start, two types of environments can be used.
 
+#### Static Environment
+
+In the static environment, the obstacles are polygonal and are stored in a binary search tree in order to increase the speed of the colision check.
+The following code initializes an Environment:
 ```python
-from environment import Environment
+from environment import StaticEnvironment
 from rrt import RRT
 
 # We create an environment of 100x100 meters, with 100 obstacles
-env = Environment((100, 100), 100)
-
+env = StaticEnvironment((100, 100), 100)
 env.plot()
 ```
 <p align="center">
-  <img src="doc/environment.png">
+  <img src="docs/img/without_nodes.png">
 </p>
 
 ```python
 # We initialize the tree with the environment
-myRRT = RRT(env)
+rrt = RRT(env)
 
 # We select two random points in the free space as a start and final node
 start = env.random_free_space()
 end = env.random_free_space()
 
 # We initialize an empty tree
-myRRT.set_start(start)
+rrt.set_start(start)
 
 # We run 100 iterations of growth
-myRRT.run(end, precision=(5, 5, 1), nb_iteration=100)
-myRRT.plot_tree()
+rrt.run(end, nb_iteration=100)
+
+env.plot()
+rrt.plot(nodes=True)
+```
+<p align="center">
+  <img src="docs/img/with_nodes.png">
+</p>
+
+#### Dynamic Environment
+In the dynamic environement, two options are available: the obstacles can either move or stay static. In both cases, the tree is pruned of the unreachable nodes once they are passed.
+
+```python
+from dynamic_environment import DynamicEnvironment
+from rrt import RRT
+
+env = DynamicEnvironment((100, 100), 5, moving=False)
+
 ```
 
-### Performance
+```python
+# We initialize the tree with the environment
+rrt = RRT(env)
 
-In the current implementation, the default metric used to search for the closest node on the tree uses the local planner in order to measure the real distance needed to link the sample to all the nodes in the tree. To increase the computation speed, it is also possible to use instead the euclidian distance. 
+start = (50, 1, 1.57) # At the bottom of the environment
+end = (50, 99, 1.57) # At the top of the environment
+
+# Initialisation of the tree, to have a first edge
+rrt.set_start(start)
+rrt.run(end, 200, metric='local')
+
+```
+
+However, to display several frames at different timestamps, a small loop is required, as follows:
+```python
+# Initialisation of the position of the vehicle
+position = start[:2]
+current_edge = rrt.select_best_edge()
+
+# We let it run for a few steps
+time = 0
+for i in range(500):
+    time += 1
+    # We check if we are on an edge or if we have to choose a new edge
+    if not current_edge.path:
+        time = rrt.nodes[current_edge.node_to].time
+        current_edge = rrt.select_best_edge()
+    # Update the position of the vehicle
+    position = current_edge.path.popleft()
+    # Update the environment
+    #   The frontiers of the sampling and the obstacles
+    env.update(position)
+    #   The position of the goal
+    end = (50, position[1]+90, 1.57)
+    # Continue the growth of the tree, we try to add only 2 nodes
+    rrt.run(end, 2, metric='local')
+    # Ploting and generating an image (the most time consuming step)
+    env.plot(time, display=False)
+    rrt.plot(file_name='moving'+str(i)+'.png', close=True)
+```
+This code executes relatively slowly due to the time needed to plot every single frame with matplotlib.
+Here is the result obtained by concatenating all the produced images into one gif file.
+
+<p align="center">
+  <img src="docs/img/dyn_RRT.gif">
+</p>
 
 ## References
 
