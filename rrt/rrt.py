@@ -1,10 +1,12 @@
 """
 Construction of the Rapidely Exploring Random Tree
 """
+
 from collections import deque
 import matplotlib.pyplot as plt
 import numpy as np
-from dubins import Dubins, dist
+from rrt.dubins import Dubins, dist
+
 
 class Node:
     """
@@ -27,6 +29,7 @@ class Node:
         self.position = position
         self.time = time
         self.cost = cost
+
 
 class Edge:
     """
@@ -51,6 +54,7 @@ class Edge:
         self.node_to = node_to
         self.path = deque(path)
         self.cost = cost
+
 
 class RRT:
     """
@@ -120,7 +124,7 @@ class RRT:
         self.nodes[start] = Node(start, 0, 0)
         self.root = start
 
-    def run(self, goal, nb_iteration=100, goal_rate=.1, metric='local'):
+    def run(self, goal, nb_iteration=100, goal_rate=0.1, metric="local"):
         """
         Executes the algorithm with an empty graph, initialized with the start
         position at least.
@@ -165,33 +169,33 @@ class RRT:
             # longest, we can try to connect one node after the other. We stop
             # after 10 in order to limit computations.
             for node, option in options:
-                if option[0] == float('inf'):
+                if option[0] == float("inf"):
                     break
-                path = self.local_planner.generate_points(node,
-                                                          sample,
-                                                          option[1],
-                                                          option[2])
+                path = self.local_planner.generate_points(
+                    node, sample, option[1], option[2]
+                )
                 for i, point in enumerate(path):
-                    if not self.environment.is_free(point[0],
-                                                    point[1],
-                                                    self.nodes[node].time+i):
+                    if not self.environment.is_free(
+                        point[0], point[1], self.nodes[node].time + i
+                    ):
                         break
                 else:
                     # Adding the node
                     # To compute the time, we use a constant speed of 1 m/s
                     # As the cost, we use the distance
-                    self.nodes[sample] = Node(sample,
-                                              self.nodes[node].time+option[0],
-                                              self.nodes[node].cost+option[0])
+                    self.nodes[sample] = Node(
+                        sample,
+                        self.nodes[node].time + option[0],
+                        self.nodes[node].cost + option[0],
+                    )
                     self.nodes[node].destination_list.append(sample)
                     # Adding the Edge
-                    self.edges[node, sample] = \
-                        Edge(node, sample, path, option[0])
+                    self.edges[node, sample] = Edge(node, sample, path, option[0])
                     if self.in_goal_region(sample):
                         return
                     break
 
-    def select_options(self, sample, nb_options, metric='local'):
+    def select_options(self, sample, nb_options, metric="local"):
         """
         Chooses the best nodes for the expansion of the tree, and returns
         them in a list ordered by increasing cost.
@@ -213,13 +217,16 @@ class RRT:
             Sorted list of the options, by increasing cost.
         """
 
-        if metric == 'local':
+        if metric == "local":
             # The local planner is used to measure the real distance needed
             options = []
             for node in self.nodes:
                 options.extend(
-                    [(node, opt)\
-                     for opt in self.local_planner.all_options(node, sample)])
+                    [
+                        (node, opt)
+                        for opt in self.local_planner.all_options(node, sample)
+                    ]
+                )
             # sorted by cost
             options.sort(key=lambda x: x[1][0])
             options = options[:nb_options]
@@ -246,11 +253,11 @@ class RRT:
         """
 
         for i, value in enumerate(sample):
-            if abs(self.goal[i]-value) > self.precision[i]:
+            if abs(self.goal[i] - value) > self.precision[i]:
                 return False
         return True
 
-    def plot(self, file_name='', close=False, nodes=False):
+    def plot(self, file_name="", close=False, nodes=False):
         """
         Displays the tree using matplotlib, on a currently open figure.
 
@@ -267,12 +274,12 @@ class RRT:
         if nodes and self.nodes:
             nodes = np.array(list(self.nodes.keys()))
             plt.scatter(nodes[:, 0], nodes[:, 1])
-            plt.scatter(self.root[0], self.root[1], c='g')
-            plt.scatter(self.goal[0], self.goal[1], c='r')
+            plt.scatter(self.root[0], self.root[1], c="g")
+            plt.scatter(self.goal[0], self.goal[1], c="r")
         for _, val in self.edges.items():
             if val.path:
                 path = np.array(val.path)
-                plt.plot(path[:, 0], path[:, 1], 'r')
+                plt.plot(path[:, 0], path[:, 1], "r")
         if file_name:
             plt.savefig(file_name)
         if close:
@@ -289,9 +296,13 @@ class RRT:
             The best edge.
         """
 
-        node = max([(child, self.children_count(child))\
-                    for child in self.nodes[self.root].destination_list],
-                   key=lambda x: x[1])[0]
+        node = max(
+            [
+                (child, self.children_count(child))
+                for child in self.nodes[self.root].destination_list
+            ],
+            key=lambda x: x[1],
+        )[0]
         best_edge = self.edges[(self.root, node)]
         # we update the tree to remove all the other siblings of the old root
         for child in self.nodes[self.root].destination_list:
@@ -326,4 +337,3 @@ class RRT:
         for child in self.nodes[node].destination_list:
             total += 1 + self.children_count(child)
         return total
-            

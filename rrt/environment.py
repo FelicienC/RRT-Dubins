@@ -1,11 +1,13 @@
 """
 The environment with static polygonal obstacles
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 from scipy.spatial import KDTree
-from obstacle import Obstacle
+from rrt.obstacle import Obstacle
+
 
 class StaticEnvironment:
     """
@@ -34,8 +36,9 @@ class StaticEnvironment:
 
     def __init__(self, dimensions, nb_obstacles):
         self.dimensions = dimensions
-        self.obstacles = [Obstacle(dimensions, 0.05*dimensions[0], 5)\
-                          for _ in range(nb_obstacles)]
+        self.obstacles = [
+            Obstacle(dimensions, 0.05 * dimensions[0], 5) for _ in range(nb_obstacles)
+        ]
         self.kdtree = KDTree([obs.center for obs in self.obstacles])
 
     def plot(self, close=False, display=True):
@@ -49,7 +52,7 @@ class StaticEnvironment:
         display : bool
             If the view pops up or not (used when generating many images)
         """
-        
+
         plt.ion() if display else plt.ioff()
         for obstacle in self.obstacles:
             obstacle.plot()
@@ -64,8 +67,7 @@ class StaticEnvironment:
         boundaries of the environnement.
         """
 
-        if x < 0 or x > self.dimensions[0]\
-        or y < 0 or y > self.dimensions[1]:
+        if x < 0 or x > self.dimensions[0] or y < 0 or y > self.dimensions[1]:
             return False
         for obstacle in self.close_obstacles(x, y, nb_obstacles=5):
             if obstacle.colides(x, y):
@@ -96,17 +98,19 @@ class StaticEnvironment:
         and one of its vertices.
         """
 
-        return [self.obstacles[index]\
-                for index in self.kdtree.query((x, y), nb_obstacles)[1]]
+        return [
+            self.obstacles[index]
+            for index in self.kdtree.query((x, y), nb_obstacles)[1]
+        ]
 
     def random_free_space(self):
         """
         Returns a randomly selected point in the free space.
         """
 
-        x = np.random.rand()*self.dimensions[0]
-        y = np.random.rand()*self.dimensions[1]
+        x = np.random.rand() * self.dimensions[0]
+        y = np.random.rand() * self.dimensions[1]
         while not self.is_free(x, y):
-            x = np.random.rand()*self.dimensions[0]
-            y = np.random.rand()*self.dimensions[1]
-        return x, y, np.random.rand()*np.pi*2
+            x = np.random.rand() * self.dimensions[0]
+            y = np.random.rand() * self.dimensions[1]
+        return x, y, np.random.rand() * np.pi * 2

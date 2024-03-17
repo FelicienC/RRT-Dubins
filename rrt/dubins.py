@@ -1,17 +1,20 @@
 import numpy as np
 
+
 def ortho(vect2d):
     """Computes an orthogonal vector to the one given"""
     return np.array((-vect2d[1], vect2d[0]))
 
+
 def dist(pt_a, pt_b):
     """Euclidian distance between two (x, y) points"""
-    return ((pt_a[0]-pt_b[0])**2 + (pt_a[1]-pt_b[1])**2)**.5
+    return ((pt_a[0] - pt_b[0]) ** 2 + (pt_a[1] - pt_b[1]) ** 2) ** 0.5
+
 
 class Dubins:
     """
     Class implementing a Dubins path planner with a constant turn radius.
-    
+
     Attributes
     ----------
     radius : float
@@ -46,6 +49,7 @@ class Dubins:
     rlr
         Dubins path with a right left right trajectory.
     """
+
     def __init__(self, radius, point_separation):
         assert radius > 0 and point_separation > 0
         self.radius = radius
@@ -74,16 +78,18 @@ class Dubins:
         given as input with only turns of a defined radius and straight line.
 
         """
-        center_0_left = self.find_center(start, 'L')
-        center_0_right = self.find_center(start, 'R')
-        center_2_left = self.find_center(end, 'L')
-        center_2_right = self.find_center(end, 'R')
-        options = [self.lsl(start, end, center_0_left, center_2_left),
-                   self.rsr(start, end, center_0_right, center_2_right),
-                   self.rsl(start, end, center_0_right, center_2_left),
-                   self.lsr(start, end, center_0_left, center_2_right),
-                   self.rlr(start, end, center_0_right, center_2_right),
-                   self.lrl(start, end, center_0_left, center_2_left)]
+        center_0_left = self.find_center(start, "L")
+        center_0_right = self.find_center(start, "R")
+        center_2_left = self.find_center(end, "L")
+        center_2_right = self.find_center(end, "R")
+        options = [
+            self.lsl(start, end, center_0_left, center_2_left),
+            self.rsr(start, end, center_0_right, center_2_right),
+            self.rsl(start, end, center_0_right, center_2_left),
+            self.lsr(start, end, center_0_left, center_2_right),
+            self.rlr(start, end, center_0_right, center_2_right),
+            self.lrl(start, end, center_0_left, center_2_left),
+        ]
         if sort:
             options.sort(key=lambda x: x[0])
         return options
@@ -177,10 +183,10 @@ class Dubins:
             True, to indicate that this path contains a straight segment.
         """
         straight_dist = dist(center_0, center_2)
-        alpha = np.arctan2((center_2-center_0)[1], (center_2-center_0)[0])
-        beta_2 = (end[2]-alpha)%(2*np.pi)
-        beta_0 = (alpha-start[2])%(2*np.pi)
-        total_len = self.radius*(beta_2+beta_0)+straight_dist
+        alpha = np.arctan2((center_2 - center_0)[1], (center_2 - center_0)[0])
+        beta_2 = (end[2] - alpha) % (2 * np.pi)
+        beta_0 = (alpha - start[2]) % (2 * np.pi)
+        total_len = self.radius * (beta_2 + beta_0) + straight_dist
         return (total_len, (beta_0, beta_2, straight_dist), True)
 
     def rsr(self, start, end, center_0, center_2):
@@ -189,7 +195,7 @@ class Dubins:
         First computes the poisition of the centers of the turns, and then uses
         the fact that the vector defined by the distance between the centers
         gives the direction and distance of the straight segment.
-        
+
         .. image:: img/twoturnssame.svg
 
         Parameters
@@ -215,10 +221,10 @@ class Dubins:
 
         """
         straight_dist = dist(center_0, center_2)
-        alpha = np.arctan2((center_2-center_0)[1], (center_2-center_0)[0])
-        beta_2 = (-end[2]+alpha)%(2*np.pi)
-        beta_0 = (-alpha+start[2])%(2*np.pi)
-        total_len = self.radius*(beta_2+beta_0)+straight_dist
+        alpha = np.arctan2((center_2 - center_0)[1], (center_2 - center_0)[0])
+        beta_2 = (-end[2] + alpha) % (2 * np.pi)
+        beta_0 = (-alpha + start[2]) % (2 * np.pi)
+        total_len = self.radius * (beta_2 + beta_0) + straight_dist
         return (total_len, (-beta_0, -beta_2, straight_dist), True)
 
     def rsl(self, start, end, center_0, center_2):
@@ -255,16 +261,16 @@ class Dubins:
             True, to indicate that this path contains a straight segment.
 
         """
-        median_point = (center_2 - center_0)/2
+        median_point = (center_2 - center_0) / 2
         psia = np.arctan2(median_point[1], median_point[0])
         half_intercenter = np.linalg.norm(median_point)
         if half_intercenter < self.radius:
-            return (float('inf'), (0, 0, 0), True)
-        alpha = np.arccos(self.radius/half_intercenter)
-        beta_0 = -(psia+alpha-start[2]-np.pi/2)%(2*np.pi)
-        beta_2 = (np.pi+end[2]-np.pi/2-alpha-psia)%(2*np.pi)
-        straight_dist = 2*(half_intercenter**2-self.radius**2)**.5
-        total_len = self.radius*(beta_2+beta_0)+straight_dist
+            return (float("inf"), (0, 0, 0), True)
+        alpha = np.arccos(self.radius / half_intercenter)
+        beta_0 = -(psia + alpha - start[2] - np.pi / 2) % (2 * np.pi)
+        beta_2 = (np.pi + end[2] - np.pi / 2 - alpha - psia) % (2 * np.pi)
+        straight_dist = 2 * (half_intercenter**2 - self.radius**2) ** 0.5
+        total_len = self.radius * (beta_2 + beta_0) + straight_dist
         return (total_len, (-beta_0, beta_2, straight_dist), True)
 
     def lsr(self, start, end, center_0, center_2):
@@ -278,7 +284,7 @@ class Dubins:
         distance.
 
         .. image:: img/twoturnsopposite.svg
-        
+
         Parameters
         ----------
         start : tuple
@@ -300,17 +306,17 @@ class Dubins:
         straight : bool
             True, to indicate that this path contains a straight segment.
 
-            """
-        median_point = (center_2 - center_0)/2
+        """
+        median_point = (center_2 - center_0) / 2
         psia = np.arctan2(median_point[1], median_point[0])
         half_intercenter = np.linalg.norm(median_point)
         if half_intercenter < self.radius:
-            return (float('inf'), (0, 0, 0), True)
-        alpha = np.arccos(self.radius/half_intercenter)
-        beta_0 = (psia-alpha-start[2]+np.pi/2)%(2*np.pi)
-        beta_2 = (.5*np.pi-end[2]-alpha+psia)%(2*np.pi)
-        straight_dist = 2*(half_intercenter**2-self.radius**2)**.5
-        total_len = self.radius*(beta_2+beta_0)+straight_dist
+            return (float("inf"), (0, 0, 0), True)
+        alpha = np.arccos(self.radius / half_intercenter)
+        beta_0 = (psia - alpha - start[2] + np.pi / 2) % (2 * np.pi)
+        beta_2 = (0.5 * np.pi - end[2] - alpha + psia) % (2 * np.pi)
+        straight_dist = 2 * (half_intercenter**2 - self.radius**2) ** 0.5
+        total_len = self.radius * (beta_2 + beta_0) + straight_dist
         return (total_len, (beta_0, -beta_2, straight_dist), True)
 
     def lrl(self, start, end, center_0, center_2):
@@ -343,17 +349,15 @@ class Dubins:
             False, to indicate that this path does not contain a straight part.
         """
         dist_intercenter = dist(center_0, center_2)
-        intercenter = (center_2 - center_0)/2
+        intercenter = (center_2 - center_0) / 2
         psia = np.arctan2(intercenter[1], intercenter[0])
-        if 2*self.radius < dist_intercenter > 4*self.radius:
-            return (float('inf'), (0, 0, 0), False)
-        gamma = 2*np.arcsin(dist_intercenter/(4*self.radius))
-        beta_0 = (psia-start[2]+np.pi/2+(np.pi-gamma)/2)%(2*np.pi)
-        beta_1 = (-psia+np.pi/2+end[2]+(np.pi-gamma)/2)%(2*np.pi)
-        total_len = (2*np.pi-gamma+abs(beta_0)+abs(beta_1))*self.radius
-        return (total_len,
-                (beta_0, beta_1, 2*np.pi-gamma),
-                False)
+        if 2 * self.radius < dist_intercenter > 4 * self.radius:
+            return (float("inf"), (0, 0, 0), False)
+        gamma = 2 * np.arcsin(dist_intercenter / (4 * self.radius))
+        beta_0 = (psia - start[2] + np.pi / 2 + (np.pi - gamma) / 2) % (2 * np.pi)
+        beta_1 = (-psia + np.pi / 2 + end[2] + (np.pi - gamma) / 2) % (2 * np.pi)
+        total_len = (2 * np.pi - gamma + abs(beta_0) + abs(beta_1)) * self.radius
+        return (total_len, (beta_0, beta_1, 2 * np.pi - gamma), False)
 
     def rlr(self, start, end, center_0, center_2):
         """
@@ -385,18 +389,15 @@ class Dubins:
             False, to indicate that this path does not contain a straight part.
         """
         dist_intercenter = dist(center_0, center_2)
-        intercenter = (center_2 - center_0)/2
+        intercenter = (center_2 - center_0) / 2
         psia = np.arctan2(intercenter[1], intercenter[0])
-        if 2*self.radius < dist_intercenter > 4*self.radius:
-            return (float('inf'), (0, 0, 0), False)
-        gamma = 2*np.arcsin(dist_intercenter/(4*self.radius))
-        beta_0 = -((-psia+(start[2]+np.pi/2)+(np.pi-gamma)/2)%(2*np.pi))
-        beta_1 = -((psia+np.pi/2-end[2]+(np.pi-gamma)/2)%(2*np.pi))
-        total_len = (2*np.pi-gamma+abs(beta_0)+abs(beta_1))*self.radius
-        return (total_len,
-                (beta_0, beta_1, 2*np.pi-gamma),
-                False)
-
+        if 2 * self.radius < dist_intercenter > 4 * self.radius:
+            return (float("inf"), (0, 0, 0), False)
+        gamma = 2 * np.arcsin(dist_intercenter / (4 * self.radius))
+        beta_0 = -((-psia + (start[2] + np.pi / 2) + (np.pi - gamma) / 2) % (2 * np.pi))
+        beta_1 = -((psia + np.pi / 2 - end[2] + (np.pi - gamma) / 2) % (2 * np.pi))
+        total_len = (2 * np.pi - gamma + abs(beta_0) + abs(beta_1)) * self.radius
+        return (total_len, (beta_0, beta_1, 2 * np.pi - gamma), False)
 
     def find_center(self, point, side):
         """
@@ -418,10 +419,14 @@ class Dubins:
             Coordinates of the center of the circle describing the turn.
 
         """
-        assert side in 'LR'
-        angle = point[2] + (np.pi/2 if side == 'L' else -np.pi/2)
-        return np.array((point[0] + np.cos(angle)*self.radius,
-                         point[1] + np.sin(angle)*self.radius))
+        assert side in "LR"
+        angle = point[2] + (np.pi / 2 if side == "L" else -np.pi / 2)
+        return np.array(
+            (
+                point[0] + np.cos(angle) * self.radius,
+                point[1] + np.sin(angle) * self.radius,
+            )
+        )
 
     def generate_points_straight(self, start, end, path):
         """
@@ -449,32 +454,34 @@ class Dubins:
         In the form of a (2xn) numpy array.
 
         """
-        total = self.radius*(abs(path[1])+abs(path[0]))+path[2] # Path length
-        center_0 = self.find_center(start, 'L' if path[0] > 0 else 'R')
-        center_2 = self.find_center(end, 'L' if path[1] > 0 else 'R')
+        total = self.radius * (abs(path[1]) + abs(path[0])) + path[2]  # Path length
+        center_0 = self.find_center(start, "L" if path[0] > 0 else "R")
+        center_2 = self.find_center(end, "L" if path[1] > 0 else "R")
 
         # We first need to find the points where the straight segment starts
         if abs(path[0]) > 0:
-            angle = start[2]+(abs(path[0])-np.pi/2)*np.sign(path[0])
-            ini = center_0+self.radius*np.array([np.cos(angle), np.sin(angle)])
-        else: ini = np.array(start[:2])
+            angle = start[2] + (abs(path[0]) - np.pi / 2) * np.sign(path[0])
+            ini = center_0 + self.radius * np.array([np.cos(angle), np.sin(angle)])
+        else:
+            ini = np.array(start[:2])
         # We then identify its end
         if abs(path[1]) > 0:
-            angle = end[2]+(-abs(path[1])-np.pi/2)*np.sign(path[1])
-            fin = center_2+self.radius*np.array([np.cos(angle), np.sin(angle)])
-        else: fin = np.array(end[:2])
+            angle = end[2] + (-abs(path[1]) - np.pi / 2) * np.sign(path[1])
+            fin = center_2 + self.radius * np.array([np.cos(angle), np.sin(angle)])
+        else:
+            fin = np.array(end[:2])
         dist_straight = dist(ini, fin)
 
         # We can now generate all the points with the desired precision
         points = []
         for x in np.arange(0, total, self.point_separation):
-            if x < abs(path[0])*self.radius: # First turn
+            if x < abs(path[0]) * self.radius:  # First turn
                 points.append(self.circle_arc(start, path[0], center_0, x))
-            elif x > total - abs(path[1])*self.radius: # Last turn
-                points.append(self.circle_arc(end, path[1], center_2, x-total))
-            else: # Straight segment
-                coeff = (x-abs(path[0])*self.radius)/dist_straight
-                points.append(coeff*fin + (1-coeff)*ini)
+            elif x > total - abs(path[1]) * self.radius:  # Last turn
+                points.append(self.circle_arc(end, path[1], center_2, x - total))
+            else:  # Straight segment
+                coeff = (x - abs(path[0]) * self.radius) / dist_straight
+                points.append(coeff * fin + (1 - coeff) * ini)
         points.append(end[:2])
         return np.array(points)
 
@@ -506,26 +513,25 @@ class Dubins:
         (2xn) numpy array.
 
         """
-        total = self.radius*(abs(path[1])+abs(path[0])+abs(path[2]))
-        center_0 = self.find_center(start, 'L' if path[0] > 0 else 'R')
-        center_2 = self.find_center(end, 'L' if path[1] > 0 else 'R')
+        total = self.radius * (abs(path[1]) + abs(path[0]) + abs(path[2]))
+        center_0 = self.find_center(start, "L" if path[0] > 0 else "R")
+        center_2 = self.find_center(end, "L" if path[1] > 0 else "R")
         intercenter = dist(center_0, center_2)
-        center_1 = (center_0 + center_2)/2 +\
-                   np.sign(path[0])*ortho((center_2-center_0)/intercenter)\
-                    *(4*self.radius**2-(intercenter/2)**2)**.5
-        psi_0 = np.arctan2((center_1 - center_0)[1],
-                           (center_1 - center_0)[0])-np.pi
+        center_1 = (center_0 + center_2) / 2 + np.sign(path[0]) * ortho(
+            (center_2 - center_0) / intercenter
+        ) * (4 * self.radius**2 - (intercenter / 2) ** 2) ** 0.5
+        psi_0 = np.arctan2((center_1 - center_0)[1], (center_1 - center_0)[0]) - np.pi
 
         points = []
         for x in np.arange(0, total, self.point_separation):
-            if x < abs(path[0])*self.radius: # First turn
+            if x < abs(path[0]) * self.radius:  # First turn
                 points.append(self.circle_arc(start, path[0], center_0, x))
-            elif x > total - abs(path[1])*self.radius: # Last turn
-                points.append(self.circle_arc(end, path[1], center_2, x-total))
-            else: # Middle Turn
-                angle = psi_0-np.sign(path[0])*(x/self.radius-abs(path[0]))
+            elif x > total - abs(path[1]) * self.radius:  # Last turn
+                points.append(self.circle_arc(end, path[1], center_2, x - total))
+            else:  # Middle Turn
+                angle = psi_0 - np.sign(path[0]) * (x / self.radius - abs(path[0]))
                 vect = np.array([np.cos(angle), np.sin(angle)])
-                points.append(center_1+self.radius*vect)
+                points.append(center_1 + self.radius * vect)
         points.append(end[:2])
         return np.array(points)
 
@@ -552,6 +558,6 @@ class Dubins:
         -------
         The coordinates of the point on the circle, in the form of a tuple.
         """
-        angle = reference[2]+((x/self.radius)-np.pi/2)*np.sign(beta)
+        angle = reference[2] + ((x / self.radius) - np.pi / 2) * np.sign(beta)
         vect = np.array([np.cos(angle), np.sin(angle)])
-        return center+self.radius*vect
+        return center + self.radius * vect

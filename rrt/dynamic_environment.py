@@ -1,11 +1,13 @@
 """
 The environement where the obstacles can move
 """
+
 from collections import deque
 import numpy as np
 import matplotlib.pyplot as plt
 
-from obstacle import Wall
+from rrt.obstacle import Wall
+
 
 class DynamicEnvironment:
     """
@@ -45,10 +47,15 @@ class DynamicEnvironment:
         # nb_walls represent the number of walls on the screen
         self.obstacles = deque()
         for i in range(nb_walls * 2):
-            self.obstacles.append(Wall(dimensions[0],
-                                       dimensions[1]*(0.1+i/nb_walls),
-                                       thickness=5, moving=moving))
-        self.center = [dimensions[0]/2, dimensions[1]/2]
+            self.obstacles.append(
+                Wall(
+                    dimensions[0],
+                    dimensions[1] * (0.1 + i / nb_walls),
+                    thickness=5,
+                    moving=moving,
+                )
+            )
+        self.center = [dimensions[0] / 2, dimensions[1] / 2]
 
     def plot(self, time=0, close=False, display=True):
         """
@@ -67,10 +74,14 @@ class DynamicEnvironment:
         plt.figure()
         for obstacle in self.obstacles:
             obstacle.plot(time)
-        plt.gca().set_xlim(self.center[0]-self.dimensions[0]/2,
-                           self.center[0]+self.dimensions[0]/2)
-        plt.gca().set_ylim(self.center[1]-self.dimensions[1]/2,
-                           self.center[1]+self.dimensions[1]/2)
+        plt.gca().set_xlim(
+            self.center[0] - self.dimensions[0] / 2,
+            self.center[0] + self.dimensions[0] / 2,
+        )
+        plt.gca().set_ylim(
+            self.center[1] - self.dimensions[1] / 2,
+            self.center[1] + self.dimensions[1] / 2,
+        )
         if close:
             plt.close()
 
@@ -80,10 +91,12 @@ class DynamicEnvironment:
         boundaries of the environnement.
         """
 
-        if x < self.center[0]-self.dimensions[0]/2\
-        or x > self.center[0]+self.dimensions[0]/2\
-        or y < self.center[1]-self.dimensions[1]/2\
-        or y > self.center[1]+self.dimensions[1]/2:
+        if (
+            x < self.center[0] - self.dimensions[0] / 2
+            or x > self.center[0] + self.dimensions[0] / 2
+            or y < self.center[1] - self.dimensions[1] / 2
+            or y > self.center[1] + self.dimensions[1] / 2
+        ):
             return False
         for obstacle in self.obstacles:
             if obstacle.colides(x, y, time):
@@ -100,7 +113,7 @@ class DynamicEnvironment:
         while not self.is_free(x, y):
             x = np.random.rand() * self.dimensions[0]
             y = (np.random.rand() - 0.5) * self.dimensions[1] + self.center[1]
-        return x, y, np.random.rand()*np.pi*2
+        return x, y, np.random.rand() * np.pi * 2
 
     def update(self, position):
         """
@@ -113,13 +126,16 @@ class DynamicEnvironment:
         """
 
         # every time an obstacles gets out, we add one on the other side
-        self.center = [self.center[0], position[1]+40]
+        self.center = [self.center[0], position[1] + 40]
         for wall in self.obstacles:
-            if wall.bottom_y + wall.thickness < \
-               self.center[1]-self.dimensions[1]:
-                self.obstacles.append(Wall(self.dimensions[0],
-                                           position[1]+50+self.dimensions[1],
-                                           thickness=5, moving=self.moving))
+            if wall.bottom_y + wall.thickness < self.center[1] - self.dimensions[1]:
+                self.obstacles.append(
+                    Wall(
+                        self.dimensions[0],
+                        position[1] + 50 + self.dimensions[1],
+                        thickness=5,
+                        moving=self.moving,
+                    )
+                )
                 self.obstacles.popleft()
                 break
-        

@@ -1,0 +1,102 @@
+# Ignore compiled object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Ignore executable files
+*.exe
+*.out
+*.app
+
+# Ignore libraries
+*.a
+*.lib
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+*.swp
+
+# Ignore build directories
+/build
+/dist
+/node_modules
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE-specific files
+.idea/
+.vscode/
+
+# Ignore package lock files
+package-lock.json
+yarn.lock
+
+# Ignore environment-specific files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ignore sensitive or personal information
+secrets.txt
+credentials.json
+
+# Ignore generated documentation
+/docs
+
+# Ignore backup files
+*.bak
+*.backup
+*.old
+
+# Ignore cache directories
+/cache
+# Python specific
+*.pyc
+__pycache__/
+
+# Ignore virtual environment
+venv/
+.env
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
+
+# Ignore package distribution files
+dist/
+build/
+*.egg-info/
+
+# Ignore compiled Python files
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore cache and log files
+*.cache/
+*.log
+
+# Ignore environment-specific files
+.env
+.env.local
+.env.dev
+.env.prod
+
+# Ignore sensitive or personal information
+secrets.json
+credentials.json
+
+# Ignore database files
+*.db
+*.sqlite3
+
+# Ignore backup files
+*.bak
+*.backup
+*.old
