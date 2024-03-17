@@ -12,8 +12,8 @@ from rrt.obstacle import Wall
 class DynamicEnvironment:
     """
     Class implementing a simple dynamic bounded 2D world, containing square
-    obstacles placed in an ordered manner in order to always permit passage
-    from the bottom to the top of the space.
+    obstacles placed in an ordered manner to always permit passage from the
+    bottom to the top of the space.
 
     Attributes
     ----------

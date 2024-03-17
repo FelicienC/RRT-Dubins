@@ -1,22 +1,17 @@
 # RRT-Dubins
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/FelicienC/RRT-Dubins.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/FelicienC/RRT-Dubins/context:python)
-[![CodeFactor](https://www.codefactor.io/repository/github/felicienc/rrt-dubins/badge)](https://www.codefactor.io/repository/github/felicienc/rrt-dubins)
-[![Build Status](https://travis-ci.org/FelicienC/RRT-Dubins.svg?branch=master)](https://travis-ci.org/FelicienC/RRT-Dubins)
-[![Coverage Status](https://coveralls.io/repos/github/FelicienC/RRT-Dubins/badge.svg?branch=master)](https://coveralls.io/github/FelicienC/RRT-Dubins?branch=master&service=github)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 
 Simple implementation of a **Rapidly Exploring Random Tree** using **Dubins path** as an expansion method, in a 2D environment filled with polygonal obstacles. Check the documentation [here](https://felicienc.github.io/RRT-Dubins/index.html).
 <p align="center">
-  <img src="docs/img/example.gif", width=400><img src="docs/img/moving.gif", width=400>
+  <img src="https://github.com/FelicienC/RRT-Dubins/blob/master/docs/img/moving.gif", width=400><img src="https://github.com/FelicienC/RRT-Dubins/blob/master/docs/img/example.gif", width=400>
 </p>
 
-## Requirements
+## Installation
+The easiest way is to use pip: 
+```bash
+pip install rrt-dubins
+```
 
-- [Scipy](https://www.scipy.org)
-- [Numpy](https://numpy.org)
-- [Matplotlib](https://matplotlib.org)
-- [Shapely](https://pypi.org/project/Shapely)
 
 ## Dubins path
 
@@ -34,8 +29,7 @@ As we want to have the shortest path among the 6 potential candidates, we comput
 The Dubins path are implemented in the Dubins class. As already mentionned, we simplify the problem here by considering the same radius for all the turns.
 
 ```python
-
-from dubins import Dubins
+from rrt.dubins import Dubins
 
 # We initialize the planner with the turn radius and the desired distance between consecutive points
 local_planner = Dubins(radius=2, point_separation=.5)
@@ -76,8 +70,8 @@ In order to use it, the environment needs to be defined first. To start, two typ
 In the static environment, the obstacles are polygonal and are stored in a binary search tree in order to increase the speed of the colision check.
 The following code initializes an Environment:
 ```python
-from environment import StaticEnvironment
-from rrt import RRT
+from rrt.environment import StaticEnvironment
+from rrt.rrt import RRT
 
 # We create an environment of 100x100 meters, with 100 obstacles
 env = StaticEnvironment((100, 100), 100)
@@ -112,8 +106,8 @@ rrt.plot(nodes=True)
 In the dynamic environement, two options are available: the obstacles can either move or stay static. In both cases, the tree is pruned of the unreachable nodes once they are passed.
 
 ```python
-from dynamic_environment import DynamicEnvironment
-from rrt import RRT
+from rrt.dynamic_environment import DynamicEnvironment
+from rrt.rrt import RRT
 
 env = DynamicEnvironment((100, 100), 5, moving=False)
 
@@ -171,3 +165,17 @@ Here is the result obtained by concatenating all the produced images into one gi
 [Steven M. LaValle](http://msl.cs.illinois.edu/~lavalle/papers/Lav98c.pdf) "Rapidly-Exploring Random Trees: A New Tool for Path Planning" 1998, tech. rpt C.S.Dept, Iowa State University
 
 [Wikipedia](https://en.wikipedia.org/wiki/Rapidly-exploring_random_tree)
+
+# TODO : 
+
+- [ ] Setup pre-commit tools (ruff - tests - coverage - spelling)
+- [ ] Setup CI
+- [ ] Move time to the state
+- [ ] Make the rrt dimensions and planner independent
+- [ ] Return the path 
+- [ ] Remove matplotlib dependency
+- [ ] Implement real unit tests 
+- [ ] Implemment RRT*
+- [ ] Implement // processing ?
+- [ ] Add typing everywhere
+- [ ] Add seed to make real tests

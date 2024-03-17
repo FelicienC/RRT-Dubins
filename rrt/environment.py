@@ -91,7 +91,7 @@ class StaticEnvironment:
         Note
         ----
         To be sure that this step actually does not remove any obstacle which
-        could yield to a collision, the relation between the size of the
+        could lead to a collision, the relation between the size of the
         obstacles and the considered radius for search must be verified:
             R_search > R_obs_Max
         With R_obs_Max the maximum distance between the center of an obstacle

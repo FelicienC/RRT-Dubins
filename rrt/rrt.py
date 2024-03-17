@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from rrt.dubins import Dubins, dist
 
+from typing import List
+
 
 class Node:
     """
@@ -24,11 +26,12 @@ class Node:
         The cost needed to reach this node.
     """
 
-    def __init__(self, position, time, cost):
+    def __init__(self, position, time, cost, parent=None):
         self.destination_list = []
         self.position = position
         self.time = time
         self.cost = cost
+        self.parent = parent
 
 
 class Edge:
@@ -58,33 +61,29 @@ class Edge:
 
 class RRT:
     """
-    Class implementing a Rapidely Exploring Random Tree in two dimensions using
-    dubins paths as an expansion method. The state space considered here is
-    straightforward, as every state can be represented by a simple tuple made
-    of three continuous variables: (x, y, psi)
+    Class implementing a Rapidely Exploring Random Tree algorithm.
 
     Attributes
     ----------
     nodes : dict
         Dictionnary containing all the nodes of the tree. The keys are hence
-        simply the reached state, i.e. tuples of the form (x, y, psi).
+        simply the reached state, i.e. tuples.
     environment : Environment
         Instance of the Environment class.
     goal_rate : float
         The frequency at which the randomly selected node is choosen among
         the goal zone.
     precision : tuple
-            The precision needed to stop the algorithm. In the form
-            (delta_x, delta_y, delta_psi).
+        The precision needed to stop the algorithm. In the form
+        (delta_x, delta_y, delta_psi).
     goal : tuple
         The position of the goal (the center of the goal zone), in the form of
-        a tuple (x, y, psi).
+        a tuple.
     root : tuple
-        The position of the root of the tree, (the initial position of the
-        vehicle), in the form of a tuple (x, y, psi).
+        The state of the root of the tree, (the initial state).
     local_planner : Planner
-        The planner used for the expansion of the tree, here it is a Dubins
-        path planner.
+        The planner used for the expansion of the tree, it needs to implement
+        the method get_options and generate_points.
 
     Methods
     -------
@@ -100,14 +99,17 @@ class RRT:
         from.
     """
 
-    def __init__(self, environment, precision=(5, 5, 1)):
-        self.nodes = {}
-        self.edges = {}
-        self.environment = environment
-        self.local_planner = Dubins(4, 1)
-        self.goal = (0, 0, 0)
-        self.root = (0, 0, 0)
+    def __init__(self, environment, local_planner, precision):
+        self.nodes: dict = {}
+        self.edges: dict = {}
+        self.root: tuple
+        self.goal: tuple
         self.precision = precision
+        self.environment = environment
+        self.local_planner = local_planner
+        # TODO: check that the environment has the right methods
+        # TODO: check that the local planner has the right methods
+        # TODO: check that the precision has the same dimension as the state space
 
     def set_start(self, start):
         """
@@ -121,10 +123,10 @@ class RRT:
 
         self.nodes = {}
         self.edges = {}
-        self.nodes[start] = Node(start, 0, 0)
+        self.nodes[start] = Node(position=start, time=0, cost=0)
         self.root = start
 
-    def run(self, goal, nb_iteration=100, goal_rate=0.1, metric="local"):
+    def find_path(self, goal, nb_iteration=100, goal_rate=0.1, metric="local") -> List:
         """
         Executes the algorithm with an empty graph, initialized with the start
         position at least.
@@ -132,7 +134,7 @@ class RRT:
         Parameters
         ----------
         goal : tuple
-            The final requested position (x, y, psi).
+            The final requested state as a tuple.
         nb_iteration : int
             The number of maximal iterations (not using the number of nodes as
             potentialy the start is in a region of unavoidable collision).
@@ -152,8 +154,8 @@ class RRT:
         the computation faster and the code a simpler, this is why several
         metrics are available.
         """
-
-        assert len(goal) == len(self.precision)
+        # TODO : check that the goal is within the boundaries of the environment
+        # TODO : check that the goal dimensions are the same as the state space
         self.goal = goal
 
         for _ in range(nb_iteration):
@@ -181,19 +183,21 @@ class RRT:
                         break
                 else:
                     # Adding the node
-                    # To compute the time, we use a constant speed of 1 m/s
-                    # As the cost, we use the distance
                     self.nodes[sample] = Node(
-                        sample,
-                        self.nodes[node].time + option[0],
-                        self.nodes[node].cost + option[0],
+                        position=sample,
+                        time=self.nodes[node].time
+                        + option[0],  # As the time, we use the distance
+                        cost=self.nodes[node].cost
+                        + option[0],  # As the cost, we use the distance
+                        parent=node,
                     )
                     self.nodes[node].destination_list.append(sample)
                     # Adding the Edge
                     self.edges[node, sample] = Edge(node, sample, path, option[0])
                     if self.in_goal_region(sample):
-                        return
+                        return self.get_path_to_node(sample)
                     break
+        return []
 
     def select_options(self, sample, nb_options, metric="local"):
         """
@@ -203,8 +207,7 @@ class RRT:
         Parameters
         ----------
         sample : tuple
-            The (x, y, psi) coordinates of the node we wish to connect to the
-            tree.
+            The state of the node we wish to connect to the tree.
         nb_options : int
             The number of options requested.
         metric : str
@@ -224,7 +227,7 @@ class RRT:
                 options.extend(
                     [
                         (node, opt)
-                        for opt in self.local_planner.all_options(node, sample)
+                        for opt in self.local_planner.get_options(node, sample)
                     ]
                 )
             # sorted by cost
@@ -235,11 +238,16 @@ class RRT:
             options = [(node, dist(node, sample)) for node in self.nodes]
             options.sort(key=lambda x: x[1])
             options = options[:nb_options]
-            new_opt = []
-            for node, _ in options:
-                db_options = self.local_planner.all_options(node, sample)
-                new_opt.append((node, min(db_options, key=lambda x: x[0])))
-            options = new_opt
+
+            # We now have to compute the real cost of the path, and not only the
+            # distance. We use the local planner to do so.
+            for index, (node, _) in enumerate(options):
+                options[index] = (
+                    node,
+                    min(
+                        self.local_planner.get_options(node, sample), key=lambda x: x[0]
+                    ),
+                )
         return options
 
     def in_goal_region(self, sample):
@@ -249,7 +257,7 @@ class RRT:
         Parameters
         ----------
         sample : tuple
-            (x, y, psi) the position of the point which needs to be tested.
+            The state of the point which needs to be tested.
         """
 
         for i, value in enumerate(sample):
@@ -257,35 +265,7 @@ class RRT:
                 return False
         return True
 
-    def plot(self, file_name="", close=False, nodes=False):
-        """
-        Displays the tree using matplotlib, on a currently open figure.
-
-        Parameters
-        ----------
-        file_name : string
-            The name of the file used to save an image of the tree.
-        close : bool
-            If the plot needs to be automaticaly closed after the drawing.
-        nodes : bool
-            If the nodes need to be displayed as well.
-        """
-
-        if nodes and self.nodes:
-            nodes = np.array(list(self.nodes.keys()))
-            plt.scatter(nodes[:, 0], nodes[:, 1])
-            plt.scatter(self.root[0], self.root[1], c="g")
-            plt.scatter(self.goal[0], self.goal[1], c="r")
-        for _, val in self.edges.items():
-            if val.path:
-                path = np.array(val.path)
-                plt.plot(path[:, 0], path[:, 1], "r")
-        if file_name:
-            plt.savefig(file_name)
-        if close:
-            plt.close()
-
-    def select_best_edge(self):
+    def select_best_edge(self) -> Edge:
         """
         Selects the best edge of the tree among the ones leaving from the root.
         Uses the number of children to determine the best option.
@@ -314,7 +294,7 @@ class RRT:
         self.root = node
         return best_edge
 
-    def delete_all_children(self, node):
+    def delete_all_children(self, node) -> None:
         """
         Removes all the nodes of the tree below the requested node.
         """
@@ -325,7 +305,7 @@ class RRT:
                 self.delete_all_children(child)
         self.nodes.pop(node)
 
-    def children_count(self, node):
+    def children_count(self, node) -> int:
         """
         Not optimal at all as it recounts a lot of the tree every time a path
         needs to b selected.
@@ -337,3 +317,14 @@ class RRT:
         for child in self.nodes[node].destination_list:
             total += 1 + self.children_count(child)
         return total
+
+    def get_path_to_node(self, node) -> list[tuple]:
+        """
+        Returns the path from the root to the requested node.
+        """
+
+        path = []
+        while node != self.root:
+            path.append(self.edges[(self.nodes[node].parent, node)].path)
+            node = self.nodes[node].parent
+        return path

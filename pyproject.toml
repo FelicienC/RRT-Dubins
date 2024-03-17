@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "rrt"
-version = "0.1.0"
+name = "rrt-dubins"
+version = "0.1.1"
 description = "Simple implementation of a Rapidly Exploring Random Tree using Dubins path as an expansion method"
 authors = ["FelicienC <cantalloubef@gmail.com>"]
 license = "MIT"
@@ -13,8 +13,10 @@ matplotlib = "^3.8.3"
 shapely = "^2.0.3"
 numpy = "^1.26.4"
 
+
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.1"
+ruff = "^0.3.3"
 
 [build-system]
 requires = ["poetry-core"]

@@ -2,8 +2,6 @@
 Test module, making sure the main functionnalities are always functionning
 """
 
-import pytest
-
 from rrt.dubins import Dubins
 from rrt.environment import StaticEnvironment
 from rrt.dynamic_environment import DynamicEnvironment
@@ -33,7 +31,8 @@ def test_rrt():
     """
 
     env = StaticEnvironment((100, 100), 100)
-    rrt = RRT(env)
+    local_planner = Dubins(4, 1)
+    rrt = RRT(env, local_planner=local_planner, precision=(1, 1, 1))
 
     # Selection of random starting and ending points
     start = env.random_free_space()
@@ -41,11 +40,11 @@ def test_rrt():
 
     # Trying first the euclidian distance
     rrt.set_start(start)
-    rrt.run(end, 200, metric="euclidian")
+    path = rrt.find_path(end, 200, metric="euclidian")
 
     # Trying first the distance defined by the local planner
     rrt.set_start(start)
-    rrt.run(end, 200, metric="local")
+    path = rrt.find_path(end, 200, metric="local")
 
 
 def test_dynamic_env():
@@ -54,13 +53,14 @@ def test_dynamic_env():
     """
 
     env = DynamicEnvironment((100, 100), 5)
-    rrt = RRT(env)
+    local_planner = Dubins(4, 1)
+    rrt = RRT(env, local_planner=local_planner, precision=(1, 1, 1))
     start = (50, 1, 1.57)
     end = (50, 99, 1.57)
 
     # Initialisation of the tree, to have a first edge
     rrt.set_start(start)
-    rrt.run(end, 200, metric="local")
+    path = rrt.find_path(end, 200, metric="local")
 
     # Initialisation of the position of the vehicle
     position = start[:2]
@@ -78,7 +78,7 @@ def test_dynamic_env():
         #   The position of the goal
         end = (50, position[1] + 90, 1.57)
         # Continue the growth of the tree
-        rrt.run(end, 2, metric="local")
+        rrt.find_path(end, 2, metric="local")
 
 
 def test_dynamic_env_moving():
@@ -87,13 +87,14 @@ def test_dynamic_env_moving():
     """
 
     env = DynamicEnvironment((100, 100), 5, moving=True)
-    rrt = RRT(env)
+    local_planner = Dubins(4, 1)
+    rrt = RRT(env, local_planner=local_planner, precision=(1, 1, 1))
     start = (50, 1, 1.57)
     end = (50, 99, 1.57)
 
     # Initialisation of the tree, to have a first edge
     rrt.set_start(start)
-    rrt.run(end, 200, metric="local")
+    rrt.find_path(end, 200, metric="local")
 
     # Initialisation of the position of the vehicle
     position = start[:2]
@@ -102,7 +103,6 @@ def test_dynamic_env_moving():
     for time in range(60):
         # We check if we are on an edge or if we have to choose a new edge
         if not current_edge.path:
-            time = rrt.nodes[current_edge.node_to].time
             current_edge = rrt.select_best_edge()
         # Update the position of the vehicle
         position = current_edge.path.popleft()
@@ -112,4 +112,4 @@ def test_dynamic_env_moving():
         #   The position of the goal
         end = (50, position[1] + 90, 1.57)
         # Continue the growth of the tree
-        rrt.run(end, 2, metric="local")
+        rrt.find_path(end, 2, metric="local")

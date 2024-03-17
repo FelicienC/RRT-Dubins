@@ -51,11 +51,12 @@ class Dubins:
     """
 
     def __init__(self, radius, point_separation):
-        assert radius > 0 and point_separation > 0
+        if radius <= 0 or point_separation <= 0:
+            raise ValueError("Radius and point separation have to be positive")
         self.radius = radius
         self.point_separation = point_separation
 
-    def all_options(self, start, end, sort=False):
+    def get_options(self, start, end, sort=False):
         """
         Computes all the possible Dubin's path and returns them, in the form
         of a list of tuples representing each option: (path_length,
@@ -74,8 +75,8 @@ class Dubins:
 
         Returns
         -------
-        The shortest list of points (x, y) linking the initial and final points
-        given as input with only turns of a defined radius and straight line.
+        All 6 possible paths linking the initial and final points, as a list
+        of dubins paths (path_length, dubins_path, straight).
 
         """
         center_0_left = self.find_center(start, "L")
@@ -115,8 +116,8 @@ class Dubins:
         In the form of a (2xn) numpy array.
 
         """
-        options = self.all_options(start, end)
-        dubins_path, straight = min(options, key=lambda x: x[0])[1:]
+        options = self.get_options(start, end)
+        _, dubins_path, straight = min(options, key=lambda x: x[0])
         return self.generate_points(start, end, dubins_path, straight)
 
     def generate_points(self, start, end, dubins_path, straight):
