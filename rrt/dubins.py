@@ -95,7 +95,7 @@ class Dubins:
             options.sort(key=lambda x: x[0])
         return options
 
-    def dubins_path(self, start, end):
+    def get_path(self, state1, state2):
         """
         Computes all the possible Dubin's path and returns the sequence of
         points representing the shortest option.
@@ -116,9 +116,9 @@ class Dubins:
         In the form of a (2xn) numpy array.
 
         """
-        options = self.get_options(start, end)
+        options = self.get_options(state1, state2)
         _, dubins_path, straight = min(options, key=lambda x: x[0])
-        return self.generate_points(start, end, dubins_path, straight)
+        return self.generate_points(state1, state2, dubins_path, straight)
 
     def generate_points(self, start, end, dubins_path, straight):
         """
@@ -462,18 +462,21 @@ class Dubins:
         # We first need to find the points where the straight segment starts
         if abs(path[0]) > 0:
             angle = start[2] + (abs(path[0]) - np.pi / 2) * np.sign(path[0])
-            ini = center_0 + self.radius * np.array([np.cos(angle), np.sin(angle)])
+            x, y = center_0 + self.radius * np.array([np.cos(angle), np.sin(angle)])
+            ini = np.array([x, y, angle])
         else:
-            ini = np.array(start[:2])
+            ini = np.array(start)
         # We then identify its end
         if abs(path[1]) > 0:
             angle = end[2] + (-abs(path[1]) - np.pi / 2) * np.sign(path[1])
-            fin = center_2 + self.radius * np.array([np.cos(angle), np.sin(angle)])
+            x, y = center_2 + self.radius * np.array([np.cos(angle), np.sin(angle)])
+            fin = np.array([x, y, angle])
         else:
-            fin = np.array(end[:2])
-        dist_straight = dist(ini, fin)
+            fin = np.array(end)
+        dist_straight = dist(ini[:2], fin[:2])
 
         # We can now generate all the points with the desired precision
+        angle = np.arctan2((fin[1] - ini[1]), (fin[0] - ini[0]))
         points = []
         for x in np.arange(0, total, self.point_separation):
             if x < abs(path[0]) * self.radius:  # First turn
@@ -482,8 +485,9 @@ class Dubins:
                 points.append(self.circle_arc(end, path[1], center_2, x - total))
             else:  # Straight segment
                 coeff = (x - abs(path[0]) * self.radius) / dist_straight
-                points.append(coeff * fin + (1 - coeff) * ini)
-        points.append(end[:2])
+                x, y = ini[:2] + coeff * (fin[:2] - ini[:2])
+                points.append((x, y, angle))
+        points.append(end)
         return np.array(points)
 
     def generate_points_curve(self, start, end, path):
@@ -532,8 +536,9 @@ class Dubins:
             else:  # Middle Turn
                 angle = psi_0 - np.sign(path[0]) * (x / self.radius - abs(path[0]))
                 vect = np.array([np.cos(angle), np.sin(angle)])
-                points.append(center_1 + self.radius * vect)
-        points.append(end[:2])
+                a, b = center_1 + self.radius * vect
+                points.append((a, b, angle + np.pi / 2))
+        points.append(end)
         return np.array(points)
 
     def circle_arc(self, reference, beta, center, x):
@@ -561,4 +566,5 @@ class Dubins:
         """
         angle = reference[2] + ((x / self.radius) - np.pi / 2) * np.sign(beta)
         vect = np.array([np.cos(angle), np.sin(angle)])
-        return center + self.radius * vect
+        x, y = center + self.radius * vect
+        return x, y, angle + np.pi / 2 * np.sign(beta)

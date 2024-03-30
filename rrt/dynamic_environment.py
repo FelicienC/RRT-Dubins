@@ -4,8 +4,6 @@ The environement where the obstacles can move
 
 from collections import deque
 import numpy as np
-import matplotlib.pyplot as plt
-
 from rrt.obstacle import Wall
 
 
@@ -28,8 +26,6 @@ class DynamicEnvironment:
 
     Methods
     -------
-    plot
-        Draws the environnement using matplotlib.
     is_free
         Returns False if a point is within an obstacle or outside of the
         boundaries of the environnement. Checks at a specific instant.
@@ -44,7 +40,6 @@ class DynamicEnvironment:
     def __init__(self, dimensions, nb_walls, moving=False):
         self.moving = moving
         self.dimensions = dimensions
-        # nb_walls represent the number of walls on the screen
         self.obstacles = deque()
         for i in range(nb_walls * 2):
             self.obstacles.append(
@@ -57,39 +52,12 @@ class DynamicEnvironment:
             )
         self.center = [dimensions[0] / 2, dimensions[1] / 2]
 
-    def plot(self, time=0, close=False, display=True):
-        """
-        Creates a figure and plots the environement on it.
-
-        Parameters
-        ----------
-        time : float
-            The instant at which the environment must be drawn.
-        close : bool
-            If the plot needs to be automaticaly closed after the drawing.
-        display : bool
-            If the view pops up or not (used when generating many images)
-        """
-        plt.ion() if display else plt.ioff()
-        plt.figure()
-        for obstacle in self.obstacles:
-            obstacle.plot(time)
-        plt.gca().set_xlim(
-            self.center[0] - self.dimensions[0] / 2,
-            self.center[0] + self.dimensions[0] / 2,
-        )
-        plt.gca().set_ylim(
-            self.center[1] - self.dimensions[1] / 2,
-            self.center[1] + self.dimensions[1] / 2,
-        )
-        if close:
-            plt.close()
-
-    def is_free(self, x, y, time=0):
+    def is_free(self, state):
         """
         Returns False if a point is within an obstacle or outside of the
         boundaries of the environnement.
         """
+        x, y, psi, time = state
 
         if (
             x < self.center[0] - self.dimensions[0] / 2

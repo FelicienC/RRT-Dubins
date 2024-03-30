@@ -93,10 +93,7 @@ end = env.random_free_space()
 rrt.set_start(start)
 
 # We run 100 iterations of growth
-rrt.run(end, nb_iteration=100)
-
-env.plot()
-rrt.plot(nodes=True)
+path = rrt.find_path(end, 200)
 ```
 <p align="center">
   <img src="docs/img/with_nodes.png">
@@ -149,9 +146,6 @@ for i in range(500):
     end = (50, position[1]+90, 1.57)
     # Continue the growth of the tree, we try to add only 2 nodes
     rrt.run(end, 2, metric='local')
-    # Ploting and generating an image (the most time consuming step)
-    env.plot(time, display=False)
-    rrt.plot(file_name='moving'+str(i)+'.png', close=True)
 ```
 This code executes relatively slowly due to the time needed to plot every single frame with matplotlib.
 Here is the result obtained by concatenating all the produced images into one gif file.
@@ -168,14 +162,20 @@ Here is the result obtained by concatenating all the produced images into one gi
 
 # TODO : 
 
+- [x] Return the path 
+- [x] Remove matplotlib dependency
+- [ ] Get rid of the get_options method of the local planner
 - [ ] Setup pre-commit tools (ruff - tests - coverage - spelling)
 - [ ] Setup CI
 - [ ] Move time to the state
 - [ ] Make the rrt dimensions and planner independent
-- [ ] Return the path 
-- [ ] Remove matplotlib dependency
 - [ ] Implement real unit tests 
 - [ ] Implemment RRT*
 - [ ] Implement // processing ?
 - [ ] Add typing everywhere
 - [ ] Add seed to make real tests
+- [ ] Use private attributes
+
+from rrt import RRT
+
+my_random_tree = RRT()

@@ -1,9 +1,8 @@
 """
 Implementation of the polygonal obstacles as well as of the walls
 """
+
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.patches as pat
 
 from shapely.geometry import Polygon, Point
 
@@ -24,11 +23,6 @@ class Obstacle:
         Coordinates of the center of the bounding box.
     polygon : shapely.geometry.Polygon
         The polygon representing the obstacle.
-
-    Methods
-    -------
-    plot
-        Displays the polygon on screen.
 
     """
 
@@ -60,13 +54,6 @@ class Obstacle:
 
         return self.polygon.contains(Point(x, y))
 
-    def plot(self):
-        """
-        Draws the polygon on screen.
-        """
-
-        plt.gca().add_patch(pat.Polygon(self.points, color="black", fill=True))
-
 
 class Wall:
     """
@@ -89,8 +76,6 @@ class Wall:
     -------
     colides
         Checks if a point is in the wall or not.
-    plot
-        Draws the wall on screen.
     visible
         Checks if the wall is in the field of view
     """
@@ -115,52 +100,6 @@ class Wall:
         hole = (self.hole + self.speed * time) % (self.width)
         return (x < hole - self.width * 0.05 or x > hole + self.width * 0.05) and (
             self.bottom_y <= y <= self.bottom_y + self.thickness
-        )
-
-    def plot(self, time=0, x_scale=1, y_scale=1):
-        """
-        Draws the wall on screen.
-        """
-
-        hole = (self.hole + self.speed * time) % (self.width)
-        plt.gca().add_patch(
-            pat.Rectangle(
-                (0, self.bottom_y * y_scale),
-                hole - 0.05 * self.width,
-                self.thickness * y_scale,
-                color="grey",
-                fill=True,
-            )
-        )
-        plt.gca().add_patch(
-            pat.Rectangle(
-                ((hole + self.width * 0.05) * x_scale, self.bottom_y * y_scale),
-                self.width * x_scale,
-                self.thickness * y_scale,
-                color="grey",
-                fill=True,
-            )
-        )
-        plt.gca().add_patch(
-            pat.Rectangle(
-                (0, (self.bottom_y + self.thickness * 0.4) * y_scale),
-                hole - self.width * 0.1,
-                self.thickness * 0.2 * y_scale,
-                color="black",
-                fill=True,
-            )
-        )
-        plt.gca().add_patch(
-            pat.Rectangle(
-                (
-                    (hole + self.width * 0.1) * x_scale,
-                    (self.bottom_y + self.thickness * 0.4) * y_scale,
-                ),
-                (self.width) * x_scale,
-                self.thickness * 0.2 * y_scale,
-                color="black",
-                fill=True,
-            )
         )
 
     def visible(self, view_top, view_bottom):

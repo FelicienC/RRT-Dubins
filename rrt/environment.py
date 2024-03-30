@@ -3,10 +3,22 @@ The environment with static polygonal obstacles
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 from scipy.spatial import KDTree
 from rrt.obstacle import Obstacle
+
+
+class EmptyEnvironment:
+
+    def __init__(self, dimensions: list[int]) -> None:
+        self.dimensions = dimensions
+
+    def is_free(self, state: np.ndarray) -> bool:
+        return True
+
+    def random_free_space(self) -> np.ndarray:
+        """Return a random np.array in the free space"""
+        return np.random.rand(len(self.dimensions)) * self.dimensions
 
 
 class StaticEnvironment:
@@ -27,8 +39,6 @@ class StaticEnvironment:
 
     Methods
     -------
-    plot
-        Draws the environnement using matplotlib.
     is_free
         Returns False if a point is within an obstacle or outside of the
         boundaries of the environnement.
@@ -41,32 +51,12 @@ class StaticEnvironment:
         ]
         self.kdtree = KDTree([obs.center for obs in self.obstacles])
 
-    def plot(self, close=False, display=True):
-        """
-        Creates a figure and plots the environement on it.
-
-        Parameters
-        ----------
-        close : bool
-            If the plot needs to be automatically closed after the drawing.
-        display : bool
-            If the view pops up or not (used when generating many images)
-        """
-
-        plt.ion() if display else plt.ioff()
-        for obstacle in self.obstacles:
-            obstacle.plot()
-        plt.gca().set_xlim(0, self.dimensions[0])
-        plt.gca().set_ylim(0, self.dimensions[1])
-        if close:
-            plt.close()
-
-    def is_free(self, x, y, time=0):
+    def is_free(self, state):
         """
         Returns False if a point is within an obstacle or outside of the
         boundaries of the environnement.
         """
-
+        x, y, psi = state
         if x < 0 or x > self.dimensions[0] or y < 0 or y > self.dimensions[1]:
             return False
         for obstacle in self.close_obstacles(x, y, nb_obstacles=5):
@@ -107,10 +97,9 @@ class StaticEnvironment:
         """
         Returns a randomly selected point in the free space.
         """
-
         x = np.random.rand() * self.dimensions[0]
         y = np.random.rand() * self.dimensions[1]
-        while not self.is_free(x, y):
+        while not self.is_free((x, y, 0)):
             x = np.random.rand() * self.dimensions[0]
             y = np.random.rand() * self.dimensions[1]
         return x, y, np.random.rand() * np.pi * 2

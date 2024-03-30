@@ -2,6 +2,7 @@
 Test module, making sure the main functionnalities are always functionning
 """
 
+import numpy as np
 from rrt.dubins import Dubins
 from rrt.environment import StaticEnvironment
 from rrt.dynamic_environment import DynamicEnvironment
@@ -22,7 +23,6 @@ def test_environment():
     """
 
     env = StaticEnvironment((100, 100), 200)
-    env.plot()
 
 
 def test_rrt():
@@ -30,9 +30,9 @@ def test_rrt():
     Tests that the RRT class works
     """
 
-    env = StaticEnvironment((100, 100), 100)
+    env = StaticEnvironment((100, 100, 6.29), 100)
     local_planner = Dubins(4, 1)
-    rrt = RRT(env, local_planner=local_planner, precision=(1, 1, 1))
+    rrt = RRT(env, local_planner=local_planner, precision=(1, 1, 2))
 
     # Selection of random starting and ending points
     start = env.random_free_space()
@@ -40,11 +40,12 @@ def test_rrt():
 
     # Trying first the euclidian distance
     rrt.set_start(start)
-    path = rrt.find_path(end, 200, metric="euclidian")
+    path = rrt.find_path(end, 1000, metric="euclidian")
 
-    # Trying first the distance defined by the local planner
+    # Trying then the distance defined by the local planner
     rrt.set_start(start)
-    path = rrt.find_path(end, 200, metric="local")
+    path = rrt.find_path(end, 1000, metric="local")
+    print(path)
 
 
 def test_dynamic_env():
@@ -52,11 +53,11 @@ def test_dynamic_env():
     Tests that the RRT works in a dynamic environement
     """
 
-    env = DynamicEnvironment((100, 100), 5)
+    env = DynamicEnvironment((100, 100, 6.29), 5)
     local_planner = Dubins(4, 1)
     rrt = RRT(env, local_planner=local_planner, precision=(1, 1, 1))
-    start = (50, 1, 1.57)
-    end = (50, 99, 1.57)
+    start = (50, 1, 1.57, 0)
+    end = (50, 99, 1.57, 10)
 
     # Initialisation of the tree, to have a first edge
     rrt.set_start(start)
@@ -64,12 +65,12 @@ def test_dynamic_env():
 
     # Initialisation of the position of the vehicle
     position = start[:2]
-    current_edge = rrt.select_best_edge()
+    current_edge = rrt.selet_largest_subtree()
 
     for i in range(60):
         # We check if we are on an edge or if we have to choose a new edge
         if not current_edge.path:
-            current_edge = rrt.select_best_edge()
+            current_edge = rrt.selet_largest_subtree()
         # Update the position of the vehicle
         position = current_edge.path.popleft()
         # Update the environment
@@ -98,12 +99,12 @@ def test_dynamic_env_moving():
 
     # Initialisation of the position of the vehicle
     position = start[:2]
-    current_edge = rrt.select_best_edge()
+    current_edge = rrt.selet_largest_subtree()
 
     for time in range(60):
         # We check if we are on an edge or if we have to choose a new edge
         if not current_edge.path:
-            current_edge = rrt.select_best_edge()
+            current_edge = rrt.selet_largest_subtree()
         # Update the position of the vehicle
         position = current_edge.path.popleft()
         # Update the environment

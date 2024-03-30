@@ -3,7 +3,6 @@ Construction of the Rapidely Exploring Random Tree
 """
 
 from collections import deque
-import matplotlib.pyplot as plt
 import numpy as np
 from rrt.dubins import Dubins, dist
 
@@ -18,18 +17,15 @@ class Node:
     ----------
     destination_list : list
         The reachable nodes from the current one.
-    position : tuple
-        The position of the node.
-    time : float
-        The instant at which this node is reached.
+    state : tuple
+        The state represented by the node.
     cost : float
         The cost needed to reach this node.
     """
 
-    def __init__(self, position, time, cost, parent=None):
+    def __init__(self, state, cost, parent=None):
         self.destination_list = []
-        self.position = position
-        self.time = time
+        self.state = state
         self.cost = cost
         self.parent = parent
 
@@ -74,8 +70,8 @@ class RRT:
         The frequency at which the randomly selected node is choosen among
         the goal zone.
     precision : tuple
-        The precision needed to stop the algorithm. In the form
-        (delta_x, delta_y, delta_psi).
+        The precision needed to stop the algorithm. It is a tuple of the same
+        dimension as the state space.
     goal : tuple
         The position of the goal (the center of the goal zone), in the form of
         a tuple.
@@ -92,8 +88,6 @@ class RRT:
     run
         Executes the algorithm with an empty graph, which needs to be
         initialized with the start position at least before.
-    plot_tree
-        Displays the RRT using matplotlib.
     select_options
         Explores the existing nodes of the tree to find the best option to grow
         from.
@@ -107,9 +101,34 @@ class RRT:
         self.precision = precision
         self.environment = environment
         self.local_planner = local_planner
-        # TODO: check that the environment has the right methods
-        # TODO: check that the local planner has the right methods
-        # TODO: check that the precision has the same dimension as the state space
+
+        self.validate()
+
+    def validate(self):
+        """
+        Checks that the environment and the local planner are correctly
+        implemented.
+        """
+        if not hasattr(self.environment, "is_free"):
+            raise AttributeError(
+                "The environment does not implement the method is_free"
+            )
+        if not hasattr(self.environment, "random_free_space"):
+            raise AttributeError(
+                "The environment does not implement the method random_free_space"
+            )
+        if not hasattr(self.local_planner, "get_options"):
+            raise AttributeError(
+                "The local planner does not implement the method get_options"
+            )
+        if not hasattr(self.local_planner, "get_path"):
+            raise AttributeError(
+                "The local planner does not implement the method get_path(state1, state2)"
+            )
+        if len(self.precision) != len(self.environment.dimensions):
+            raise AttributeError(
+                "The precision does not have the same dimension as the state space"
+            )
 
     def set_start(self, start):
         """
@@ -118,15 +137,44 @@ class RRT:
         Parameters
         ----------
         start: tuple
-            The initial position (x, y, psi), used as root.
+            The initial state, used as root.
         """
 
         self.nodes = {}
         self.edges = {}
-        self.nodes[start] = Node(position=start, time=0, cost=0)
-        self.root = start
+        if self.is_valid_state(start):
+            self.nodes[tuple(start)] = Node(state=start, cost=0)
+            self.root = start
 
-    def find_path(self, goal, nb_iteration=100, goal_rate=0.1, metric="local") -> List:
+    def is_valid_state(self, state: tuple) -> bool:
+        """
+        Checks that the provided state is within the boundaries of the
+        environment and in free space.
+        """
+        if len(state) != len(self.environment.dimensions):
+            raise ValueError(
+                "The provided state does not have the same dimension as the state space",
+                f", expected {len(self.environment.dimensions)} got {len(state)}",
+            )
+        if not all(
+            0 <= state[i] <= self.environment.dimensions[i] for i in range(len(state))
+        ):
+            raise ValueError(
+                "The provided state is not within the boundaries of the environment",
+                state,
+            )
+        if not self.environment.is_free(state):
+            raise ValueError("The provided state is not in free space")
+        return True
+
+    def find_path(
+        self,
+        goal,
+        nb_iteration=100,
+        goal_rate=0.1,
+        metric="local",
+        interupt_when_reached=True,
+    ) -> List:
         """
         Executes the algorithm with an empty graph, initialized with the start
         position at least.
@@ -154,9 +202,8 @@ class RRT:
         the computation faster and the code a simpler, this is why several
         metrics are available.
         """
-        # TODO : check that the goal is within the boundaries of the environment
-        # TODO : check that the goal dimensions are the same as the state space
-        self.goal = goal
+        if self.is_valid_state(goal):
+            self.goal = goal
 
         for _ in range(nb_iteration):
             # Select sample : either the goal, or a sample of free space
@@ -167,35 +214,27 @@ class RRT:
             # Find the closest Node in the tree, with the selected metric
             options = self.select_options(sample, 10, metric)
 
-            # Now that all the options are sorted from the shortest to the
-            # longest, we can try to connect one node after the other. We stop
-            # after 10 in order to limit computations.
             for node, option in options:
                 if option[0] == float("inf"):
                     break
-                path = self.local_planner.generate_points(
-                    node, sample, option[1], option[2]
-                )
-                for i, point in enumerate(path):
-                    if not self.environment.is_free(
-                        point[0], point[1], self.nodes[node].time + i
-                    ):
+                path = self.local_planner.get_path(node, sample)
+                for state in path:
+                    if not self.environment.is_free(state):
                         break
                 else:
-                    # Adding the node
-                    self.nodes[sample] = Node(
-                        position=sample,
-                        time=self.nodes[node].time
-                        + option[0],  # As the time, we use the distance
+                    # Adding the node to the tree, using the last state of the path
+                    state = tuple(state)
+                    self.nodes[state] = Node(
+                        state=state,
                         cost=self.nodes[node].cost
                         + option[0],  # As the cost, we use the distance
                         parent=node,
                     )
-                    self.nodes[node].destination_list.append(sample)
+                    self.nodes[node].destination_list.append(state)
                     # Adding the Edge
-                    self.edges[node, sample] = Edge(node, sample, path, option[0])
-                    if self.in_goal_region(sample):
-                        return self.get_path_to_node(sample)
+                    self.edges[node, state] = Edge(node, state, path, option[0])
+                    if self.in_goal_region(state) and interupt_when_reached:
+                        return self.get_path_to_node(state)
                     break
         return []
 
@@ -250,7 +289,7 @@ class RRT:
                 )
         return options
 
-    def in_goal_region(self, sample):
+    def in_goal_region(self, sample) -> bool:
         """
         Method to determine if a point is within a goal region or not.
 
@@ -265,7 +304,7 @@ class RRT:
                 return False
         return True
 
-    def select_best_edge(self) -> Edge:
+    def selet_largest_subtree(self) -> Edge:
         """
         Selects the best edge of the tree among the ones leaving from the root.
         Uses the number of children to determine the best option.
@@ -308,7 +347,7 @@ class RRT:
     def children_count(self, node) -> int:
         """
         Not optimal at all as it recounts a lot of the tree every time a path
-        needs to b selected.
+        needs to be selected.
         """
 
         if not self.nodes[node].destination_list:
@@ -321,10 +360,21 @@ class RRT:
     def get_path_to_node(self, node) -> list[tuple]:
         """
         Returns the path from the root to the requested node.
+
+        Parameters
+        ----------
+        node : tuple
+            The state of the node from which we want to get the path.
+
+        Returns
+        -------
+        path : list
+            The path from the root to the requested node. It is a list of
+            successive states.
         """
 
         path = []
         while node != self.root:
-            path.append(self.edges[(self.nodes[node].parent, node)].path)
+            path.extend(list(self.edges[(self.nodes[node].parent, node)].path)[::-1])
             node = self.nodes[node].parent
         return path
