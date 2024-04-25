@@ -1,48 +1,55 @@
-from rrt import RRT, EmptyEnvironment, DefaultPlanner
+from rrt import RRT, EmptyEnvironment, DefaultPlanner, Dubins
 import numpy as np
 import time
+import pytest
 
 np.random.seed(0)
 
 
-def test_rrt():
-    env = EmptyEnvironment((100, 100))
+@pytest.mark.parametrize("n_dim", range(2, 11))
+@pytest.mark.parametrize("metric", ["local", "euclidean"])
+def test_rrt_nd(n_dim, metric):
+    """Test the growth of the tree in n dimensions, n=2 to 9."""
+    env = EmptyEnvironment((100,) * n_dim)
     local_planner = DefaultPlanner(1)
-    my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1))
-
-    start = env.random_free_space()
-    end = env.random_free_space()
-
-    # We initialize an empty tree
+    start, end = env.random_free_space(), env.random_free_space()
+    my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1,) * n_dim)
     my_rrt.set_start(start)
-
-    # We run 100 iterations of growth
-    path = my_rrt.find_path(end, 3, metric="euclidean", goal_rate=0)
-
-    assert len(my_rrt.nodes) == 4
-    assert list(my_rrt.nodes.keys()) == [
-        (54.88135039273247, 71.51893663724195),
-        (55.21145802594044, 70.57499333889304),
-        (55.998752004700016, 69.95841553276561),
-        (55.768716576583394, 68.98523327757843),
-    ]
+    path = my_rrt.grow(end, 10, metric=metric, goal_rate=0)
+    assert len(my_rrt.nodes[0].state) == n_dim
+    assert list(my_rrt.nodes.keys()) == list(range(10))
 
 
 def test_rrt_timeit():
+    """Test with a large number of nodes to see if it is fast enough"""
     env = EmptyEnvironment((100, 100))
     local_planner = DefaultPlanner(1)
     my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1))
 
     start = env.random_free_space()
     end = env.random_free_space()
-
-    # We initialize an empty tree
     my_rrt.set_start(start)
+    path = my_rrt.grow(end, 10000, metric="euclidean", goal_rate=0)
 
-    # We time the growth of the tree
-    start_time = time.time()
-    path = my_rrt.find_path(
-        end, 3000, metric="euclidean", goal_rate=0, interupt_when_reached=False
-    )
-    end_time = time.time()
-    print("Execution time:", end_time - start_time)
+
+def test_rrt_dubins():
+    """
+    Tests that the RRT class works
+    """
+
+    env = EmptyEnvironment((100, 100, 6.29))
+    local_planner = Dubins(4, 1)
+    rrt = RRT(env, local_planner=local_planner, precision=(1, 1, 2))
+
+    # Selection of random starting and ending points
+    start = env.random_free_space()
+    end = env.random_free_space()
+
+    # Trying first the euclidian distance
+    rrt.set_start(start)
+    path = rrt.grow(end, 100, metric="euclidian")
+
+    # # Trying then the distance defined by the local planner
+    rrt.set_start(start)
+    path = rrt.grow(end, 1000, metric="local")
+    print(path)

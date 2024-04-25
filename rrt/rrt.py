@@ -5,6 +5,8 @@ Construction of the Rapidely Exploring Random Tree
 from collections import deque
 import numpy as np
 from rrt.dubins import Dubins, dist
+from rtree.index import Index as RTreeIndex
+from rtree.index import Property
 
 from typing import List
 
@@ -23,11 +25,12 @@ class Node:
         The cost needed to reach this node.
     """
 
-    def __init__(self, state, cost, parent=None):
+    def __init__(self, index, state, cost, parent_index=None):
         self.destination_list = []
         self.state = state
         self.cost = cost
-        self.parent = parent
+        self.parent = parent_index
+        self.index = index
 
 
 class Edge:
@@ -101,6 +104,9 @@ class RRT:
         self.precision = precision
         self.environment = environment
         self.local_planner = local_planner
+        self.rtree = RTreeIndex()
+        self.node_index = 0
+        self.reached_goal = []
 
         self.validate()
 
@@ -116,10 +122,6 @@ class RRT:
         if not hasattr(self.environment, "random_free_space"):
             raise AttributeError(
                 "The environment does not implement the method random_free_space"
-            )
-        if not hasattr(self.local_planner, "get_options"):
-            raise AttributeError(
-                "The local planner does not implement the method get_options"
             )
         if not hasattr(self.local_planner, "get_path"):
             raise AttributeError(
@@ -142,9 +144,16 @@ class RRT:
 
         self.nodes = {}
         self.edges = {}
+        self.reached_goal = []
+        self.rtree = RTreeIndex(properties=Property(dimension=len(start)))
+        self.node_index = 0
+
         if self.is_valid_state(start):
-            self.nodes[tuple(start)] = Node(state=start, cost=0)
+            self.nodes[self.node_index] = Node(
+                index=self.node_index, state=start, cost=0
+            )
             self.root = start
+            self.rtree.add(self.node_index, start)
 
     def is_valid_state(self, state: tuple) -> bool:
         """
@@ -167,13 +176,12 @@ class RRT:
             raise ValueError("The provided state is not in free space")
         return True
 
-    def find_path(
+    def grow(
         self,
         goal,
         nb_iteration=100,
-        goal_rate=0.1,
+        goal_rate=0.05,
         metric="local",
-        interupt_when_reached=True,
     ) -> List:
         """
         Executes the algorithm with an empty graph, initialized with the start
@@ -206,39 +214,46 @@ class RRT:
             self.goal = goal
 
         for _ in range(nb_iteration):
-            # Select sample : either the goal, or a sample of free space
-            if np.random.rand() > 1 - goal_rate:
-                sample = goal
+
+            # Randomly select a sample, with a probability of goal_rate to be
+            # the goal.
+            sample = (
+                self.environment.random_free_space()
+                if np.random.rand() > goal_rate
+                else goal
+            )
+
+            # Find the closest node of the tree to the sample
+            node, cost = self.get_closest_node(sample, metric=metric)
+
+            # Try to connect the node to the sample
+            path = self.local_planner.get_path(node.state, sample)
+            for state in path:
+                if not self.environment.is_free(state):
+                    break
             else:
-                sample = self.environment.random_free_space()
-            # Find the closest Node in the tree, with the selected metric
-            options = self.select_options(sample, 10, metric)
+                # Adding the node to the tree
+                self.add_node(state, parent_index=node.index, path=path)
+                if self.in_goal_region(state):
+                    self.reached_goal.append(self.node_index - 1)
 
-            for node, option in options:
-                if option[0] == float("inf"):
-                    break
-                path = self.local_planner.get_path(node, sample)
-                for state in path:
-                    if not self.environment.is_free(state):
-                        break
-                else:
-                    # Adding the node to the tree, using the last state of the path
-                    state = tuple(state)
-                    self.nodes[state] = Node(
-                        state=state,
-                        cost=self.nodes[node].cost
-                        + option[0],  # As the cost, we use the distance
-                        parent=node,
-                    )
-                    self.nodes[node].destination_list.append(state)
-                    # Adding the Edge
-                    self.edges[node, state] = Edge(node, state, path, option[0])
-                    if self.in_goal_region(state) and interupt_when_reached:
-                        return self.get_path_to_node(state)
-                    break
-        return []
+    def add_node(self, state, parent_index, path):
+        """
+        Adds a node to the tree, without checking for collisions.
+        """
+        index = self.node_index
+        self.nodes[index] = Node(
+            index=index,
+            state=state,
+            cost=0,  # As the cost, we use the distance
+            parent_index=parent_index,
+        )
+        self.nodes[index].destination_list.append(state)
+        self.rtree.add(index, state)
+        self.edges[parent_index, index] = Edge(parent_index, index, path, 1)
+        self.node_index += 1
 
-    def select_options(self, sample, nb_options, metric="local"):
+    def get_closest_node(self, sample, metric="local"):
         """
         Chooses the best nodes for the expansion of the tree, and returns
         them in a list ordered by increasing cost.
@@ -247,47 +262,27 @@ class RRT:
         ----------
         sample : tuple
             The state of the node we wish to connect to the tree.
-        nb_options : int
-            The number of options requested.
         metric : str
             One of 'local', 'euclidian'. The euclidian metric is a lot faster
             but is also less precise and can't be used with an RRT star.
 
         Returns
         -------
-        options : list
-            Sorted list of the options, by increasing cost.
+        closest_node : Node
+        length : float, the distance between the closest node and the sample according
+                 to the metric
+
         """
-
+        closest_node = self.nodes[next(self.rtree.nearest(sample))]
         if metric == "local":
-            # The local planner is used to measure the real distance needed
-            options = []
-            for node in self.nodes:
-                options.extend(
-                    [
-                        (node, opt)
-                        for opt in self.local_planner.get_options(node, sample)
-                    ]
-                )
-            # sorted by cost
-            options.sort(key=lambda x: x[1][0])
-            options = options[:nb_options]
-        else:
-            # Euclidian distance as a metric
-            options = [(node, dist(node, sample)) for node in self.nodes]
-            options.sort(key=lambda x: x[1])
-            options = options[:nb_options]
-
-            # We now have to compute the real cost of the path, and not only the
-            # distance. We use the local planner to do so.
-            for index, (node, _) in enumerate(options):
-                options[index] = (
-                    node,
-                    min(
-                        self.local_planner.get_options(node, sample), key=lambda x: x[0]
-                    ),
-                )
-        return options
+            length = (
+                len(self.local_planner.get_path(closest_node.state, sample))
+                * self.local_planner.point_separation
+            )
+            return closest_node, length
+        return closest_node, np.linalg.norm(
+            np.array(closest_node.state) - np.array(sample)
+        )
 
     def in_goal_region(self, sample) -> bool:
         """
@@ -318,13 +313,13 @@ class RRT:
         node = max(
             [
                 (child, self.children_count(child))
-                for child in self.nodes[self.root].destination_list
+                for child in self.nodes[0].destination_list
             ],
             key=lambda x: x[1],
         )[0]
         best_edge = self.edges[(self.root, node)]
         # we update the tree to remove all the other siblings of the old root
-        for child in self.nodes[self.root].destination_list:
+        for child in self.nodes[0].destination_list:
             if child == node:
                 continue
             self.edges.pop((self.root, child))
@@ -357,14 +352,14 @@ class RRT:
             total += 1 + self.children_count(child)
         return total
 
-    def get_path_to_node(self, node) -> list[tuple]:
+    def get_path_to_node(self, node_index: int) -> list[tuple]:
         """
         Returns the path from the root to the requested node.
 
         Parameters
         ----------
-        node : tuple
-            The state of the node from which we want to get the path.
+        node_index : int
+            The index of the node from which the path is requested.
 
         Returns
         -------
@@ -374,7 +369,9 @@ class RRT:
         """
 
         path = []
-        while node != self.root:
-            path.extend(list(self.edges[(self.nodes[node].parent, node)].path)[::-1])
-            node = self.nodes[node].parent
+        while node_index > 0:
+            path.extend(
+                list(self.edges[(self.nodes[node_index].parent, node_index)].path)[::-1]
+            )
+            node_index = self.nodes[node_index].parent
         return path

@@ -19,7 +19,7 @@ end = env.random_free_space()
 my_rrt.set_start(start)
 
 # We run 100 iterations of growth
-path = my_rrt.find_path(end, 200)
+my_rrt.grow(end, 200)
 
 
 # We plot

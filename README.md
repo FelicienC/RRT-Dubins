@@ -167,7 +167,7 @@ Here is the result obtained by concatenating all the produced images into one gi
 - [ ] Get rid of the get_options method of the local planner
 - [ ] Setup pre-commit tools (ruff - tests - coverage - spelling)
 - [ ] Setup CI
-- [ ] Move time to the state
+- [ ] Move time to the state -> Bad idea
 - [ ] Make the rrt dimensions and planner independent
 - [ ] Implement real unit tests 
 - [ ] Implemment RRT*

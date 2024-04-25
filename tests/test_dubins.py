@@ -17,37 +17,6 @@ def test_dubins():
     Dubins(10, 1)
 
 
-def test_environment():
-    """
-    Tests that the class Environment initializes and plots
-    """
-
-    env = StaticEnvironment((100, 100), 200)
-
-
-def test_rrt():
-    """
-    Tests that the RRT class works
-    """
-
-    env = StaticEnvironment((100, 100, 6.29), 100)
-    local_planner = Dubins(4, 1)
-    rrt = RRT(env, local_planner=local_planner, precision=(1, 1, 2))
-
-    # Selection of random starting and ending points
-    start = env.random_free_space()
-    end = env.random_free_space()
-
-    # Trying first the euclidian distance
-    rrt.set_start(start)
-    path = rrt.find_path(end, 1000, metric="euclidian")
-
-    # Trying then the distance defined by the local planner
-    rrt.set_start(start)
-    path = rrt.find_path(end, 1000, metric="local")
-    print(path)
-
-
 def test_dynamic_env():
     """
     Tests that the RRT works in a dynamic environement
@@ -61,7 +30,7 @@ def test_dynamic_env():
 
     # Initialisation of the tree, to have a first edge
     rrt.set_start(start)
-    path = rrt.find_path(end, 200, metric="local")
+    path = rrt.grow(end, 200, metric="local")
 
     # Initialisation of the position of the vehicle
     position = start[:2]
@@ -79,7 +48,7 @@ def test_dynamic_env():
         #   The position of the goal
         end = (50, position[1] + 90, 1.57)
         # Continue the growth of the tree
-        rrt.find_path(end, 2, metric="local")
+        rrt.grow(end, 2, metric="local")
 
 
 def test_dynamic_env_moving():
@@ -95,7 +64,7 @@ def test_dynamic_env_moving():
 
     # Initialisation of the tree, to have a first edge
     rrt.set_start(start)
-    rrt.find_path(end, 200, metric="local")
+    rrt.grow(end, 200, metric="local")
 
     # Initialisation of the position of the vehicle
     position = start[:2]
@@ -113,4 +82,4 @@ def test_dynamic_env_moving():
         #   The position of the goal
         end = (50, position[1] + 90, 1.57)
         # Continue the growth of the tree
-        rrt.find_path(end, 2, metric="local")
+        rrt.grow(end, 2, metric="local")

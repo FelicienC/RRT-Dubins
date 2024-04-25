@@ -27,7 +27,7 @@ while running:
             x, y = pygame.mouse.get_pos()
             my_rrt.set_start((WIDHT / 2, HEIGHT / 2, 0))
             end = (x, y, np.random.rand() * np.pi * 2)
-            path = my_rrt.find_path(end, 100, interupt_when_reached=False)
+            my_rrt.grow(end, 100)
 
     # Plot the rrt
     screen.fill((255, 255, 255))

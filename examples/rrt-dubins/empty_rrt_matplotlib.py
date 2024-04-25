@@ -17,7 +17,7 @@ end = env.random_free_space()
 my_rrt.set_start(start)
 
 # We run 100 iterations of growth
-path = my_rrt.find_path(end, 100, interupt_when_reached=False)
+my_rrt.grow(end, 100)
 
 # We plot the rrt
 for edge in my_rrt.edges.values():

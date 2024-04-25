@@ -21,7 +21,7 @@ class EmptyEnvironment:
         return np.random.rand(len(self.dimensions)) * self.dimensions
 
 
-class StaticEnvironment:
+class StaticEnvironment(EmptyEnvironment):
     """
     Class implementing a very simple bounded 2D world, containing polygonal
     obstacles stored in an appropriate data structure for rapid access to close
@@ -56,9 +56,7 @@ class StaticEnvironment:
         Returns False if a point is within an obstacle or outside of the
         boundaries of the environnement.
         """
-        x, y, psi = state
-        if x < 0 or x > self.dimensions[0] or y < 0 or y > self.dimensions[1]:
-            return False
+        x, y = state
         for obstacle in self.close_obstacles(x, y, nb_obstacles=5):
             if obstacle.colides(x, y):
                 return False
@@ -97,9 +95,7 @@ class StaticEnvironment:
         """
         Returns a randomly selected point in the free space.
         """
-        x = np.random.rand() * self.dimensions[0]
-        y = np.random.rand() * self.dimensions[1]
-        while not self.is_free((x, y, 0)):
-            x = np.random.rand() * self.dimensions[0]
-            y = np.random.rand() * self.dimensions[1]
-        return x, y, np.random.rand() * np.pi * 2
+        state = super().random_free_space()
+        while not self.is_free(state):
+            state = super().random_free_space()
+        return state

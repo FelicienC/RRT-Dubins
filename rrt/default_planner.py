@@ -13,19 +13,19 @@ class DefaultPlanner:
     def __init__(self, point_separation=1) -> None:
         self.point_separation = point_separation
 
-    def get_options(self, state1, state2) -> list[list]:
-        """
-        Given two states, it returns the options to connect them.
+    # def get_options(self, state1, state2) -> list[list]:
+    #     """
+    #     Given two states, it returns the options to connect them.
 
-        Args:
-            state1 (np.ndarray): The first state
-            state2 (np.ndarray): The second state
+    #     Args:
+    #         state1 (np.ndarray): The first state
+    #         state2 (np.ndarray): The second state
 
-        Returns:
-            list[list]: A list containing a single option to connect the two states in
-                the form [cost, path].
-        """
-        return [[0, self.get_path(state1, state2)]]
+    #     Returns:
+    #         list[list]: A list containing a single option to connect the two states in
+    #             the form [cost, path].
+    #     """
+    #     return [[0, self.get_path(state1, state2)]]
 
     def get_path(self, state1, state2) -> list[np.ndarray]:
         """
