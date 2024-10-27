@@ -18,6 +18,11 @@ Simple implementation of a **Rapidly Exploring Random Tree** using **Dubins path
 - [Matplotlib](https://matplotlib.org)
 - [Shapely](https://pypi.org/project/Shapely)
 
+To install requirements:
+```bash
+python3 -m pip install -r requirements.txt
+```
+
 ## Dubins path
 
 Dubins path refers to the shortest curve that connects two points in the two-dimensional Euclidean plane if only one direction of movement is permitted (the vehicle can only go forward). This type of path is necessarly in the form of one of 6 types, combination of right turns (**R**), left turns (**L**) and straight segments (**S**): **RLR, LRL, LSR, RSL, LSL, RSR**.
