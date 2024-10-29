@@ -53,6 +53,7 @@ The variable *path* now contains the sequence of points (x, y) linking the start
 import matplotlib.pyplot as plt
 
 plt.plot(path[:, 0], path[:, 1])
+plt.show()
 ```
 <p align="center">
   <img src="docs/img/LSL_example.png">
