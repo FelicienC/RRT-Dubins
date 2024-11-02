@@ -56,7 +56,7 @@ class Dubins:
         self.radius = radius
         self.point_separation = point_separation
 
-    def get_options(self, start, end, sort=False):
+    def _get_options(self, start, end, sort=False):
         """
         Computes all the possible Dubin's path and returns them, in the form
         of a list of tuples representing each option: (path_length,
@@ -116,11 +116,11 @@ class Dubins:
         In the form of a (2xn) numpy array.
 
         """
-        options = self.get_options(state1, state2)
+        options = self._get_options(state1, state2)
         _, dubins_path, straight = min(options, key=lambda x: x[0])
-        return self.generate_points(state1, state2, dubins_path, straight)
+        return self._generate_points(state1, state2, dubins_path, straight)
 
-    def generate_points(self, start, end, dubins_path, straight):
+    def _generate_points(self, start, end, dubins_path, straight):
         """
         Transforms the dubins path in a succession of points in the 2D plane.
 

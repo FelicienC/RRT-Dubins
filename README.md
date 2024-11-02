@@ -162,9 +162,6 @@ Here is the result obtained by concatenating all the produced images into one gi
 
 # TODO : 
 
-- [x] Return the path 
-- [x] Remove matplotlib dependency
-- [ ] Get rid of the get_options method of the local planner
 - [ ] Setup pre-commit tools (ruff - tests - coverage - spelling)
 - [ ] Setup CI
 - [ ] Move time to the state -> Bad idea

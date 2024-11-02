@@ -6,12 +6,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from rrt import Dubins
 
-# We initialize the planner with the turn radius and the desired distance between consecutive points
+# We initialize the planner with the turn radius and the desired distance between
+# consecutive points
 local_planner = Dubins(radius=2, point_separation=0.5)
 
 # We generate two points, x, y, psi
 start = (0, 0, 0)  # heading east
-end = (0, 1, 3.141)  # heading west
+end = (0, 1, np.pi)  # heading west
 
 # We compute the path between them
 path = local_planner.get_path(start, end)

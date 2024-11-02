@@ -56,7 +56,7 @@ class StaticEnvironment(EmptyEnvironment):
         Returns False if a point is within an obstacle or outside of the
         boundaries of the environnement.
         """
-        x, y = state
+        x, y, *_ = state
         for obstacle in self.close_obstacles(x, y, nb_obstacles=5):
             if obstacle.colides(x, y):
                 return False

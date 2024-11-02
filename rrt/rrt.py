@@ -374,4 +374,7 @@ class RRT:
                 list(self.edges[(self.nodes[node_index].parent, node_index)].path)[::-1]
             )
             node_index = self.nodes[node_index].parent
+        path.extend(
+            list(self.edges[(self.nodes[node_index].parent, node_index)].path)[::-1]
+        )
         return path

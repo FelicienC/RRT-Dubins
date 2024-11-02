@@ -1,13 +1,15 @@
 """
-Demo of the Dubins path planner using Pygame.
-Creating the Dubins path going from the center to your mouse.
+Demo of the Dubins path planner using Pygame as a visualisation backend.
+Creating the Dubins path going from the center of the screent to the pointer of 
+your mouse.
 """
 
 import pygame
 import numpy as np
 from rrt import Dubins
 
-# We initialize the planner with the turn radius and the desired distance between consecutive points
+# We initialize the planner with the turn radius and the desired distance between
+# consecutive points
 local_planner = Dubins(radius=20, point_separation=10)
 
 # Pygame parameters
