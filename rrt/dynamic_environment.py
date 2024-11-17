@@ -7,6 +7,24 @@ import numpy as np
 from rrt.obstacle import Wall
 
 
+class SimpleDynamicEnvironment:
+
+    def __init__(self, dimensions: list[int]) -> None:
+        self.dimensions = dimensions
+
+    def is_free(self, state: np.ndarray) -> bool:
+        # The state is a tuple (x, y, time)
+        x, y, t = state
+        return x > t
+
+    def random_free_space(self) -> np.ndarray:
+        """Return a random np.array in the free space"""
+        state = np.random.rand(len(self.dimensions)) * self.dimensions
+        while not self.is_free(state):
+            state = np.random.rand(len(self.dimensions)) * self.dimensions
+        return state
+
+
 class DynamicEnvironment:
     """
     Class implementing a simple dynamic bounded 2D world, containing square

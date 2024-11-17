@@ -25,12 +25,14 @@ class Node:
         The cost needed to reach this node.
     """
 
+    __slots__ = ["destination_list", "state", "cost", "parent", "index"]
+
     def __init__(self, index, state, cost, parent_index=None):
-        self.destination_list = []
-        self.state = state
-        self.cost = cost
-        self.parent = parent_index
-        self.index = index
+        self.destination_list: List[int] = []
+        self.state: tuple = state
+        self.cost: float = cost
+        self.parent: int = parent_index
+        self.index: int = index
 
 
 class Edge:
@@ -50,6 +52,8 @@ class Edge:
         Cost associated to the transition between the two nodes.
 
     """
+
+    __slots__ = ["node_from", "node_to", "path", "cost"]
 
     def __init__(self, node_from, node_to, path, cost):
         self.node_from = node_from
@@ -182,7 +186,7 @@ class RRT:
         nb_iteration=100,
         goal_rate=0.05,
         metric="local",
-    ) -> List:
+    ) -> None:
         """
         Executes the algorithm with an empty graph, initialized with the start
         position at least.
