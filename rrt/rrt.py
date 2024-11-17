@@ -99,7 +99,7 @@ class RRT:
         from.
     """
 
-    def __init__(self, environment, local_planner, precision):
+    def __init__(self, environment, local_planner, precision) -> None:
         self.nodes: dict = {}
         self.edges: dict = {}
         self.root: tuple
@@ -113,7 +113,7 @@ class RRT:
 
         self.validate()
 
-    def validate(self):
+    def validate(self) -> None:
         """
         Checks that the environment and the local planner are correctly
         implemented.
@@ -135,7 +135,7 @@ class RRT:
                 "The precision does not have the same dimension as the state space"
             )
 
-    def set_start(self, start):
+    def set_start(self, start) -> None:
         """
         Resets the graph, and sets the start node as root of the tree.
 
@@ -239,7 +239,7 @@ class RRT:
                 if self.in_goal_region(state):
                     self.reached_goal.append(self.node_index - 1)
 
-    def add_node(self, state, parent_index, path):
+    def add_node(self, state, parent_index, path) -> None:
         """
         Adds a node to the tree, without checking for collisions.
         """
@@ -255,7 +255,7 @@ class RRT:
         self.edges[parent_index, index] = Edge(parent_index, index, path, 1)
         self.node_index += 1
 
-    def get_closest_node(self, sample, metric="local"):
+    def get_closest_node(self, sample, metric="local") -> tuple:
         """
         Chooses the best nodes for the expansion of the tree, and returns
         them in a list ordered by increasing cost.

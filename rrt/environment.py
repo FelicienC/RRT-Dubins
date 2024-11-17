@@ -9,7 +9,6 @@ from rrt.obstacle import Obstacle
 
 
 class EmptyEnvironment:
-
     def __init__(self, dimensions: list[int]) -> None:
         self.dimensions = dimensions
 
@@ -41,20 +40,20 @@ class StaticEnvironment(EmptyEnvironment):
     -------
     is_free
         Returns False if a point is within an obstacle or outside of the
-        boundaries of the environnement.
+        boundaries of the environment.
     """
 
-    def __init__(self, dimensions, nb_obstacles):
+    def __init__(self, dimensions, nb_obstacles) -> None:
         self.dimensions = dimensions
         self.obstacles = [
             Obstacle(dimensions, 0.05 * dimensions[0], 5) for _ in range(nb_obstacles)
         ]
         self.kdtree = KDTree([obs.center for obs in self.obstacles])
 
-    def is_free(self, state):
+    def is_free(self, state) -> bool:
         """
         Returns False if a point is within an obstacle or outside of the
-        boundaries of the environnement.
+        boundaries of the environment.
         """
         x, y, *_ = state
         for obstacle in self.close_obstacles(x, y, nb_obstacles=5):
@@ -62,7 +61,7 @@ class StaticEnvironment(EmptyEnvironment):
                 return False
         return True
 
-    def close_obstacles(self, x, y, nb_obstacles=1):
+    def close_obstacles(self, x, y, nb_obstacles=1) -> list[Obstacle]:
         """
         Returns the list of all the obstacles close enough to be considered.
 
@@ -91,7 +90,7 @@ class StaticEnvironment(EmptyEnvironment):
             for index in self.kdtree.query((x, y), nb_obstacles)[1]
         ]
 
-    def random_free_space(self):
+    def random_free_space(self) -> np.ndarray:
         """
         Returns a randomly selected point in the free space.
         """

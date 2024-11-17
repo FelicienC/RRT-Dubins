@@ -1,13 +1,13 @@
 import numpy as np
 
 
-def ortho(vect2d):
+def ortho(vect2d) -> np.ndarray:
     """Computes an orthogonal vector to the one given"""
     return np.array((-vect2d[1], vect2d[0]))
 
 
-def dist(pt_a, pt_b):
-    """Euclidian distance between two (x, y) points"""
+def dist(pt_a, pt_b) -> float:
+    """Euclidean distance between two (x, y) points"""
     return ((pt_a[0] - pt_b[0]) ** 2 + (pt_a[1] - pt_b[1]) ** 2) ** 0.5
 
 
@@ -22,7 +22,7 @@ class Dubins:
     point_separation : float
         The distance between points of the trajectories. More points increases
         the precision of the path but also augments the computation time of the
-        colision check.
+        collision check.
 
     Methods
     -------
@@ -66,7 +66,7 @@ class Dubins:
         ----------
         start :  tuple
             In the form (x, y, psi), with psi in radians.
-            The representation of the inital point.
+            The representation of the initial point.
         end : tuple
             In the form (x, y, psi), with psi in radians.
             The representation of the final point.
@@ -95,7 +95,7 @@ class Dubins:
             options.sort(key=lambda x: x[0])
         return options
 
-    def get_path(self, state1, state2):
+    def get_path(self, state1, state2) -> np.ndarray:
         """
         Computes all the possible Dubin's path and returns the sequence of
         points representing the shortest option.
@@ -104,7 +104,7 @@ class Dubins:
         ----------
         start :  tuple
             In the form (x, y, psi), with psi in radians.
-            The representation of the inital point.
+            The representation of the initial point.
         end : tuple
             In the form (x, y, psi), with psi in radians.
             The representation of the final point.
@@ -120,7 +120,7 @@ class Dubins:
         _, dubins_path, straight = min(options, key=lambda x: x[0])
         return self._generate_points(state1, state2, dubins_path, straight)
 
-    def _generate_points(self, start, end, dubins_path, straight):
+    def _generate_points(self, start, end, dubins_path, straight) -> np.ndarray:
         """
         Transforms the dubins path in a succession of points in the 2D plane.
 
@@ -128,7 +128,7 @@ class Dubins:
         ----------
         start: tuple
             In the form (x, y, psi), with psi in radians.
-            The representation of the inital point.
+            The representation of the initial point.
         end: tuple
             In the form (x, y, psi), with psi in radians.
             The representation of the final point.
@@ -153,10 +153,10 @@ class Dubins:
             return self.generate_points_straight(start, end, dubins_path)
         return self.generate_points_curve(start, end, dubins_path)
 
-    def lsl(self, start, end, center_0, center_2):
+    def lsl(self, start, end, center_0, center_2) -> tuple:
         """
         Left-Straight-Left trajectories.
-        First computes the poisition of the centers of the turns, and then uses
+        First computes the position of the centers of the turns, and then uses
         the fact that the vector defined by the distance between the centers
         gives the direction and distance of the straight segment.
 
@@ -165,7 +165,7 @@ class Dubins:
         Parameters
         ----------
         start : tuple
-            (x, y, psi) coordinates of the inital point.
+            (x, y, psi) coordinates of the initial point.
         end : tuple
             (x, y, psi) coordinates of the final point.
         center_0 : tuple
@@ -190,10 +190,10 @@ class Dubins:
         total_len = self.radius * (beta_2 + beta_0) + straight_dist
         return (total_len, (beta_0, beta_2, straight_dist), True)
 
-    def rsr(self, start, end, center_0, center_2):
+    def rsr(self, start, end, center_0, center_2) -> tuple:
         """
         Right-Straight-Right trajectories.
-        First computes the poisition of the centers of the turns, and then uses
+        First computes the position of the centers of the turns, and then uses
         the fact that the vector defined by the distance between the centers
         gives the direction and distance of the straight segment.
 
@@ -202,7 +202,7 @@ class Dubins:
         Parameters
         ----------
         start : tuple
-            (x, y, psi) coordinates of the inital point.
+            (x, y, psi) coordinates of the initial point.
         end : tuple
             (x, y, psi) coordinates of the final point.
         center_0 : tuple
@@ -228,7 +228,7 @@ class Dubins:
         total_len = self.radius * (beta_2 + beta_0) + straight_dist
         return (total_len, (-beta_0, -beta_2, straight_dist), True)
 
-    def rsl(self, start, end, center_0, center_2):
+    def rsl(self, start, end, center_0, center_2) -> tuple:
         """
         Right-Straight-Left trajectories.
         Because of the change in turn direction, it is a little more complex to
@@ -243,7 +243,7 @@ class Dubins:
         Parameters
         ----------
         start : tuple
-            (x, y, psi) coordinates of the inital point.
+            (x, y, psi) coordinates of the initial point.
         end : tuple
             (x, y, psi) coordinates of the final point.
         center_0 : tuple
@@ -274,11 +274,11 @@ class Dubins:
         total_len = self.radius * (beta_2 + beta_0) + straight_dist
         return (total_len, (-beta_0, beta_2, straight_dist), True)
 
-    def lsr(self, start, end, center_0, center_2):
+    def lsr(self, start, end, center_0, center_2) -> tuple:
         """
         Left-Straight-Right trajectories.
         Because of the change in turn direction, it is a little more complex to
-        compute than in the RSR or LSL cases. First computes the poisition of
+        compute than in the RSR or LSL cases. First computes the position of
         the centers of the turns, and then uses the rectangle triangle defined
         by the point between the two circles, the center point of one circle
         and the tangeancy point of this circle to compute the straight segment
@@ -289,7 +289,7 @@ class Dubins:
         Parameters
         ----------
         start : tuple
-            (x, y, psi) coordinates of the inital point.
+            (x, y, psi) coordinates of the initial point.
         end : tuple
             (x, y, psi) coordinates of the final point.
         center_0 : tuple
@@ -320,7 +320,7 @@ class Dubins:
         total_len = self.radius * (beta_2 + beta_0) + straight_dist
         return (total_len, (beta_0, -beta_2, straight_dist), True)
 
-    def lrl(self, start, end, center_0, center_2):
+    def lrl(self, start, end, center_0, center_2) -> tuple:
         """
         Left-right-Left trajectories.
         Using the isocele triangle made by the centers of the three circles,
@@ -331,7 +331,7 @@ class Dubins:
         Parameters
         ----------
         start : tuple
-            (x, y, psi) coordinates of the inital point.
+            (x, y, psi) coordinates of the initial point.
         end : tuple
             (x, y, psi) coordinates of the final point.
         center_0 : tuple
@@ -360,7 +360,7 @@ class Dubins:
         total_len = (2 * np.pi - gamma + abs(beta_0) + abs(beta_1)) * self.radius
         return (total_len, (beta_0, beta_1, 2 * np.pi - gamma), False)
 
-    def rlr(self, start, end, center_0, center_2):
+    def rlr(self, start, end, center_0, center_2) -> tuple:
         """
         Right-left-right trajectories.
         Using the isocele triangle made by the centers of the three circles,
@@ -371,7 +371,7 @@ class Dubins:
         Parameters
         ----------
         start : tuple
-            (x, y, psi) coordinates of the inital point.
+            (x, y, psi) coordinates of the initial point.
         end : tuple
             (x, y, psi) coordinates of the final point.
         center_0 : tuple
@@ -400,17 +400,17 @@ class Dubins:
         total_len = (2 * np.pi - gamma + abs(beta_0) + abs(beta_1)) * self.radius
         return (total_len, (beta_0, beta_1, 2 * np.pi - gamma), False)
 
-    def find_center(self, point, side):
+    def find_center(self, point, side) -> np.ndarray:
         """
         Given an initial position, and the direction of the turn, computes the
-        center of the circle with turn radius self.radius passing by the intial
+        center of the circle with turn radius self.radius passing by the initial
         point.
 
         Parameters
         ----------
         point : tuple
             In the form (x, y, psi), with psi in radians.
-            The representation of the inital point.
+            The representation of the initial point.
         side : Char
             Either 'L' to indicate a left turn, or 'R' for a right turn.
 
@@ -429,7 +429,7 @@ class Dubins:
             )
         )
 
-    def generate_points_straight(self, start, end, path):
+    def generate_points_straight(self, start, end, path) -> np.ndarray:
         """
         For the 4 first classes of dubins paths, containing in the middle a
         straight section.
@@ -490,7 +490,7 @@ class Dubins:
         points.append(end)
         return np.array(points)
 
-    def generate_points_curve(self, start, end, path):
+    def generate_points_curve(self, start, end, path) -> np.ndarray:
         """
         For the two last paths, where the trajectory is a succession of 3
         turns. First computing the position of the center of the central turn,
@@ -541,7 +541,7 @@ class Dubins:
         points.append(end)
         return np.array(points)
 
-    def circle_arc(self, reference, beta, center, x):
+    def circle_arc(self, reference, beta, center, x) -> tuple:
         """
         Returns the point located on the circle of center center and radius
         defined by the class, at the angle x.
@@ -552,13 +552,13 @@ class Dubins:
             Angular starting point, in radians.
         beta : float
             Used actually only to know the direction of the rotation, and hence
-            to know if the path needs to be added or substracted from the
+            to know if the path needs to be added or subtracted from the
             reference angle.
         center : tuple
             (x, y) coordinates of the center of the circle from which we need a
             point on the circumference.
         x : float
-            The lenght of the path on the circle.
+            The length of the path on the circle.
 
         Returns
         -------

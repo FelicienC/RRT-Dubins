@@ -12,7 +12,6 @@ The easiest way is to use pip:
 pip install rrt-dubins
 ```
 
-
 ## Dubins path
 
 Dubins path refers to the shortest curve that connects two points in the two-dimensional Euclidean plane if only one direction of movement is permitted (the vehicle can only go forward). This type of path is necessarily in the form of one of 6 types, combination of right turns (**R**), left turns (**L**) and straight segments (**S**): **RLR, LRL, LSR, RSL, LSL, RSR**.
@@ -162,10 +161,8 @@ Here is the result obtained by concatenating all the produced images into one gi
 
 # TODO :
 
-- [ ] Setup pre-commit tools (ruff - tests - coverage - spelling)
 - [ ] Setup CI
 - [ ] Move time to the state -> Bad idea
-- [ ] Make the rrt dimensions and planner independent
 - [ ] Implement real unit tests
 - [ ] Implemment RRT*
 - [ ] Implement // processing ?

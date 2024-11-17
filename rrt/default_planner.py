@@ -11,13 +11,15 @@ class DefaultPlanner:
     """
 
     def __init__(self, point_separation=1) -> None:
+        if point_separation <= 0:
+            raise ValueError("point_separation must be a positive number")
         self.point_separation = point_separation
 
     def get_path(self, state1, state2) -> list[np.ndarray]:
         """
         Given two states, it returns the path [state1, stateX].
 
-        stateX is the point obtained by starting at state1 and moving along the vetor
+        stateX is the point obtained by starting at state1 and moving along the vector
         vect(state1, state2) for the distance point_separation.
 
         Args:

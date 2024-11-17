@@ -1,5 +1,5 @@
 """
-The environement where the obstacles can move
+The environment where the obstacles can move
 """
 
 from collections import deque
@@ -8,7 +8,6 @@ from rrt.obstacle import Wall
 
 
 class SimpleDynamicEnvironment:
-
     def __init__(self, dimensions: list[int]) -> None:
         self.dimensions = dimensions
 
@@ -46,7 +45,7 @@ class DynamicEnvironment:
     -------
     is_free
         Returns False if a point is within an obstacle or outside of the
-        boundaries of the environnement. Checks at a specific instant.
+        boundaries of the environment. Checks at a specific instant.
     random_free_space
         Selects an element of the free space, and returns it. Does not check at
         a specific instant.
@@ -70,10 +69,10 @@ class DynamicEnvironment:
             )
         self.center = [dimensions[0] / 2, dimensions[1] / 2]
 
-    def is_free(self, state):
+    def is_free(self, state) -> bool:
         """
         Returns False if a point is within an obstacle or outside of the
-        boundaries of the environnement.
+        boundaries of the environment.
         """
         x, y, psi, time = state
 
@@ -89,7 +88,7 @@ class DynamicEnvironment:
                 return False
         return True
 
-    def random_free_space(self):
+    def random_free_space(self) -> tuple:
         """
         Returns a randomly selected point in the free space.
         """
@@ -101,9 +100,9 @@ class DynamicEnvironment:
             y = (np.random.rand() - 0.5) * self.dimensions[1] + self.center[1]
         return x, y, np.random.rand() * np.pi * 2
 
-    def update(self, position):
+    def update(self, position) -> None:
         """
-        Refreshs the active walls as well as the position of the camera.
+        Refreshes the active walls as well as the position of the camera.
 
         Parameters
         ----------
