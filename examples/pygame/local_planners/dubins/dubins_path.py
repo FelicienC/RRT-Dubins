@@ -13,8 +13,7 @@ from rrt import Dubins
 local_planner = Dubins(radius=20, point_separation=10)
 
 # Pygame parameters
-WIDTH = 800
-HEIGHT = 600
+WIDTH, HEIGHT = 800, 600
 
 # We generate two points, x, y, psi
 start = (WIDTH / 2, HEIGHT / 2, 0)

@@ -6,7 +6,8 @@ from collections import deque
 import numpy as np
 from rtree.index import Index as RTreeIndex
 from rtree.index import Property
-
+from rrt.environment import Environment
+from rrt.default_planner import DefaultPlanner
 from typing import List
 
 
@@ -99,14 +100,23 @@ class RRT:
         from.
     """
 
-    def __init__(self, environment, local_planner, precision) -> None:
+    def __init__(
+        self,
+        environment: Environment,
+        local_planner=None,
+        precision=None,
+    ) -> None:
         self.nodes: dict = {}
         self.edges: dict = {}
         self.root: tuple
         self.goal: tuple
+        if not local_planner:
+            local_planner = DefaultPlanner(1)
+        self.local_planner = local_planner
+        if not precision:
+            precision = [1] * len(environment.dimensions)
         self.precision = precision
         self.environment = environment
-        self.local_planner = local_planner
         self.rtree = RTreeIndex()
         self.node_index = 0
         self.reached_goal = []

@@ -4,17 +4,13 @@ Demo of the RRT with dubin planner using Pygame.
 """
 
 import pygame
-from rrt import StaticEnvironment, RRT, DefaultPlanner
+from rrt import StaticEnvironment, RRT
 
-# Pygame parameters
-WIDTH = 800
-HEIGHT = 600
-N_STEPS = 10000
+WIDTH, HEIGHT, N_STEPS = 800, 600, 10000
 
 # Initialize the planner
 env = StaticEnvironment((WIDTH, HEIGHT), 100)
-local_planner = DefaultPlanner(point_separation=5)
-my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1))
+my_rrt = RRT(environment=env)
 
 my_rrt.set_start(env.random_free_space())
 # All the computation is done here

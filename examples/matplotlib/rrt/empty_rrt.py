@@ -3,18 +3,16 @@ RRT using dubins in a empty 2D environment.
 """
 
 import matplotlib.pyplot as plt
-from rrt import RRT, EmptyEnvironment, DefaultPlanner
+from rrt import RRT, EmptyEnvironment
 
 N_STEPS = 1000
 
 # Initialize an empty environment and a planner
 env = EmptyEnvironment((100, 100))
-local_planner = DefaultPlanner(1)
-my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1))
+my_rrt = RRT(environment=env)
 
 # We generate two random points
-start = env.random_free_space()
-end = env.random_free_space()
+start, end = env.random_free_space(), env.random_free_space()
 
 # We initialize an empty tree
 my_rrt.set_start(start)

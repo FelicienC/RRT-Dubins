@@ -3,21 +3,17 @@ Demo of the RRT with dubin planner using Pygame.
 """
 
 import pygame
-from rrt import EmptyEnvironment, RRT, DefaultPlanner
+from rrt import EmptyEnvironment, RRT
 
 # Pygame parameters
-WIDTH = 800
-HEIGHT = 600
-N_STEPS = 10000
+WIDTH, HEIGHT, N_STEPS = 800, 600, 10000
 
 # Initialize the planner
 env = EmptyEnvironment((WIDTH, HEIGHT))
-local_planner = DefaultPlanner(point_separation=5)
-my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1))
+my_rrt = RRT(environment=env)
 
 # We generate two random points
-start = env.random_free_space()
-end = env.random_free_space()
+start, end = env.random_free_space(), env.random_free_space()
 
 # We initialize an empty tree
 my_rrt.set_start(start)

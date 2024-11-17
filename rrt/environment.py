@@ -6,9 +6,20 @@ import numpy as np
 
 from scipy.spatial import KDTree
 from rrt.obstacle import Obstacle
+from abc import ABC, abstractmethod
 
 
-class EmptyEnvironment:
+class Environment(ABC):
+    @abstractmethod
+    def is_free(self, state: np.ndarray) -> bool:
+        pass
+
+    @abstractmethod
+    def random_free_space(self) -> np.ndarray:
+        pass
+
+
+class EmptyEnvironment(Environment):
     def __init__(self, dimensions: list[int]) -> None:
         self.dimensions = dimensions
 

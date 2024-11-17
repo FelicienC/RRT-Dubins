@@ -166,6 +166,5 @@ Here is the result obtained by concatenating all the produced images into one gi
 - [ ] Implement real unit tests
 - [ ] Implemment RRT*
 - [ ] Implement // processing ?
-- [ ] Add typing everywhere
 - [ ] Add seed to make real tests
 - [ ] Use private attributes

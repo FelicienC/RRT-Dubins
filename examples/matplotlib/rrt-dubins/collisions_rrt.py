@@ -1,5 +1,5 @@
 """
-RRT using dubins in a 2D environment 
+RRT using dubins in a 2D environment
 """
 
 import matplotlib.pyplot as plt
@@ -13,8 +13,7 @@ env = StaticEnvironment((100, 100, 2 * np.pi), 50)
 local_planner = Dubins(radius=2, point_separation=0.5)
 my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1, 2))
 
-start = env.random_free_space()
-end = env.random_free_space()
+start, end = env.random_free_space(), env.random_free_space()
 
 # We initialize an empty tree
 my_rrt.set_start(start)
