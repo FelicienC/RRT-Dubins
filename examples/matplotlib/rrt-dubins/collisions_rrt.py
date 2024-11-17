@@ -7,7 +7,8 @@ from matplotlib.patches import Polygon
 import numpy as np
 from rrt import Dubins, RRT, StaticEnvironment
 
-# We initialize the planner with the turn radius and the desired distance between consecutive points
+# We initialize the planner with the turn radius and the desired distance between
+# consecutive points
 env = StaticEnvironment((100, 100, 2 * np.pi), 50)
 local_planner = Dubins(radius=2, point_separation=0.5)
 my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1, 2))
@@ -32,6 +33,6 @@ if my_rrt.reached_goal:
     path = my_rrt.get_path_to_node(my_rrt.reached_goal[-1])
     plt.plot([x[0] for x in path], [x[1] for x in path], c="red")
 
-plt.plot(start[0], start[1], "o", c="green")
-plt.plot(end[0], end[1], "o", c="blue")
+plt.plot(*start, "o", c="green")
+plt.plot(*end, "o", c="blue")
 plt.show()

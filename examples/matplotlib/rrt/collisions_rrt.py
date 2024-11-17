@@ -34,6 +34,6 @@ if my_rrt.reached_goal:
     path = my_rrt.get_path_to_node(my_rrt.reached_goal[-1])
     plt.plot([x[0] for x in path], [x[1] for x in path], c="red")
 
-plt.plot(start[0], start[1], "o", c="green")
-plt.plot(end[0], end[1], "o", c="blue")
+plt.plot(*start, "o", c="green")
+plt.plot(*end, "o", c="blue")
 plt.show()

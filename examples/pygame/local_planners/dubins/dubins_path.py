@@ -1,6 +1,6 @@
 """
 Demo of the Dubins path planner using Pygame as a visualisation backend.
-Creating the Dubins path going from the center of the screent to the pointer of 
+Creating the Dubins path going from the center of the screen to the pointer of 
 your mouse.
 """
 
