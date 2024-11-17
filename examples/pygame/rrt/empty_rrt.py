@@ -3,16 +3,15 @@ Demo of the RRT with dubin planner using Pygame.
 """
 
 import pygame
-import numpy as np
 from rrt import EmptyEnvironment, RRT, DefaultPlanner
 
 # Pygame parameters
-WIDHT = 800
+WIDTH = 800
 HEIGHT = 600
 N_STEPS = 10000
 
 # Initialize the planner
-env = EmptyEnvironment((WIDHT, HEIGHT))
+env = EmptyEnvironment((WIDTH, HEIGHT))
 local_planner = DefaultPlanner(point_separation=5)
 my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1))
 
@@ -28,7 +27,7 @@ path = my_rrt.grow(end, N_STEPS, metric="euclidean")
 
 # We plot the rrt using pygame, adding one edge at a time
 pygame.init()
-screen = pygame.display.set_mode((WIDHT, HEIGHT))
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 nb_edges_to_plot = 0
 running = True
 while running:

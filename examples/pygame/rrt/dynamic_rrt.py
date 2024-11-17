@@ -3,26 +3,25 @@ Demo of the RRT with dubin planner using Pygame.
 """
 
 import pygame
-import numpy as np
 from rrt import StaticEnvironment, RRT, DefaultPlanner
 
 # Pygame parameters
-WIDHT = 800
+WIDTH = 800
 HEIGHT = 600
 N_STEPS = 10000
 
 # Initialize the planner
-env = StaticEnvironment((WIDHT, HEIGHT), 100)
+env = StaticEnvironment((WIDTH, HEIGHT), 100)
 local_planner = DefaultPlanner(point_separation=5)
 my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1))
 
 my_rrt.set_start(env.random_free_space())
-path = my_rrt.grow((WIDHT, HEIGHT), N_STEPS, metric="euclidean")
+path = my_rrt.grow((WIDTH, HEIGHT), N_STEPS, metric="euclidean")
 nb_edges_to_plot = 0
 
 
 pygame.init()
-screen = pygame.display.set_mode((WIDHT, HEIGHT))
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 running = True
 while running:
     for event in pygame.event.get():
@@ -30,7 +29,7 @@ while running:
             running = False
         if event.type == pygame.MOUSEBUTTONUP:
             x, y = pygame.mouse.get_pos()
-            my_rrt.set_start((WIDHT / 2, HEIGHT / 2))
+            my_rrt.set_start((WIDTH / 2, HEIGHT / 2))
             end = (x, y)
             my_rrt.grow(end, N_STEPS, metric="euclidean")
             nb_edges_to_plot = 0

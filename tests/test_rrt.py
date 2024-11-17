@@ -1,6 +1,5 @@
 from rrt import RRT, EmptyEnvironment, DefaultPlanner, Dubins
 import numpy as np
-import time
 import pytest
 
 np.random.seed(0)
@@ -15,7 +14,7 @@ def test_rrt_nd(n_dim, metric):
     start, end = env.random_free_space(), env.random_free_space()
     my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1,) * n_dim)
     my_rrt.set_start(start)
-    path = my_rrt.grow(end, 10, metric=metric, goal_rate=0)
+    my_rrt.grow(end, 10, metric=metric, goal_rate=0)
     assert len(my_rrt.nodes[0].state) == n_dim
     assert list(my_rrt.nodes.keys()) == list(range(10))
 
@@ -29,7 +28,7 @@ def test_rrt_timeit():
     start = env.random_free_space()
     end = env.random_free_space()
     my_rrt.set_start(start)
-    path = my_rrt.grow(end, 10000, metric="euclidean", goal_rate=0)
+    my_rrt.grow(end, 10000, metric="euclidean", goal_rate=0)
 
 
 def test_rrt_dubins():
@@ -45,11 +44,10 @@ def test_rrt_dubins():
     start = env.random_free_space()
     end = env.random_free_space()
 
-    # Trying first the euclidian distance
+    # Trying first the euclidean distance
     rrt.set_start(start)
-    path = rrt.grow(end, 100, metric="euclidian")
+    rrt.grow(end, 100, metric="euclidean")
 
     # # Trying then the distance defined by the local planner
     rrt.set_start(start)
-    path = rrt.grow(end, 1000, metric="local")
-    print(path)
+    rrt.grow(end, 1000, metric="local")

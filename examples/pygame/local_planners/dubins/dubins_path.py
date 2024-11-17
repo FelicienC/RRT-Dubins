@@ -1,6 +1,6 @@
 """
 Demo of the Dubins path planner using Pygame as a visualisation backend.
-Creating the Dubins path going from the center of the screen to the pointer of 
+Creating the Dubins path going from the center of the screen to the pointer of
 your mouse.
 """
 
@@ -13,15 +13,15 @@ from rrt import Dubins
 local_planner = Dubins(radius=20, point_separation=10)
 
 # Pygame parameters
-WIDHT = 800
+WIDTH = 800
 HEIGHT = 600
 
 # We generate two points, x, y, psi
-start = (WIDHT / 2, HEIGHT / 2, 0)
+start = (WIDTH / 2, HEIGHT / 2, 0)
 end_angle = np.random.rand() * np.pi * 2
 
 pygame.init()
-screen = pygame.display.set_mode((WIDHT, HEIGHT))
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 running = True
 while running:
     for event in pygame.event.get():

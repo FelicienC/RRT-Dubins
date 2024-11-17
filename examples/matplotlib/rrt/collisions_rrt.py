@@ -4,7 +4,6 @@ RRT using dubins in a empty 2D environment.
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
-import numpy as np
 from rrt import RRT, StaticEnvironment, DefaultPlanner
 
 N_STEPS = 1000

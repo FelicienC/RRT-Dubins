@@ -1,9 +1,8 @@
 """
-RRT using dubins in an empty 3D environment. 
+RRT using dubins in an empty 3D environment.
 """
 
 import matplotlib.pyplot as plt
-import numpy as np
 from rrt import RRT, EmptyEnvironment, DefaultPlanner
 
 N_STEPS = 1000

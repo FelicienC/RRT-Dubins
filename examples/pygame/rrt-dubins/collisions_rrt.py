@@ -8,12 +8,12 @@ import numpy as np
 from rrt import StaticEnvironment, RRT, Dubins
 
 # Pygame parameters
-WIDHT = 800
+WIDTH = 800
 HEIGHT = 600
 N_STEPS = 1000
 
 # Initialize the planner
-env = StaticEnvironment((WIDHT, HEIGHT, 2 * np.pi), 50)
+env = StaticEnvironment((WIDTH, HEIGHT, 2 * np.pi), 50)
 local_planner = Dubins(radius=10, point_separation=0.5)
 my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1, 2))
 
@@ -24,10 +24,9 @@ path = my_rrt.grow(goal=end, nb_iteration=N_STEPS, metric="euclidean")
 nb_edges_to_plot = 0
 
 pygame.init()
-screen = pygame.display.set_mode((WIDHT, HEIGHT))
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 running = True
 while running:
-
     # Using the event system to reset the tree
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

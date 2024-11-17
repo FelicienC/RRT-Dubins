@@ -1,12 +1,10 @@
 """
-Test module, making sure the main functionnalities are always functionning
+Test module, making sure the main functionalities are always functioning
 """
 
-import numpy as np
 from rrt.dubins import Dubins
 from rrt.default_planner import DefaultPlanner
-from rrt.environment import StaticEnvironment, EmptyEnvironment
-from rrt.dynamic_environment import SimpleDynamicEnvironment, DynamicEnvironment
+from rrt.dynamic_environment import SimpleDynamicEnvironment
 from rrt.rrt import RRT
 
 
@@ -20,7 +18,7 @@ def test_dubins():
 
 def test_dynamic_env():
     """
-    Tests that the RRT works in a dynamic environement
+    Tests that the RRT works in a dynamic environment
     """
 
     env = SimpleDynamicEnvironment((100, 100, 10))  # x, y, time
@@ -30,4 +28,4 @@ def test_dynamic_env():
 
     # Initialisation of the tree, to have a first edge
     rrt.set_start(start)
-    path = rrt.grow(end, 200, metric="local")
+    rrt.grow(end, 200, metric="local")

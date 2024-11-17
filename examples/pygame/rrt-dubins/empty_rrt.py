@@ -7,12 +7,12 @@ import numpy as np
 from rrt import EmptyEnvironment, RRT, Dubins
 
 # Pygame parameters
-WIDHT = 800
+WIDTH = 800
 HEIGHT = 600
 N_STEPS = 1000
 
 # Initialize the planner
-env = EmptyEnvironment((WIDHT, HEIGHT, np.pi * 2))
+env = EmptyEnvironment((WIDTH, HEIGHT, np.pi * 2))
 local_planner = Dubins(radius=20, point_separation=10)
 my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1, 2))
 
@@ -28,7 +28,7 @@ path = my_rrt.grow(end, N_STEPS, metric="euclidean")
 
 # We plot the rrt using pygame, adding one edge at a time
 pygame.init()
-screen = pygame.display.set_mode((WIDHT, HEIGHT))
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 nb_edges_to_plot = 0
 running = True
 while running:

@@ -4,7 +4,6 @@ Construction of the Rapidely Exploring Random Tree
 
 from collections import deque
 import numpy as np
-from rrt.dubins import Dubins, dist
 from rtree.index import Index as RTreeIndex
 from rtree.index import Property
 
@@ -69,12 +68,12 @@ class RRT:
     Attributes
     ----------
     nodes : dict
-        Dictionnary containing all the nodes of the tree. The keys are hence
+        Dictionary containing all the nodes of the tree. The keys are hence
         simply the reached state, i.e. tuples.
     environment : Environment
         Instance of the Environment class.
     goal_rate : float
-        The frequency at which the randomly selected node is choosen among
+        The frequency at which the randomly selected node is chosen among
         the goal zone.
     precision : tuple
         The precision needed to stop the algorithm. It is a tuple of the same
@@ -197,20 +196,20 @@ class RRT:
             The final requested state as a tuple.
         nb_iteration : int
             The number of maximal iterations (not using the number of nodes as
-            potentialy the start is in a region of unavoidable collision).
+            potentially the start is in a region of unavoidable collision).
         goal_rate : float
             The probability to expand towards the goal rather than towards a
             randomly selected sample.
         metric : string
-            One of 'local' or 'euclidian'.
+            One of 'local' or 'euclidean'.
             The method used to select the closest node on the tree from which a
             path will be grown towards a sample.
 
         Notes
         -----
         It is not necessary to use several nodes to try and connect a sample to
-        the existing graph; The closest node only could be choosen. The notion
-        of "closest" can also be simpy the euclidian distance, which would make
+        the existing graph; The closest node only could be chosen. The notion
+        of "closest" can also be simply the euclidean distance, which would make
         the computation faster and the code a simpler, this is why several
         metrics are available.
         """
@@ -218,7 +217,6 @@ class RRT:
             self.goal = goal
 
         for _ in range(nb_iteration):
-
             # Randomly select a sample, with a probability of goal_rate to be
             # the goal.
             sample = (
@@ -267,7 +265,7 @@ class RRT:
         sample : tuple
             The state of the node we wish to connect to the tree.
         metric : str
-            One of 'local', 'euclidian'. The euclidian metric is a lot faster
+            One of 'local', 'euclidean'. The euclidean metric is a lot faster
             but is also less precise and can't be used with an RRT star.
 
         Returns

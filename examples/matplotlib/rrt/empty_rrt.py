@@ -1,9 +1,8 @@
 """
-RRT using dubins in a empty 2D environment. 
+RRT using dubins in a empty 2D environment.
 """
 
 import matplotlib.pyplot as plt
-import numpy as np
 from rrt import RRT, EmptyEnvironment, DefaultPlanner
 
 N_STEPS = 1000
@@ -30,6 +29,7 @@ for edge in my_rrt.edges.values():
 if my_rrt.reached_goal:
     path = my_rrt.get_path_to_node(my_rrt.reached_goal[-1])
     plt.plot([x[0] for x in path], [x[1] for x in path], c="red")
+
 plt.plot(*start, "o", c="green")
 plt.plot(*end, "o", c="blue")
 plt.show()
