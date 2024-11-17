@@ -7,7 +7,7 @@ Simple implementation of a **Rapidly Exploring Random Tree** using **Dubins path
 </p>
 
 ## Installation
-The easiest way is to use pip: 
+The easiest way is to use pip:
 ```bash
 pip install rrt-dubins
 ```
@@ -15,18 +15,18 @@ pip install rrt-dubins
 
 ## Dubins path
 
-Dubins path refers to the shortest curve that connects two points in the two-dimensional Euclidean plane if only one direction of movement is permitted (the vehicle can only go forward). This type of path is necessarly in the form of one of 6 types, combination of right turns (**R**), left turns (**L**) and straight segments (**S**): **RLR, LRL, LSR, RSL, LSL, RSR**.
+Dubins path refers to the shortest curve that connects two points in the two-dimensional Euclidean plane if only one direction of movement is permitted (the vehicle can only go forward). This type of path is necessarily in the form of one of 6 types, combination of right turns (**R**), left turns (**L**) and straight segments (**S**): **RLR, LRL, LSR, RSL, LSL, RSR**.
 
 ### How does it work ?
 
-As we want to have the shortest path among the 6 potential candidates, we compute the lenght of the path we would obtain if we followed each of the trajectories. To do so, we need to separate three cases:
+As we want to have the shortest path among the 6 potential candidates, we compute the length of the path we would obtain if we followed each of the trajectories. To do so, we need to separate three cases:
   1. **LSL** and **RSR** : Two turns in the same direction separated by a straight segment
   2. **LSR** and **RSL** : Two turns in opposite directions separated by a straight segment
   3. **RLR** and **LRL** : Three turns
 
-### Usage 
+### Usage
 
-The Dubins path are implemented in the Dubins class. As already mentionned, we simplify the problem here by considering the same radius for all the turns.
+The Dubins path are implemented in the Dubins class. As already mentioned, we simplify the problem here by considering the same radius for all the turns.
 
 ```python
 from rrt.dubins import Dubins
@@ -67,7 +67,7 @@ In order to use it, the environment needs to be defined first. To start, two typ
 
 #### Static Environment
 
-In the static environment, the obstacles are polygonal and are stored in a binary search tree in order to increase the speed of the colision check.
+In the static environment, the obstacles are polygonal and are stored in a binary search tree in order to increase the speed of the collision check.
 The following code initializes an Environment:
 ```python
 from rrt.environment import StaticEnvironment
@@ -100,7 +100,7 @@ path = rrt.find_path(end, 200)
 </p>
 
 #### Dynamic Environment
-In the dynamic environement, two options are available: the obstacles can either move or stay static. In both cases, the tree is pruned of the unreachable nodes once they are passed.
+In the dynamic environment, two options are available: the obstacles can either move or stay static. In both cases, the tree is pruned of the unreachable nodes once they are passed.
 
 ```python
 from rrt.dynamic_environment import DynamicEnvironment
@@ -160,19 +160,15 @@ Here is the result obtained by concatenating all the produced images into one gi
 
 [Wikipedia](https://en.wikipedia.org/wiki/Rapidly-exploring_random_tree)
 
-# TODO : 
+# TODO :
 
 - [ ] Setup pre-commit tools (ruff - tests - coverage - spelling)
 - [ ] Setup CI
 - [ ] Move time to the state -> Bad idea
 - [ ] Make the rrt dimensions and planner independent
-- [ ] Implement real unit tests 
+- [ ] Implement real unit tests
 - [ ] Implemment RRT*
 - [ ] Implement // processing ?
 - [ ] Add typing everywhere
 - [ ] Add seed to make real tests
 - [ ] Use private attributes
-
-from rrt import RRT
-
-my_random_tree = RRT()

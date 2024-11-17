@@ -100,3 +100,6 @@ credentials.json
 *.bak
 *.backup
 *.old
+
+# Ignore coverage reports
+coverage.xml

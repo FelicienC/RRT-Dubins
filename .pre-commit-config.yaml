@@ -1,0 +1,46 @@
+
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-yaml
+    -   id: check-added-large-files
+
+
+- repo: local
+  hooks:
+  - id: pytest
+    name: pytest
+    entry: ./.venv/bin/pytest tests/ --cov-report=xml
+    language: system
+    types: [python]
+    pass_filenames: false
+    stages: [pre-commit]
+    always_run: true
+  - id: ruff
+    name: ruff-check
+    language: system
+    types: [python]
+    pass_filenames: true
+    stages: [pre-commit]
+    entry: ./.venv/bin/ruff check
+  - id: ruff-format
+    name: ruff-format
+    language: system
+    types: [python]
+    pass_filenames: true
+    stages: [pre-commit]
+    entry: ./.venv/bin/ruff format
+  - id: codespell
+    name: codespell
+    language: system
+    stages: [pre-commit]
+    entry: ./.venv/bin/codespell
+  - id: conventional-pre-commit
+    stages: [commit-msg]
+    always_run: true
+    name: conventional-pre-commit
+    entry: conventional-pre-commit
+    language: system
