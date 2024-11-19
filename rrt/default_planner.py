@@ -15,7 +15,7 @@ class DefaultPlanner:
             raise ValueError("point_separation must be a positive number")
         self.point_separation = point_separation
 
-    def get_path(self, state1, state2) -> list[np.ndarray]:
+    def get_next_state(self, state1, state2) -> list[np.ndarray]:
         """
         Given two states, it returns the path [state1, stateX].
 

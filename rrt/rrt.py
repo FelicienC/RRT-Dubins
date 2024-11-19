@@ -136,9 +136,9 @@ class RRT:
             raise AttributeError(
                 "The environment does not implement the method random_free_space"
             )
-        if not hasattr(self.local_planner, "get_path"):
+        if not hasattr(self.local_planner, "get_next_state"):
             raise AttributeError(
-                "The local planner does not implement the method get_path(state1, state2)"
+                "The local planner does not implement the method get_next_state(state1, state2)"
             )
         if len(self.precision) != len(self.environment.dimensions):
             raise AttributeError(
@@ -179,7 +179,10 @@ class RRT:
                 f", expected {len(self.environment.dimensions)} got {len(state)}",
             )
         if not all(
-            0 <= state[i] <= self.environment.dimensions[i] for i in range(len(state))
+            self.environment.dimensions[i][0]
+            <= state[i]
+            <= self.environment.dimensions[i][1]
+            for i in range(len(state))
         ):
             raise ValueError(
                 "The provided state is not within the boundaries of the environment",
@@ -239,7 +242,7 @@ class RRT:
             node, cost = self.get_closest_node(sample, metric=metric)
 
             # Try to connect the node to the sample
-            path = self.local_planner.get_path(node.state, sample)
+            path = self.local_planner.get_next_state(node.state, sample)
             for state in path:
                 if not self.environment.is_free(state):
                     break
@@ -288,7 +291,7 @@ class RRT:
         closest_node = self.nodes[next(self.rtree.nearest(sample))]
         if metric == "local":
             length = (
-                len(self.local_planner.get_path(closest_node.state, sample))
+                len(self.local_planner.get_next_state(closest_node.state, sample))
                 * self.local_planner.point_separation
             )
             return closest_node, length

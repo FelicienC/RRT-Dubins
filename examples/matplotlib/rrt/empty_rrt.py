@@ -8,7 +8,7 @@ from rrt import RRT, EmptyEnvironment
 N_STEPS = 1000
 
 # Initialize an empty environment and a planner
-env = EmptyEnvironment((100, 100))
+env = EmptyEnvironment([(-50, 50), (-50, 50)])
 my_rrt = RRT(environment=env)
 
 # We generate two random points

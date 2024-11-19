@@ -9,7 +9,7 @@ np.random.seed(0)
 @pytest.mark.parametrize("metric", ["local", "euclidean"])
 def test_rrt_nd(n_dim, metric):
     """Test the growth of the tree in n dimensions, n=2 to 9."""
-    env = EmptyEnvironment((100,) * n_dim)
+    env = EmptyEnvironment([(0, 100)] * n_dim)
     local_planner = DefaultPlanner(1)
     start, end = env.random_free_space(), env.random_free_space()
     my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1,) * n_dim)
@@ -21,7 +21,7 @@ def test_rrt_nd(n_dim, metric):
 
 def test_rrt_timeit():
     """Test with a large number of nodes to see if it is fast enough"""
-    env = EmptyEnvironment((100, 100))
+    env = EmptyEnvironment([(0, 100), (0, 100)])
     local_planner = DefaultPlanner(1)
     my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1))
 
@@ -36,7 +36,7 @@ def test_rrt_dubins():
     Tests that the RRT class works
     """
 
-    env = EmptyEnvironment((100, 100, 6.29))
+    env = EmptyEnvironment([(0, 100), (0, 100), (0, 6.29)])
     local_planner = Dubins(4, 1)
     rrt = RRT(env, local_planner=local_planner, precision=(1, 1, 2))
 

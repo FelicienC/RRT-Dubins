@@ -20,7 +20,7 @@ class Environment(ABC):
 
 
 class EmptyEnvironment(Environment):
-    def __init__(self, dimensions: list[int]) -> None:
+    def __init__(self, dimensions: list[tuple]) -> None:
         self.dimensions = dimensions
 
     def is_free(self, state: np.ndarray) -> bool:
@@ -28,7 +28,13 @@ class EmptyEnvironment(Environment):
 
     def random_free_space(self) -> np.ndarray:
         """Return a random np.array in the free space"""
-        return np.random.rand(len(self.dimensions)) * self.dimensions
+        # sample a random point in the free space
+        return np.array(
+            [
+                np.random.uniform(dim_min, dim_max)
+                for (dim_min, dim_max) in self.dimensions
+            ]
+        )
 
 
 class StaticEnvironment(EmptyEnvironment):
@@ -54,10 +60,10 @@ class StaticEnvironment(EmptyEnvironment):
         boundaries of the environment.
     """
 
-    def __init__(self, dimensions, nb_obstacles) -> None:
+    def __init__(self, dimensions, nb_obstacles, obstacle_size) -> None:
         self.dimensions = dimensions
         self.obstacles = [
-            Obstacle(dimensions, 0.05 * dimensions[0], 5) for _ in range(nb_obstacles)
+            Obstacle(dimensions, obstacle_size, 4) for _ in range(nb_obstacles)
         ]
         self.kdtree = KDTree([obs.center for obs in self.obstacles])
 

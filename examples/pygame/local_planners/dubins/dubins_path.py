@@ -31,7 +31,7 @@ while running:
 
     screen.fill((255, 255, 255))
     x, y = pygame.mouse.get_pos()
-    path = local_planner.get_path(start, (x, y, end_angle))
+    path = local_planner.get_next_state(start, (x, y, end_angle))
     for point in path:
         # drawing arrows with the heading of each point (point[2]):
         pygame.draw.line(

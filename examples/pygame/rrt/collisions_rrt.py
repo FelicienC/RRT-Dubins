@@ -9,7 +9,7 @@ from rrt import StaticEnvironment, RRT
 WIDTH, HEIGHT, N_STEPS = 800, 600, 10000
 
 # Initialize the planner
-env = StaticEnvironment((WIDTH, HEIGHT), 100)
+env = StaticEnvironment([(0, WIDTH), (0, HEIGHT)], 100, 30)
 my_rrt = RRT(environment=env)
 
 my_rrt.set_start(env.random_free_space())

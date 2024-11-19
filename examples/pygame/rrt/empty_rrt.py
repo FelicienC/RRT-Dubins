@@ -9,7 +9,7 @@ from rrt import EmptyEnvironment, RRT
 WIDTH, HEIGHT, N_STEPS = 800, 600, 10000
 
 # Initialize the planner
-env = EmptyEnvironment((WIDTH, HEIGHT))
+env = EmptyEnvironment([(0, WIDTH), (0, HEIGHT)])
 my_rrt = RRT(environment=env)
 
 # We generate two random points
@@ -24,8 +24,8 @@ path = my_rrt.grow(end, N_STEPS, metric="euclidean")
 # We plot the rrt using pygame, adding one edge at a time
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-nb_edges_to_plot = 0
 running = True
+nb_edges_to_plot = 0
 while running:
     # Using the event system to reset the tree
     for event in pygame.event.get():

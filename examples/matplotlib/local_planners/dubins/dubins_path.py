@@ -15,7 +15,7 @@ start = (0, 0, 0)  # heading east
 end = (0, 1, np.pi)  # heading west
 
 # We compute the path between them
-path = local_planner.get_path(start, end)
+path = local_planner.get_next_state(start, end)
 
 # plot arrows with the heading of each point (point[2]):
 for point in path:

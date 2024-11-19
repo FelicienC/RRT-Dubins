@@ -27,9 +27,9 @@ class Obstacle:
     """
 
     def __init__(self, map_dimensions, size, nb_pts) -> None:
-        self.center = np.array(
-            [np.random.rand() * map_dimensions[0], np.random.rand() * map_dimensions[1]]
-        )
+        self.center = [
+            np.random.uniform(dim_min, dim_max) for (dim_min, dim_max) in map_dimensions
+        ]
         # We use very simple convex polygons, generated with a radius
         # and randomly selected angles.
         angles = sorted((np.random.rand() * 2 * np.pi for _ in range(nb_pts)))

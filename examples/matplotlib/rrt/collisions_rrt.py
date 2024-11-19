@@ -8,7 +8,7 @@ from rrt import RRT, StaticEnvironment
 
 N_STEPS = 1000
 
-env = StaticEnvironment((100, 100), 100)
+env = StaticEnvironment([(-50, 50), (-50, 50)], 100)
 my_rrt = RRT(environment=env)
 
 start, end = env.random_free_space(), env.random_free_space()
