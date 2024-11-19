@@ -46,6 +46,7 @@ The variable *path* now contains the sequence of points (x, y) linking the start
 import matplotlib.pyplot as plt
 
 plt.plot(path[:, 0], path[:, 1])
+plt.show()
 ```
 <p align="center">
   <img src="docs/img/LSL_example.png">
@@ -73,8 +74,7 @@ from rrt.environment import StaticEnvironment
 from rrt.rrt import RRT
 
 # We create an environment of 100x100 meters, with 100 obstacles
-env = StaticEnvironment((100, 100), 100)
-env.plot()
+env = StaticEnvironment([(-50, 50), (-50, 50)], 100)
 ```
 <p align="center">
   <img src="docs/img/without_nodes.png">
@@ -161,10 +161,9 @@ Here is the result obtained by concatenating all the produced images into one gi
 
 # TODO :
 
-- [ ] Setup CI
-- [ ] Move time to the state -> Bad idea
-- [ ] Implement real unit tests
-- [ ] Implemment RRT*
+- [x] Setup CI
+- [ ] Implement real unit tests & display coverage
+- [ ] Improve integration tests to capture and assert output
+- [ ] Implement RRT*
 - [ ] Implement // processing ?
 - [ ] Add seed to make real tests
-- [ ] Use private attributes

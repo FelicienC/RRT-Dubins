@@ -4,12 +4,11 @@ RRT using dubins in a 2D environment
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
-import numpy as np
 from rrt import Dubins, RRT, StaticEnvironment
 
 # We initialize the planner with the turn radius and the desired distance between
 # consecutive points
-env = StaticEnvironment((100, 100, 2 * np.pi), 50)
+env = StaticEnvironment([(-50, 50), (-50, 50), (0, 6.29)], 100, 10)
 local_planner = Dubins(radius=2, point_separation=0.5)
 my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1, 2))
 
