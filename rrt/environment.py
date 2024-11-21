@@ -65,7 +65,7 @@ class StaticEnvironment(EmptyEnvironment):
         self.obstacles = [
             Obstacle(dimensions, obstacle_size, 4) for _ in range(nb_obstacles)
         ]
-        self.kdtree = KDTree([obs.center for obs in self.obstacles])
+        self.kdtree = KDTree([obs.center[:2] for obs in self.obstacles])
 
     def is_free(self, state) -> bool:
         """

@@ -161,9 +161,8 @@ Here is the result obtained by concatenating all the produced images into one gi
 
 # TODO :
 
-- [x] Setup CI
+- [ ] Setup CI
 - [ ] Implement real unit tests & display coverage
-- [ ] Improve integration tests to capture and assert output
 - [ ] Implement RRT*
 - [ ] Implement // processing ?
-- [ ] Add seed to make real tests
+- [ ] Add seed to make reproducible tree and unit tests

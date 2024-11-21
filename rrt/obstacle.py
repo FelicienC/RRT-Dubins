@@ -35,7 +35,7 @@ class Obstacle:
         angles = sorted((np.random.rand() * 2 * np.pi for _ in range(nb_pts)))
         self.points = np.array(
             [
-                self.center + np.array([size * np.cos(angle), size * np.sin(angle)])
+                self.center[:2] + np.array([size * np.cos(angle), size * np.sin(angle)])
                 for angle in angles
             ]
         )

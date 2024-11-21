@@ -7,12 +7,10 @@ import numpy as np
 from rrt import EmptyEnvironment, RRT, Dubins
 
 # Pygame parameters
-WIDTH = 800
-HEIGHT = 600
-N_STEPS = 1000
+WIDTH, HEIGHT, N_STEPS = 800, 600, 1000
 
 # Initialize the planner
-env = EmptyEnvironment((WIDTH, HEIGHT, np.pi * 2))
+env = EmptyEnvironment([(0, WIDTH), (0, HEIGHT), (0, 2 * np.pi)])
 local_planner = Dubins(radius=20, point_separation=10)
 my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1, 2))
 
