@@ -16,7 +16,7 @@ def test_rrt_nd(n_dim, metric):
     my_rrt.set_start(start)
     my_rrt.grow(end, 10, metric=metric, goal_rate=0)
     assert len(my_rrt.nodes[0].state) == n_dim
-    assert list(my_rrt.nodes.keys()) == list(range(10))
+    assert list(my_rrt.nodes.keys()) == list(range(11))
 
 
 def test_rrt_timeit():

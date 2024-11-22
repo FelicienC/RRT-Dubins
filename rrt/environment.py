@@ -24,6 +24,10 @@ class EmptyEnvironment(Environment):
         self.dimensions = dimensions
 
     def is_free(self, state: np.ndarray) -> bool:
+        """Return True if the state is in the free space"""
+        for (dim_min, dim_max), state_dim in zip(self.dimensions, state):
+            if state_dim < dim_min or state_dim > dim_max:
+                return False
         return True
 
     def random_free_space(self) -> np.ndarray:

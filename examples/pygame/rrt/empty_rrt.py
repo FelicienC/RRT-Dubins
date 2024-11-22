@@ -1,54 +1,82 @@
 """
-Demo of the RRT with dubin planner using Pygame.
+Demo of the RRT using Pygame.
 """
 
 import pygame
 from rrt import EmptyEnvironment, RRT
+import numpy as np
+from time import sleep
+
+
+class MyPlanner:
+    def get_next_state(self, state1, state2) -> list[np.ndarray]:
+        """
+        Given two states, it returns the path [state1, stateX].
+
+        stateX is the point obtained by starting at state1 and going towards state2
+        following the dynamic constraints of the object we simulate.
+
+        Args:
+            state1 (np.ndarray): The initial state in the form [x, y, psi, speed]
+            state2 (np.ndarray): The goal state in the form [x, y, psi, speed]
+
+        Returns:
+            list[np.ndarray]: The path [state1, stateX]
+        """
+
+        x, y, psi, speed = state1
+        # only 4 actions, turn left, turn right, speed up, slow down
+        new_x, new_y = x + speed * np.cos(psi), y + speed * np.sin(psi)
+        possible_states = (
+            (new_x, new_y, (psi + (np.pi / 10)) % (2 * np.pi), speed),
+            (new_x, new_y, (psi - (np.pi / 10)) % (2 * np.pi), speed),
+            (new_x, new_y, psi, speed - 1),
+            (new_x, new_y, psi, speed + 1),
+        )
+
+        return (state1, min(possible_states, key=lambda x: np.linalg.norm(x - state2)))
+
 
 # Pygame parameters
-WIDTH, HEIGHT, N_STEPS = 800, 600, 10000
+WIDTH, HEIGHT, N_STEPS = 800, 600, 200
 
 # Initialize the planner
-env = EmptyEnvironment([(0, WIDTH), (0, HEIGHT)])
-my_rrt = RRT(environment=env)
+env = EmptyEnvironment([(0, WIDTH), (0, HEIGHT), (0, 2 * np.pi), (0, 10)])
+my_rrt = RRT(environment=env, local_planner=MyPlanner(), precision=(10, 10, 1, 1))
 
-# We generate two random points
+# We generate two random points and initialize the tree
 start, end = env.random_free_space(), env.random_free_space()
-
-# We initialize an empty tree
 my_rrt.set_start(start)
 
 # We run N_STEPS iterations of growth
-path = my_rrt.grow(end, N_STEPS, metric="euclidean")
+my_rrt.grow(end, N_STEPS, metric="euclidean")
 
-# We plot the rrt using pygame, adding one edge at a time
+# We plot the rrt using pygame,
 pygame.init()
+font = pygame.font.Font(None, 16)
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 running = True
-nb_edges_to_plot = 0
 while running:
-    # Using the event system to reset the tree
+    # Using the event system to stop the simulation if the window is closed
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.MOUSEBUTTONUP:
-            # Reset the tree
-            my_rrt.set_start(env.random_free_space())
-            # Using the mouse to set the objective point
-            end = pygame.mouse.get_pos()
-            # All the computation is done here
-            my_rrt.grow(end, N_STEPS, metric="euclidean")
-            nb_edges_to_plot = 0
 
-    # Plot the rrt, one edge at a time
-    nb_edges_to_plot += 1
-    screen.fill((255, 255, 255))
-    for edge in list(my_rrt.edges.values())[:nb_edges_to_plot]:
-        points = [edge.path[0], edge.path[-1]]
-        pygame.draw.lines(screen, (200, 200, 200), False, points)
+    # Plotting the environment
+    screen.fill((0, 0, 0))
+    pygame.draw.circle(screen, (0, 255, 0), end[:2], 2)  # goal
 
-    # plot the start and end points
-    pygame.draw.circle(screen, (0, 255, 0), my_rrt.nodes[0].state[:2], 5)
-    pygame.draw.circle(screen, (255, 0, 0), end[:2], 5)
+    # Plotting the rrt
+    for edge in my_rrt.edges.values():
+        pygame.draw.lines(
+            screen, (0, 255, 0), False, [edge.path[0][:2], edge.path[-1][:2]]
+        )
 
+    x, y, psi, speed = my_rrt.nodes[my_rrt.root_index].state
+    pygame.draw.circle(screen, (255, 255, 255), (x, y), 2)
+
+    my_rrt.select_largest_subtree()
+    my_rrt.grow(end, N_STEPS)
+
+    sleep(0.01)
     pygame.display.flip()

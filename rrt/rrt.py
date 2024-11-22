@@ -25,14 +25,22 @@ class Node:
         The cost needed to reach this node.
     """
 
-    __slots__ = ["destination_list", "state", "cost", "parent", "index"]
+    __slots__ = [
+        "destination_list",
+        "state",
+        "cost",
+        "parent_index",
+        "index",
+        "children_count",
+    ]
 
     def __init__(self, index, state, cost, parent_index=None):
         self.destination_list: List[int] = []
         self.state: tuple = state
         self.cost: float = cost
-        self.parent: int = parent_index
+        self.parent_index: int = parent_index
         self.index: int = index
+        self.children_count = 0
 
 
 class Edge:
@@ -108,7 +116,7 @@ class RRT:
     ) -> None:
         self.nodes: dict = {}
         self.edges: dict = {}
-        self.root: tuple
+        self.root_index: int = 0
         self.goal: tuple
         if not local_planner:
             local_planner = DefaultPlanner(1)
@@ -165,7 +173,8 @@ class RRT:
             self.nodes[self.node_index] = Node(
                 index=self.node_index, state=start, cost=0
             )
-            self.root = start
+
+            self.root_index = 0
             self.rtree.add(self.node_index, start)
 
     def is_valid_state(self, state: tuple) -> bool:
@@ -197,7 +206,7 @@ class RRT:
         goal,
         nb_iteration=100,
         goal_rate=0.05,
-        metric="local",
+        metric="euclidean",
     ) -> None:
         """
         Executes the algorithm with an empty graph, initialized with the start
@@ -230,8 +239,7 @@ class RRT:
             self.goal = goal
 
         for _ in range(nb_iteration):
-            # Randomly select a sample, with a probability of goal_rate to be
-            # the goal.
+            # Randomly select a sample, with a probability of goal_rate to be the goal.
             sample = (
                 self.environment.random_free_space()
                 if np.random.rand() > goal_rate
@@ -256,6 +264,7 @@ class RRT:
         """
         Adds a node to the tree, without checking for collisions.
         """
+        self.node_index += 1
         index = self.node_index
         self.nodes[index] = Node(
             index=index,
@@ -263,10 +272,12 @@ class RRT:
             cost=0,  # As the cost, we use the distance
             parent_index=parent_index,
         )
-        self.nodes[index].destination_list.append(state)
+        self.nodes[parent_index].destination_list.append(index)
         self.rtree.add(index, state)
         self.edges[parent_index, index] = Edge(parent_index, index, path, 1)
-        self.node_index += 1
+        while parent_index != self.root_index:
+            self.nodes[parent_index].children_count += 1
+            parent_index = self.nodes[parent_index].parent_index
 
     def get_closest_node(self, sample, metric="local") -> tuple:
         """
@@ -314,7 +325,7 @@ class RRT:
                 return False
         return True
 
-    def selet_largest_subtree(self) -> Edge:
+    def select_largest_subtree(self) -> Edge:
         """
         Selects the best edge of the tree among the ones leaving from the root.
         Uses the number of children to determine the best option.
@@ -325,47 +336,39 @@ class RRT:
             The best edge.
         """
 
-        node = max(
+        node_index = max(
             [
-                (child, self.children_count(child))
-                for child in self.nodes[0].destination_list
+                (child, self.nodes[child].children_count)
+                for child in self.nodes[self.root_index].destination_list
             ],
             key=lambda x: x[1],
         )[0]
-        best_edge = self.edges[(self.root, node)]
-        # we update the tree to remove all the other siblings of the old root
-        for child in self.nodes[0].destination_list:
-            if child == node:
-                continue
-            self.edges.pop((self.root, child))
-            self.delete_all_children(child)
-        self.nodes.pop(self.root)
-        self.root = node
+        best_edge = self.edges[(self.root_index, node_index)]
+
+        self.edges.pop((self.root_index, node_index))
+        self.nodes[self.root_index].destination_list.remove(node_index)
+
+        self.delete_all_children(self.root_index)
+        self.rtree.delete(
+            id=self.root_index, coordinates=self.nodes[self.root_index].state
+        )
+        self.nodes.pop(self.root_index)
+        self.root_index = node_index
         return best_edge
 
-    def delete_all_children(self, node) -> None:
+    def delete_all_children(self, node_index) -> None:
         """
         Removes all the nodes of the tree below the requested node.
         """
 
-        if self.nodes[node].destination_list:
-            for child in self.nodes[node].destination_list:
-                self.edges.pop((node, child))
-                self.delete_all_children(child)
-        self.nodes.pop(node)
-
-    def children_count(self, node) -> int:
-        """
-        Not optimal at all as it recounts a lot of the tree every time a path
-        needs to be selected.
-        """
-
-        if not self.nodes[node].destination_list:
-            return 0
-        total = 0
-        for child in self.nodes[node].destination_list:
-            total += 1 + self.children_count(child)
-        return total
+        if self.nodes[node_index].destination_list:
+            for child_index in self.nodes[node_index].destination_list:
+                self.edges.pop((node_index, child_index))
+                self.delete_all_children(child_index)
+                self.rtree.delete(
+                    id=child_index, coordinates=self.nodes[child_index].state
+                )
+                self.nodes.pop(child_index)
 
     def get_path_to_node(self, node_index: int) -> list[tuple]:
         """
@@ -384,12 +387,11 @@ class RRT:
         """
 
         path = []
-        while node_index > 0:
+        while node_index > self.root_index:
             path.extend(
-                list(self.edges[(self.nodes[node_index].parent, node_index)].path)[::-1]
+                list(
+                    self.edges[(self.nodes[node_index].parent_index, node_index)].path
+                )[::-1]
             )
-            node_index = self.nodes[node_index].parent
-        path.extend(
-            list(self.edges[(self.nodes[node_index].parent, node_index)].path)[::-1]
-        )
+            node_index = self.nodes[node_index].parent_index
         return path
