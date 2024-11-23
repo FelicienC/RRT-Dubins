@@ -15,9 +15,10 @@ my_rrt = RRT(environment=env)
 # We generate two random points and initialize the tree
 start, end = env.random_free_space(), env.random_free_space()
 my_rrt.set_start(start)
+my_rrt.set_goal(end)
 
 # We run N_STEPS iterations of growth
-my_rrt.grow(end, N_STEPS, metric="euclidean")
+my_rrt.grow(N_STEPS, metric="euclidean")
 
 # We plot the rrt using pygame,
 pygame.init()
@@ -44,6 +45,6 @@ while running:
     pygame.draw.circle(screen, (255, 255, 255), start, 2)  # goal
 
     my_rrt.select_largest_subtree()
-    my_rrt.grow(end, N_STEPS)
+    my_rrt.grow(N_STEPS)
 
     pygame.display.flip()

@@ -17,17 +17,18 @@ class DefaultPlanner:
 
     def get_next_state(self, state1, state2) -> list[np.ndarray]:
         """
-        Given two states, it returns the path [state1, stateX].
+        Given two states, it computes the path from state 1 to state 2.
 
-        stateX is the point obtained by starting at state1 and moving along the vector
-        vect(state1, state2) for the distance point_separation.
+        The computed path does not include state1. Here, the path only contains one
+        point, stateX. It is the point obtained by starting at state1 and moving along
+        the vector vect(state1, state2) for the distance point_separation.
 
         Args:
             state1 (np.ndarray): The first state
             state2 (np.ndarray): The second state
 
         Returns:
-            list[np.ndarray]: The path [state1, stateX]
+            list[np.ndarray]: The path [stateX]
         """
         return [
             state1,

@@ -16,9 +16,10 @@ start, end = env.random_free_space(), env.random_free_space()
 
 # We initialize an empty tree
 my_rrt.set_start(start)
+my_rrt.set_goal(end)
 
-# We run 100 iterations of growth
-my_rrt.grow(end, 300)
+# We run 300 iterations of growth
+my_rrt.grow(300)
 
 # We plot
 fig, ax = plt.subplots()

@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from rrt import Dubins, RRT, EmptyEnvironment
 
-N_STEPS = 100
-
 # Initialize an empty environment and a planner
 env = EmptyEnvironment([(0, 100), (0, 100), (0, 2 * np.pi)], random_seed=7)
 local_planner = Dubins(radius=2, point_separation=0.5)
@@ -18,9 +16,10 @@ start, end = env.random_free_space(), env.random_free_space()
 
 # We initialize an empty tree
 my_rrt.set_start(start)
+my_rrt.set_goal(end)
 
 # We run N_STEPS iterations of growth
-my_rrt.grow(end, N_STEPS)
+my_rrt.grow(nb_iteration=100)
 
 # We plot the rrt
 for node in my_rrt.nodes.values():

@@ -41,8 +41,6 @@ class MyPlanner:
         return (state1, min(possible_states, key=lambda x: np.linalg.norm(x - state2)))
 
 
-N_STEPS = 3000
-
 env = EmptyEnvironment([(-50, 50), (-50, 50), (-5, 5), (-5, 5)], random_seed=7)
 my_rrt = RRT(environment=env, local_planner=MyPlanner(), precision=(3, 3, 3, 3))
 
@@ -51,9 +49,10 @@ start, end = env.random_free_space(), env.random_free_space()
 
 # We initialize an empty tree
 my_rrt.set_start(start)
+my_rrt.set_goal(end)
 
 # We run N_STEPS iterations of growth
-my_rrt.grow(end, N_STEPS, metric="euclidean")
+my_rrt.grow(nb_iteration=3000, metric="euclidean")
 
 # We plot the rrt using matplotlib, all at once
 for node in my_rrt.nodes.values():

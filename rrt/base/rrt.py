@@ -157,6 +157,18 @@ class RRT:
             self.root_index = 0
             self.rtree.add(self.node_index, start)
 
+    def set_goal(self, goal) -> None:
+        """
+        Sets the goal of the algorithm.
+
+        Parameters
+        ----------
+        goal : tuple
+            The final requested state as a tuple.
+        """
+        if self.is_valid_state(goal):
+            self.goal = goal
+
     def is_valid_state(self, state: tuple) -> bool:
         """
         Checks that the provided state is within the boundaries of the
@@ -183,7 +195,6 @@ class RRT:
 
     def grow(
         self,
-        goal,
         nb_iteration=100,
         goal_rate=0.05,
         metric="euclidean",
@@ -194,8 +205,6 @@ class RRT:
 
         Parameters
         ----------
-        goal : tuple
-            The final requested state as a tuple.
         nb_iteration : int
             The number of maximal iterations (not using the number of nodes as
             potentially the start is in a region of unavoidable collision).
@@ -215,27 +224,23 @@ class RRT:
         the computation faster and the code a simpler, this is why several
         metrics are available.
         """
-        if self.is_valid_state(goal):
-            self.goal = goal
-
         for _ in range(nb_iteration):
             # Randomly select a sample, with a probability of goal_rate to be the goal.
             sample = (
                 self.environment.random_free_space()
                 if np.random.rand() > goal_rate
-                else goal
+                else self.goal
             )
 
             # Find the closest node of the tree to the sample
             node, cost = self.get_closest_node(sample, metric=metric)
 
-            # Try to connect the node to the sample
+            # Try to connect the sample to the tree
             path = self.local_planner.get_next_state(node.state, sample)
             for state in path:
                 if not self.environment.is_free(state):
                     break
             else:
-                # Adding the node to the tree
                 self.add_node(state, parent_index=node.index, path=path)
                 if self.in_goal_region(state):
                     self.reached_goal.append(self.node_index)

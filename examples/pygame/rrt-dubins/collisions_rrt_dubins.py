@@ -19,8 +19,9 @@ my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1, 2))
 
 my_rrt.set_start(env.random_free_space())
 end = env.random_free_space()
+my_rrt.set_goal(end)
 # All the computation is done here
-path = my_rrt.grow(goal=end, nb_iteration=N_STEPS, metric="euclidean")
+my_rrt.grow(nb_iteration=N_STEPS, metric="euclidean")
 nb_edges_to_plot = 0
 
 pygame.init()
@@ -37,8 +38,9 @@ while running:
             # Using the mouse to set the objective point
             x, y = pygame.mouse.get_pos()
             end = (x, y, np.random.rand() * np.pi * 2)
+            my_rrt.set_goal(end)
             # All the computation is done here
-            my_rrt.grow(end, N_STEPS, metric="euclidean")
+            my_rrt.grow(nb_iteration=N_STEPS, metric="euclidean")
             nb_edges_to_plot = 0
 
     # Plot the obstacles

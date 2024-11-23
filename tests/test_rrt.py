@@ -11,10 +11,10 @@ def test_rrt_nd(n_dim, metric):
     """Test the growth of the tree in n dimensions, n=2 to 9."""
     env = EmptyEnvironment([(0, 100)] * n_dim)
     local_planner = DefaultPlanner(1)
-    start, end = env.random_free_space(), env.random_free_space()
     my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1,) * n_dim)
-    my_rrt.set_start(start)
-    my_rrt.grow(end, 10, metric=metric, goal_rate=0)
+    my_rrt.set_start(env.random_free_space())
+    my_rrt.set_goal(env.random_free_space())
+    my_rrt.grow(10, metric=metric, goal_rate=0)
     assert len(my_rrt.nodes[0].state) == n_dim
     assert list(my_rrt.nodes.keys()) == list(range(11))
 
@@ -25,10 +25,9 @@ def test_rrt_timeit():
     local_planner = DefaultPlanner(1)
     my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1))
 
-    start = env.random_free_space()
-    end = env.random_free_space()
-    my_rrt.set_start(start)
-    my_rrt.grow(end, 10000, metric="euclidean", goal_rate=0)
+    my_rrt.set_start(env.random_free_space())
+    my_rrt.set_goal(env.random_free_space())
+    my_rrt.grow(nb_iteration=10000, metric="euclidean", goal_rate=0)
 
 
 def test_rrt_dubins():
@@ -40,14 +39,12 @@ def test_rrt_dubins():
     local_planner = Dubins(4, 1)
     rrt = RRT(env, local_planner=local_planner, precision=(1, 1, 2))
 
-    # Selection of random starting and ending points
-    start = env.random_free_space()
-    end = env.random_free_space()
-
     # Trying first the euclidean distance
-    rrt.set_start(start)
-    rrt.grow(end, 100, metric="euclidean")
+    rrt.set_start(env.random_free_space())
+    rrt.set_goal(env.random_free_space())
+    rrt.grow(100, metric="euclidean")
 
     # # Trying then the distance defined by the local planner
-    rrt.set_start(start)
-    rrt.grow(end, 1000, metric="local")
+    rrt.set_start(env.random_free_space())
+    rrt.set_goal(env.random_free_space())
+    rrt.grow(1000, metric="local")
