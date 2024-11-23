@@ -5,7 +5,6 @@ Demo of the RRT using Pygame.
 import pygame
 from rrt import EmptyEnvironment, RRT
 import numpy as np
-from time import sleep
 
 
 class MyPlanner:
@@ -76,8 +75,8 @@ while running:
     x, y, psi, speed = my_rrt.nodes[my_rrt.root_index].state
     pygame.draw.circle(screen, (255, 255, 255), (x, y), 2)
 
-    my_rrt.select_largest_subtree()
-    my_rrt.grow(end, N_STEPS)
+    my_rrt.select_deepest_subtree()
+    while my_rrt.max_depth - my_rrt.nodes[my_rrt.root_index].depth < 100:
+        my_rrt.grow(end, 100)
 
-    sleep(0.01)
     pygame.display.flip()

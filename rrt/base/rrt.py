@@ -28,19 +28,23 @@ class Node:
         "destination_list",
         "state",
         "cost",
+        "depth",
         "parent_index",
         "index",
         "children_count",
+        "children_max_depth",
         "paths",
     ]
 
-    def __init__(self, index, state, cost, parent_index=None):
+    def __init__(self, index, state, cost, depth, parent_index=None):
         self.destination_list: List[int] = []
         self.paths: List[tuple] = []
         self.state: tuple = state
         self.cost: float = cost
         self.parent_index: int = parent_index
         self.index: int = index
+        self.depth = depth
+        self.children_max_depth = 0
         self.children_count = 0
 
 
@@ -100,6 +104,7 @@ class RRT:
         self.environment = environment
         self.rtree = RTreeIndex()
         self.node_index = 0
+        self.max_depth = 0
         self.reached_goal = []
 
         self.validate()
@@ -143,7 +148,10 @@ class RRT:
 
         if self.is_valid_state(start):
             self.nodes[self.node_index] = Node(
-                index=self.node_index, state=start, cost=0
+                index=self.node_index,
+                state=start,
+                cost=0,
+                depth=0,
             )
 
             self.root_index = 0
@@ -238,17 +246,30 @@ class RRT:
         """
         self.node_index += 1
         index = self.node_index
+
         self.nodes[index] = Node(
             index=index,
             state=state,
             cost=0,  # As the cost, we use the distance
             parent_index=parent_index,
+            depth=self.nodes[parent_index].depth + 1,
         )
+
+        # updating the max depth and the deepest node
+        if self.nodes[index].depth > self.max_depth:
+            self.max_depth = self.nodes[index].depth
+            self.deepest_node = index
+
         self.nodes[parent_index].destination_list.append(index)
         self.nodes[parent_index].paths.append(path)
         self.rtree.add(index, state)
+
+        # Updating the number of children of the parents
         while parent_index != self.root_index:
             self.nodes[parent_index].children_count += 1
+            self.nodes[parent_index].children_max_depth = max(
+                self.nodes[parent_index].children_max_depth, self.nodes[index].depth
+            )
             parent_index = self.nodes[parent_index].parent_index
 
     def get_closest_node(self, sample, metric="local") -> tuple:
@@ -311,6 +332,35 @@ class RRT:
         node_index = max(
             [
                 (child, self.nodes[child].children_count)
+                for child in self.nodes[self.root_index].destination_list
+            ],
+            key=lambda x: x[1],
+        )[0]
+
+        self.nodes[self.root_index].destination_list.remove(node_index)
+
+        self.delete_all_children(self.root_index)
+        self.rtree.delete(
+            id=self.root_index, coordinates=self.nodes[self.root_index].state
+        )
+        self.nodes.pop(self.root_index)
+        self.root_index = node_index
+        self.nodes[node_index].parent_index = None
+
+    def select_deepest_subtree(self) -> None:
+        """
+        Selects the best edge of the tree among the ones leaving from the root.
+        Uses the number of children to determine the best option.
+
+        Returns
+        -------
+        edge :Edge
+            The best edge.
+        """
+
+        node_index = max(
+            [
+                (child, self.nodes[child].children_max_depth)
                 for child in self.nodes[self.root_index].destination_list
             ],
             key=lambda x: x[1],
