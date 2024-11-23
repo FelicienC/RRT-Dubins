@@ -20,7 +20,9 @@ class Environment(ABC):
 
 
 class EmptyEnvironment(Environment):
-    def __init__(self, dimensions: list[tuple]) -> None:
+    def __init__(self, dimensions: list[tuple], random_seed: int = None) -> None:
+        if random_seed is not None:
+            np.random.seed(random_seed)
         self.dimensions = dimensions
 
     def is_free(self, state: np.ndarray) -> bool:
@@ -64,7 +66,11 @@ class StaticEnvironment(EmptyEnvironment):
         boundaries of the environment.
     """
 
-    def __init__(self, dimensions, nb_obstacles, obstacle_size) -> None:
+    def __init__(
+        self, dimensions, nb_obstacles, obstacle_size, random_seed=None
+    ) -> None:
+        if random_seed is not None:
+            np.random.seed(random_seed)
         self.dimensions = dimensions
         self.obstacles = [
             Obstacle(dimensions, obstacle_size, 4) for _ in range(nb_obstacles)

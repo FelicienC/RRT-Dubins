@@ -41,7 +41,9 @@ class MyPlanner:
 WIDTH, HEIGHT, N_STEPS = 800, 600, 200
 
 # Initialize the planner
-env = EmptyEnvironment([(0, WIDTH), (0, HEIGHT), (0, 2 * np.pi), (0, 10)])
+env = EmptyEnvironment(
+    [(0, WIDTH), (0, HEIGHT), (0, 2 * np.pi), (0, 10)], random_seed=42
+)
 my_rrt = RRT(environment=env, local_planner=MyPlanner(), precision=(10, 10, 1, 1))
 
 # We generate two random points and initialize the tree

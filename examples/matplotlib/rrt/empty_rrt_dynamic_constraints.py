@@ -41,9 +41,9 @@ class MyPlanner:
         return (state1, min(possible_states, key=lambda x: np.linalg.norm(x - state2)))
 
 
-N_STEPS = 10000
+N_STEPS = 3000
 
-env = EmptyEnvironment([(-50, 50), (-50, 50), (-5, 5), (-5, 5)])
+env = EmptyEnvironment([(-50, 50), (-50, 50), (-5, 5), (-5, 5)], random_seed=7)
 my_rrt = RRT(environment=env, local_planner=MyPlanner(), precision=(3, 3, 3, 3))
 
 # We generate two random points

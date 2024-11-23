@@ -9,7 +9,7 @@ from rrt import Dubins, RRT, EmptyEnvironment
 N_STEPS = 100
 
 # Initialize an empty environment and a planner
-env = EmptyEnvironment([(0, 100), (0, 100), (0, 2 * np.pi)])
+env = EmptyEnvironment([(0, 100), (0, 100), (0, 2 * np.pi)], random_seed=7)
 local_planner = Dubins(radius=2, point_separation=0.5)
 my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1, 1))
 

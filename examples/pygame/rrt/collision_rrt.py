@@ -9,7 +9,7 @@ from rrt import StaticEnvironment, RRT
 WIDTH, HEIGHT, N_STEPS = 800, 600, 10
 
 # Initialize the planner
-env = StaticEnvironment([(0, WIDTH), (0, HEIGHT)], 100, 30)
+env = StaticEnvironment([(0, WIDTH), (0, HEIGHT)], 100, 30, random_seed=7)
 my_rrt = RRT(environment=env)
 
 # We generate two random points and initialize the tree

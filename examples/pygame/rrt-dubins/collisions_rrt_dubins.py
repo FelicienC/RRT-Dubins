@@ -11,7 +11,9 @@ from rrt import StaticEnvironment, RRT, Dubins
 WIDTH, HEIGHT, N_STEPS = 800, 600, 1000
 
 # Initialize the planner
-env = StaticEnvironment([(0, WIDTH), (0, HEIGHT), (0, 2 * np.pi)], 100, 30)
+env = StaticEnvironment(
+    [(0, WIDTH), (0, HEIGHT), (0, 2 * np.pi)], 100, 30, random_seed=7
+)
 local_planner = Dubins(radius=10, point_separation=0.5)
 my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1, 2))
 

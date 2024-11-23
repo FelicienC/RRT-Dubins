@@ -8,7 +8,7 @@ from rrt import Dubins, RRT, StaticEnvironment
 
 # We initialize the planner with the turn radius and the desired distance between
 # consecutive points
-env = StaticEnvironment([(-50, 50), (-50, 50), (0, 6.29)], 100, 5)
+env = StaticEnvironment([(-50, 50), (-50, 50), (0, 6.29)], 100, 5, random_seed=7)
 local_planner = Dubins(radius=2, point_separation=0.5)
 my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1, 2))
 
