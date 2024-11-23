@@ -2,7 +2,7 @@
 Test module, making sure the main functionalities are always functioning
 """
 
-from rrt.dubins import Dubins
+from rrt.local_planners.dubins import Dubins
 
 
 def test_dubins():

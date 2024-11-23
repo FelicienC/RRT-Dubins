@@ -5,8 +5,8 @@ Construction of the Rapidely Exploring Random Tree
 import numpy as np
 from rtree.index import Index as RTreeIndex
 from rtree.index import Property
-from rrt.environment import Environment
-from rrt.default_planner import DefaultPlanner
+from rrt.environments.environment import Environment
+from rrt.local_planners.default_planner import DefaultPlanner
 from typing import List
 
 
@@ -330,7 +330,6 @@ class RRT:
         """
         Removes all the nodes of the tree below the requested node.
         """
-
         if self.nodes[node_index].destination_list:
             for child_index in self.nodes[node_index].destination_list:
                 self.delete_all_children(child_index)

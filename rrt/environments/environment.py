@@ -5,7 +5,7 @@ The environment with static polygonal obstacles
 import numpy as np
 
 from scipy.spatial import KDTree
-from rrt.obstacle import Obstacle
+from rrt.environments.obstacle import Obstacle
 from abc import ABC, abstractmethod
 
 

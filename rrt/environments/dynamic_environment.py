@@ -4,7 +4,7 @@ The environment where the obstacles can move
 
 from collections import deque
 import numpy as np
-from rrt.obstacle import Wall
+from rrt.environments.obstacle import Wall
 
 
 class DynamicEnvironment:

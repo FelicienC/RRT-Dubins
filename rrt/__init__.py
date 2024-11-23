@@ -1,7 +1,7 @@
 # load the rrt module in the namespace
-from .rrt import RRT
-from .dubins import Dubins
-from .default_planner import DefaultPlanner
-from .environment import StaticEnvironment, EmptyEnvironment
-from .dynamic_environment import DynamicEnvironment
-from .obstacle import Wall, Obstacle
+from .base.rrt import RRT
+from .local_planners.dubins import Dubins
+from .local_planners.default_planner import DefaultPlanner
+from .environments.environment import StaticEnvironment, EmptyEnvironment
+from .environments.dynamic_environment import DynamicEnvironment
+from .environments.obstacle import Wall, Obstacle
