@@ -6,6 +6,7 @@ Simple implementation of a **Rapidly Exploring Random Tree** using **Dubins path
   <img src="https://github.com/FelicienC/RRT-Dubins/blob/master/docs/img/moving.gif", width=400><img src="https://github.com/FelicienC/RRT-Dubins/blob/master/docs/img/example.gif", width=400>
 </p>
 
+
 ## Installation
 The easiest way is to use pip:
 ```bash
