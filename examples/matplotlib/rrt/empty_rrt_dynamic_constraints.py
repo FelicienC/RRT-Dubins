@@ -1,22 +1,21 @@
 """
-RRT using dubins in a empty 2D environment, simulating an object having a limited
-acceleration and velocity.
+RRT in an empty 2D environment with dynamic constraints.
 
-The state of the object is [x, y, vx, vy], where x and y are the position of the object
-and vx and vy are the velocity of the object in the x and y axis respectively.
-
-The object can only accelerate by 1 in the x and y axis, and can only have a velocity
-between -5 and 5 in both axis.
-
+This example demonstrates the use of Rapidly-exploring Random Tree (RRT) in an empty 2D
+environment. The planner simulates an object with limited acceleration and velocity,
+and grows the RRT to find a path from a start state to a goal state.
 """
 
 import matplotlib.pyplot as plt
 from rrt import RRT, EmptyEnvironment
 import numpy as np
+from typing import List, Tuple
 
 
 class MyPlanner:
-    def get_next_state(self, state1, state2) -> list[np.ndarray]:
+    def get_next_state(
+        self, state1: np.ndarray, state2: np.ndarray
+    ) -> List[np.ndarray]:
         """
         Given two states, it returns the path [state1, stateX].
 
@@ -38,32 +37,43 @@ class MyPlanner:
             (x + vx, y + vy, vx, vy + 1),
         )
 
-        return (state1, min(possible_states, key=lambda x: np.linalg.norm(x - state2)))
+        return [state1, min(possible_states, key=lambda s: np.linalg.norm(s - state2))]
 
 
+# Initialize an empty environment with boundaries and a random seed for reproducibility
 env = EmptyEnvironment([(-50, 50), (-50, 50), (-5, 5), (-5, 5)], random_seed=7)
-my_rrt = RRT(environment=env, local_planner=MyPlanner(), precision=(3, 3, 3, 3))
 
-# We generate two random points
-start, end = env.random_free_space(), env.random_free_space()
+# Create an RRT planner with the environment and custom local planner
+rrt_planner = RRT(environment=env, local_planner=MyPlanner(), precision=(3, 3, 3, 3))
 
-# We initialize an empty tree
-my_rrt.set_start(start)
-my_rrt.set_goal(end)
+# Generate two random points in the free space of the environment
+start: Tuple[float, float, float, float] = env.random_free_space()
+goal: Tuple[float, float, float, float] = env.random_free_space()
 
-# We run N_STEPS iterations of growth
-my_rrt.grow(nb_iteration=3000, metric="euclidean")
+# Set the start and goal points for the RRT planner
+rrt_planner.set_start(start)
+rrt_planner.set_goal(goal)
 
-# We plot the rrt using matplotlib, all at once
-for node in my_rrt.nodes.values():
+# Grow the RRT for 3000 iterations using the Euclidean distance metric
+rrt_planner.grow(nb_iteration=3000, metric="euclidean")
+
+# Create a 2D plot to visualize the RRT
+fig, ax = plt.subplots()
+
+# Plot all the edges in the RRT
+for node in rrt_planner.nodes.values():
     for path in node.paths:
-        plt.plot([x[0] for x in path], [x[1] for x in path], c="grey")
+        ax.plot([x[0] for x in path], [x[1] for x in path], c="grey")
 
-# We plot the path to the goal if it exists
-if my_rrt.reached_goal:
-    path = my_rrt.get_path_to_node(my_rrt.reached_goal[-1])
-    plt.plot([x[0] for x in path], [x[1] for x in path], c="red")
+# If a path to the goal was found, plot it in red
+if rrt_planner.reached_goal:
+    path = rrt_planner.get_path_to_node(rrt_planner.reached_goal[-1])
+    ax.plot([x[0] for x in path], [x[1] for x in path], c="red")
 
-plt.plot(*start[:2], "o", c="green", label="Start")
-plt.plot(*end[:2], "o", c="blue", label="End")
+# Plot the start point in green and the goal point in blue
+ax.scatter(*start[:2], c="green", label="Start")
+ax.scatter(*goal[:2], c="blue", label="Goal")
+
+# Add a legend and show the plot
+ax.legend()
 plt.show()

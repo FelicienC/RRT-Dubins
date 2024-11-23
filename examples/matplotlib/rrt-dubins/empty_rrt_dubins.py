@@ -1,36 +1,54 @@
 """
-RRT using dubins in a empty 2D environment
+RRT using Dubins in an empty 2D environment.
+
+This example demonstrates the use of Rapidly-exploring Random Tree (RRT) with a Dubins
+local planner in an empty 2D environment. The planner grows the RRT to find a path from
+a start state to a goal state.
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
 from rrt import Dubins, RRT, EmptyEnvironment
+from typing import Tuple
 
-# Initialize an empty environment and a planner
+# Initialize an empty environment with boundaries and a random seed for reproducibility
 env = EmptyEnvironment([(0, 100), (0, 100), (0, 2 * np.pi)], random_seed=7)
+
+# Create a Dubins local planner with specified radius and point separation
 local_planner = Dubins(radius=2, point_separation=0.5)
-my_rrt = RRT(environment=env, local_planner=local_planner, precision=(1, 1, 1))
 
-# We generate two random points
-start, end = env.random_free_space(), env.random_free_space()
+# Create an RRT planner with the environment and local planner
+rrt_planner = RRT(environment=env, local_planner=local_planner, precision=(1, 1, 1))
 
-# We initialize an empty tree
-my_rrt.set_start(start)
-my_rrt.set_goal(end)
+# Generate two random points in the free space of the environment
+start: Tuple[float, float, float] = env.random_free_space()
+goal: Tuple[float, float, float] = env.random_free_space()
 
-# We run N_STEPS iterations of growth
-my_rrt.grow(nb_iteration=100)
+# Set the start and goal points for the RRT planner
+rrt_planner.set_start(start)
+rrt_planner.set_goal(goal)
 
-# We plot the rrt
-for node in my_rrt.nodes.values():
+# Grow the RRT for 100 iterations using the Euclidean distance metric
+rrt_planner.grow(nb_iteration=100)
+
+# Create a 2D plot to visualize the RRT
+fig, ax = plt.subplots()
+
+# Plot all the edges in the RRT
+for node in rrt_planner.nodes.values():
     for path in node.paths:
-        plt.plot([x[0] for x in path], [x[1] for x in path], c="grey")
+        ax.plot([x[0] for x in path], [x[1] for x in path], c="grey")
 
-if my_rrt.reached_goal:
-    for goal_index in my_rrt.reached_goal:
-        path = my_rrt.get_path_to_node(goal_index)
-        plt.plot([x[0] for x in path], [x[1] for x in path], c="red")
+# If a path to the goal was found, plot it in red
+if rrt_planner.reached_goal:
+    for goal_index in rrt_planner.reached_goal:
+        path = rrt_planner.get_path_to_node(goal_index)
+        ax.plot([x[0] for x in path], [x[1] for x in path], c="red")
 
-plt.plot(*start[:2], "o", c="green")
-plt.plot(*end[:2], "o", c="blue")
+# Plot the start point in green and the goal point in blue
+ax.scatter(*start[:2], c="green", label="Start")
+ax.scatter(*goal[:2], c="blue", label="Goal")
+
+# Add a legend and show the plot
+ax.legend()
 plt.show()

@@ -37,7 +37,7 @@ class DynamicEnvironment:
         environment.
     """
 
-    def __init__(self, dimensions, nb_walls, moving=False):
+    def __init__(self, dimensions, nb_walls, moving: bool = False) -> None:
         self.moving = moving
         self.dimensions = dimensions
         self.obstacles = deque()
@@ -52,7 +52,7 @@ class DynamicEnvironment:
             )
         self.center = [dimensions[0] / 2, dimensions[1] / 2]
 
-    def is_free(self, state) -> bool:
+    def is_free(self, state: tuple) -> bool:
         """
         Returns False if a point is within an obstacle or outside of the
         boundaries of the environment.
@@ -67,7 +67,7 @@ class DynamicEnvironment:
         ):
             return False
         for obstacle in self.obstacles:
-            if obstacle.colides(x, y, time):
+            if obstacle.collides(x, y, time):
                 return False
         return True
 
@@ -75,22 +75,23 @@ class DynamicEnvironment:
         """
         Returns a randomly selected point in the free space.
         """
-
-        x = np.random.rand() * self.dimensions[0]
-        y = (np.random.rand() - 0.5) * self.dimensions[1] + self.center[1]
-        while not self.is_free(x, y):
+        while True:
             x = np.random.rand() * self.dimensions[0]
             y = (np.random.rand() - 0.5) * self.dimensions[1] + self.center[1]
-        return x, y, np.random.rand() * np.pi * 2
+            psi = np.random.rand() * np.pi * 2
+            time = 0  # Assign default time if needed
+            state = (x, y, psi, time)
+            if self.is_free(state):
+                return x, y, psi
 
-    def update(self, position) -> None:
+    def update(self, position: tuple) -> None:
         """
         Refreshes the active walls as well as the position of the camera.
 
         Parameters
         ----------
-        position : float
-            The position of the vehicle in the environment.
+        position : tuple
+            The position (x, y) of the vehicle in the environment.
         """
 
         # every time an obstacles gets out, we add one on the other side

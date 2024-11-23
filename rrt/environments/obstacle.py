@@ -26,13 +26,25 @@ class Obstacle:
 
     """
 
-    def __init__(self, map_dimensions, size, nb_pts) -> None:
+    def __init__(self, map_dimensions: list, size: float, nb_pts: int) -> None:
+        """
+        Initializes an Obstacle instance.
+
+        Parameters
+        ----------
+        map_dimensions : list
+            List of (min, max) tuples for each dimension of the environment.
+        size : float
+            Size (radius) of the obstacle.
+        nb_pts : int
+            Number of points defining the polygonal obstacle.
+        """
         self.center = [
             np.random.uniform(dim_min, dim_max) for (dim_min, dim_max) in map_dimensions
         ]
         # We use very simple convex polygons, generated with a radius
         # and randomly selected angles.
-        angles = sorted((np.random.rand() * 2 * np.pi for _ in range(nb_pts)))
+        angles = sorted(np.random.uniform(0, 2 * np.pi, nb_pts))
         self.points = np.array(
             [
                 self.center[:2] + np.array([size * np.cos(angle), size * np.sin(angle)])
@@ -47,9 +59,21 @@ class Obstacle:
         )
         self.polygon = Polygon(self.points)
 
-    def colides(self, x, y) -> bool:
+    def collides(self, x: float, y: float) -> bool:
         """
-        Checks if the given point is in the obstacle or not.
+        Checks if the given point is inside the obstacle.
+
+        Parameters
+        ----------
+        x : float
+            X-coordinate of the point.
+        y : float
+            Y-coordinate of the point.
+
+        Returns
+        -------
+        bool
+            True if the point is inside the obstacle, False otherwise.
         """
 
         return self.polygon.contains(Point(x, y))
@@ -74,22 +98,50 @@ class Wall:
 
     Methods
     -------
-    colides
+    collides
         Checks if a point is in the wall or not.
     visible
         Checks if the wall is in the field of view
     """
 
-    def __init__(self, width, bottom_y, thickness, moving=False) -> None:
+    def __init__(self, width: float, bottom_y: float, thickness: float, moving: bool = False) -> None:
+        """
+        Initializes a Wall instance with an optional moving hole.
+
+        Parameters
+        ----------
+        width : float
+            Total width of the wall.
+        bottom_y : float
+            Y-coordinate of the bottom of the wall.
+        thickness : float
+            Thickness (height) of the wall.
+        moving : bool, optional
+            If True, the hole in the wall moves over time. Defaults to False.
+        """
         self.width = width
         self.bottom_y = bottom_y
         self.hole = width * np.random.rand()
         self.thickness = thickness
         self.speed = (np.random.rand() - 1 / 2) * 2 if moving else 0
 
-    def colides(self, x, y, time=0) -> bool:
+    def collides(self, x: float, y: float, time: float = 0) -> bool:
         """
-        Checks if the given point is in the obstacle or not.
+        Checks if the given point collides with the wall at a specific time.
+
+        Parameters
+        ----------
+        x : float
+            X-coordinate of the point.
+        y : float
+            Y-coordinate of the point.
+        time : float, optional
+            Time at which to check for collision. Defaults to 0.
+
+        Returns
+        -------
+        bool
+            True if the point collides with the wall, False otherwise.
         """
 
         if time == 0:
@@ -102,9 +154,21 @@ class Wall:
             self.bottom_y <= y <= self.bottom_y + self.thickness
         )
 
-    def visible(self, view_top, view_bottom) -> bool:
+    def visible(self, view_top: float, view_bottom: float) -> bool:
         """
-        Checks if the wall is in the field of view
+        Determines if the wall is within the given field of view.
+
+        Parameters
+        ----------
+        view_top : float
+            Top boundary of the field of view.
+        view_bottom : float
+            Bottom boundary of the field of view.
+
+        Returns
+        -------
+        bool
+            True if the wall is visible within the field of view, False otherwise.
         """
 
         return (

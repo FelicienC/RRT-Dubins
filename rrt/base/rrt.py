@@ -7,45 +7,8 @@ from rtree.index import Index as RTreeIndex
 from rtree.index import Property
 from rrt.environments.environment import Environment
 from rrt.local_planners.default_planner import DefaultPlanner
-from typing import List
-
-
-class Node:
-    """
-    Node of the rapidly exploring random tree.
-
-    Attributes
-    ----------
-    destination_list : list
-        The reachable nodes from the current one.
-    state : tuple
-        The state represented by the node.
-    cost : float
-        The cost needed to reach this node.
-    """
-
-    __slots__ = [
-        "destination_list",
-        "state",
-        "cost",
-        "depth",
-        "parent_index",
-        "index",
-        "children_count",
-        "children_max_depth",
-        "paths",
-    ]
-
-    def __init__(self, index, state, cost, depth, parent_index=None):
-        self.destination_list: List[int] = []
-        self.paths: List[tuple] = []
-        self.state: tuple = state
-        self.cost: float = cost
-        self.parent_index: int = parent_index
-        self.index: int = index
-        self.depth = depth
-        self.children_max_depth = 0
-        self.children_count = 0
+from typing import List, Tuple
+from rrt.base.node import Node  # Import the Node class
 
 
 class RRT:
@@ -62,54 +25,85 @@ class RRT:
     goal_rate : float
         The frequency at which the randomly selected node is chosen among
         the goal zone.
-    precision : tuple
-        The precision needed to stop the algorithm. It is a tuple of the same
+    precision : list
+        The precision needed to stop the algorithm. It is a list of the same
         dimension as the state space.
     goal : tuple
         The position of the goal (the center of the goal zone), in the form of
         a tuple.
-    root : tuple
-        The state of the root of the tree, (the initial state).
+    root_index : int
+        The index of the root of the tree, (the initial state).
     local_planner : Planner
         The planner used for the expansion of the tree, it needs to implement
-        the method get_options and generate_points.
+        the method get_next_state.
+    node_index : int
+        The current index for the next node to be added.
+    rtree : RTreeIndex
+        The R-tree index for spatial indexing of nodes.
+    max_depth : int
+        The maximum depth of the tree.
+    deepest_node : int
+        The index of the deepest node in the tree.
+    reached_goal : list
+        List of node indices that have reached the goal.
 
     Methods
     -------
+    set_start
+        Resets the graph, and sets the start node as root of the tree.
+    set_goal
+        Sets the goal of the algorithm.
+    grow
+        Expands the tree by adding new nodes, starting from the initial state.
+    add_node
+        Adds a node to the tree, without checking for collisions.
+    get_closest_node
+        Chooses the best nodes for the expansion of the tree, and returns them in a list ordered by increasing cost.
     in_goal_region
-        Method helping to determine if a point is within a goal region or not.
-    run
-        Executes the algorithm with an empty graph, which needs to be
-        initialized with the start position at least before.
-    select_options
-        Explores the existing nodes of the tree to find the best option to grow
-        from.
+        Method to determine if a point is within a goal region or not.
+    select_largest_subtree
+        Selects the best edge of the tree among the ones leaving from the root using the number of children.
+    select_deepest_subtree
+        Selects the best edge of the tree among the ones leaving from the root using the maximum depth of children.
+    get_path_to_node
+        Returns the path from the root to the requested node.
+    get_path_to_node_vertices_only
+        Returns the path from the root to the requested node, but only the vertices of the path are returned.
     """
 
     def __init__(
         self,
         environment: Environment,
         local_planner=None,
-        precision=None,
+        precision: List[float] = None,
     ) -> None:
-        self.nodes: dict = {}
-        self.root_index: int = 0
-        self.goal: tuple
-        if not local_planner:
-            local_planner = DefaultPlanner(1)
-        self.local_planner = local_planner
+        # Environment and Precision
+        self.environment = environment
         if not precision:
             precision = [1] * len(environment.dimensions)
         self.precision = precision
-        self.environment = environment
-        self.rtree = RTreeIndex()
+        self.goal: Tuple
+
+        # Local Planner
+        if not local_planner:
+            local_planner = DefaultPlanner(1)
+        self.local_planner = local_planner
+
+        # Tree Structure
+        self.nodes: dict[Node] = {}
         self.node_index = 0
+        self.root_index: int = 0
+        self.rtree = RTreeIndex()
+
+        # Algorithm Parameters
         self.max_depth = 0
+        self.deepest_node = self.root_index
         self.reached_goal = []
 
-        self.validate()
+        # Validation of the correct instantiation
+        self._validate()
 
-    def validate(self) -> None:
+    def _validate(self) -> None:
         """
         Checks that the environment and the local planner are correctly
         implemented.
@@ -131,7 +125,7 @@ class RRT:
                 "The precision does not have the same dimension as the state space"
             )
 
-    def set_start(self, start) -> None:
+    def set_start(self, start: Tuple) -> None:
         """
         Resets the graph, and sets the start node as root of the tree.
 
@@ -146,7 +140,7 @@ class RRT:
         self.rtree = RTreeIndex(properties=Property(dimension=len(start)))
         self.node_index = 0
 
-        if self.is_valid_state(start):
+        if self._is_valid_state(start):
             self.nodes[self.node_index] = Node(
                 index=self.node_index,
                 state=start,
@@ -157,7 +151,7 @@ class RRT:
             self.root_index = 0
             self.rtree.add(self.node_index, start)
 
-    def set_goal(self, goal) -> None:
+    def set_goal(self, goal: Tuple) -> None:
         """
         Sets the goal of the algorithm.
 
@@ -166,13 +160,23 @@ class RRT:
         goal : tuple
             The final requested state as a tuple.
         """
-        if self.is_valid_state(goal):
+        if self._is_valid_state(goal):
             self.goal = goal
 
-    def is_valid_state(self, state: tuple) -> bool:
+    def _is_valid_state(self, state: Tuple) -> bool:
         """
         Checks that the provided state is within the boundaries of the
         environment and in free space.
+
+        Parameters
+        ----------
+        state : tuple
+            The state to be checked.
+
+        Returns
+        -------
+        bool
+            True if the state is valid, raises ValueError otherwise.
         """
         if len(state) != len(self.environment.dimensions):
             raise ValueError(
@@ -195,34 +199,28 @@ class RRT:
 
     def grow(
         self,
-        nb_iteration=100,
-        goal_rate=0.05,
-        metric="euclidean",
+        nb_iteration: int = 100,
+        goal_rate: float = 0.05,
+        metric: str = "euclidean",
     ) -> None:
         """
-        Executes the algorithm with an empty graph, initialized with the start
-        position at least.
+        Expands the tree by adding new nodes, starting from the initial state.
 
         Parameters
         ----------
         nb_iteration : int
-            The number of maximal iterations (not using the number of nodes as
-            potentially the start is in a region of unavoidable collision).
+            The maximum number of iterations to run the algorithm.
         goal_rate : float
-            The probability to expand towards the goal rather than towards a
-            randomly selected sample.
+            The probability of selecting the goal as the target sample for expansion.
         metric : string
-            One of 'local' or 'euclidean'.
-            The method used to select the closest node on the tree from which a
-            path will be grown towards a sample.
+            The metric used to select the closest node in the tree. One of 'local' or 'euclidean'.
 
         Notes
         -----
-        It is not necessary to use several nodes to try and connect a sample to
-        the existing graph; The closest node only could be chosen. The notion
-        of "closest" can also be simply the euclidean distance, which would make
-        the computation faster and the code a simpler, this is why several
-        metrics are available.
+        The algorithm attempts to connect randomly selected samples to the tree.
+        With a probability of `goal_rate`, the goal is selected as the target sample.
+        The closest node in the tree is determined based on the specified metric.
+        If a valid path is found, the new node is added to the tree.
         """
         for _ in range(nb_iteration):
             # Randomly select a sample, with a probability of goal_rate to be the goal.
@@ -245,9 +243,18 @@ class RRT:
                 if self.in_goal_region(state):
                     self.reached_goal.append(self.node_index)
 
-    def add_node(self, state, parent_index, path) -> None:
+    def add_node(self, state: Tuple, parent_index: int, path: List[Tuple]) -> None:
         """
         Adds a node to the tree, without checking for collisions.
+
+        Parameters
+        ----------
+        state : tuple
+            The state of the new node.
+        parent_index : int
+            The index of the parent node.
+        path : list
+            The path from the parent node to the new node.
         """
         self.node_index += 1
         index = self.node_index
@@ -277,7 +284,9 @@ class RRT:
             )
             parent_index = self.nodes[parent_index].parent_index
 
-    def get_closest_node(self, sample, metric="local") -> tuple:
+    def get_closest_node(
+        self, sample: Tuple, metric: str = "local"
+    ) -> Tuple[Node, float]:
         """
         Chooses the best nodes for the expansion of the tree, and returns
         them in a list ordered by increasing cost.
@@ -293,9 +302,9 @@ class RRT:
         Returns
         -------
         closest_node : Node
-        length : float, the distance between the closest node and the sample according
-                 to the metric
-
+            The closest node to the sample.
+        length : float
+            The distance between the closest node and the sample according to the metric.
         """
         closest_node = self.nodes[next(self.rtree.nearest(sample))]
         if metric == "local":
@@ -308,7 +317,7 @@ class RRT:
             np.array(closest_node.state) - np.array(sample)
         )
 
-    def in_goal_region(self, sample) -> bool:
+    def in_goal_region(self, sample: Tuple) -> bool:
         """
         Method to determine if a point is within a goal region or not.
 
@@ -316,84 +325,90 @@ class RRT:
         ----------
         sample : tuple
             The state of the point which needs to be tested.
-        """
 
+        Returns
+        -------
+        bool
+            True if the sample is within the goal region, False otherwise.
+        """
         for i, value in enumerate(sample):
             if abs(self.goal[i] - value) > self.precision[i]:
                 return False
         return True
 
+    def _key_func_largest(self, x):
+        return self.nodes[x].children_count
+
+    def _key_func_deepest(self, x):
+        return self.nodes[x].children_max_depth
+
+    def _select_subtree(self, criterion: str) -> None:
+        """
+        Selects the best edge of the tree among the ones leaving from the root.
+        Uses the specified criterion to determine the best option.
+
+        Parameters
+        ----------
+        criterion : str
+            The criterion to use for selecting the subtree. One of 'largest' or 'deepest'.
+        """
+        if criterion == "largest":
+            key_func = self._key_func_largest
+        elif criterion == "deepest":
+            key_func = self._key_func_deepest
+        else:
+            raise ValueError("Invalid criterion. Use 'largest' or 'deepest'.")
+
+        node_index = max(
+            [
+                (child, key_func(child))
+                for child in self.nodes[self.root_index].destination_list
+            ],
+            key=lambda x: x[1],
+        )[0]
+
+        self.nodes[self.root_index].destination_list.remove(node_index)
+
+        self._delete_all_children(self.root_index)
+        self.rtree.delete(
+            id=self.root_index, coordinates=self.nodes[self.root_index].state
+        )
+        self.nodes.pop(self.root_index)
+        self.root_index = node_index
+        self.nodes[node_index].parent_index = None
+
     def select_largest_subtree(self) -> None:
         """
         Selects the best edge of the tree among the ones leaving from the root.
         Uses the number of children to determine the best option.
-
-        Returns
-        -------
-        edge :Edge
-            The best edge.
         """
-
-        node_index = max(
-            [
-                (child, self.nodes[child].children_count)
-                for child in self.nodes[self.root_index].destination_list
-            ],
-            key=lambda x: x[1],
-        )[0]
-
-        self.nodes[self.root_index].destination_list.remove(node_index)
-
-        self.delete_all_children(self.root_index)
-        self.rtree.delete(
-            id=self.root_index, coordinates=self.nodes[self.root_index].state
-        )
-        self.nodes.pop(self.root_index)
-        self.root_index = node_index
-        self.nodes[node_index].parent_index = None
+        self._select_subtree(criterion="largest")
 
     def select_deepest_subtree(self) -> None:
         """
         Selects the best edge of the tree among the ones leaving from the root.
-        Uses the number of children to determine the best option.
-
-        Returns
-        -------
-        edge :Edge
-            The best edge.
+        Uses the maximum depth of children to determine the best option.
         """
+        self._select_subtree(criterion="deepest")
 
-        node_index = max(
-            [
-                (child, self.nodes[child].children_max_depth)
-                for child in self.nodes[self.root_index].destination_list
-            ],
-            key=lambda x: x[1],
-        )[0]
-
-        self.nodes[self.root_index].destination_list.remove(node_index)
-
-        self.delete_all_children(self.root_index)
-        self.rtree.delete(
-            id=self.root_index, coordinates=self.nodes[self.root_index].state
-        )
-        self.nodes.pop(self.root_index)
-        self.root_index = node_index
-        self.nodes[node_index].parent_index = None
-
-    def delete_all_children(self, node_index) -> None:
+    def _delete_all_children(self, node_index) -> None:
         """
         Removes all the nodes of the tree below the requested node.
+
+        Parameters
+        ----------
+        node_index : int
+            The index of the node whose children are to be deleted.
         """
         if self.nodes[node_index].destination_list:
             for child_index in self.nodes[node_index].destination_list:
-                self.delete_all_children(child_index)
+                self._delete_all_children(child_index)
                 self.rtree.delete(
                     id=child_index, coordinates=self.nodes[child_index].state
                 )
                 self.nodes.pop(child_index)
 
-    def get_path_to_node(self, node_index: int) -> list[tuple]:
+    def get_path_to_node(self, node_index: int) -> List[Tuple]:
         """
         Returns the path from the root to the requested node.
 
@@ -419,7 +434,7 @@ class RRT:
             node_index = parent_index
         return path
 
-    def get_path_to_node_vertices_only(self, node_index: int) -> list[tuple]:
+    def get_path_to_node_vertices_only(self, node_index: int) -> List[Tuple]:
         """
         Returns the path from the root to the requested node, but only the
         vertices of the path are returned.
