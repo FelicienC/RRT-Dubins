@@ -36,8 +36,10 @@ while running:
     pygame.draw.circle(screen, (0, 255, 0), end[:2], 2)  # goal
 
     # Plotting the rrt
-    for edge in my_rrt.edges.values():
-        pygame.draw.lines(screen, (0, 255, 0), False, [edge.path[0], edge.path[-1]])
+    for node in my_rrt.nodes.values():
+        for path in node.paths:
+            pygame.draw.line(screen, (0, 255, 0), path[0], path[1], 1)
+
     start = my_rrt.nodes[my_rrt.root_index].state
     pygame.draw.circle(screen, (255, 255, 255), start, 2)  # goal
 

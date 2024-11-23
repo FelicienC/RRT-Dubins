@@ -23,13 +23,11 @@ my_rrt.grow(end, N_STEPS, metric="euclidean")
 # We plot the rrt using matplotlib, all at once
 fig = plt.figure()
 ax = fig.add_subplot(111, projection="3d")
-for edge in my_rrt.edges.values():
-    plt.plot(
-        [x[0] for x in edge.path],
-        [x[1] for x in edge.path],
-        [x[2] for x in edge.path],
-        c="grey",
-    )
+for node in my_rrt.nodes.values():
+    for path in node.paths:
+        ax.plot(
+            [x[0] for x in path], [x[1] for x in path], [x[2] for x in path], c="grey"
+        )
 # We plot the path to the goal if it exists
 if my_rrt.reached_goal:
     path = my_rrt.get_path_to_node(my_rrt.reached_goal[-1])

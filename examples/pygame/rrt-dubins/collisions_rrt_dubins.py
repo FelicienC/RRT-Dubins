@@ -46,9 +46,12 @@ while running:
 
     # Plot the rrt, one edge at a time
     nb_edges_to_plot += 1
-    for edge in list(my_rrt.edges.values())[:nb_edges_to_plot]:
-        points = [(x[0], x[1]) for x in edge.path]
-        pygame.draw.lines(screen, (200, 200, 200), False, points)
+    for node in list(my_rrt.nodes.values())[:nb_edges_to_plot]:
+        for path in node.paths:
+            path_2d = [(x, y) for x, y, _ in path]
+            if not path_2d:
+                continue
+            pygame.draw.lines(screen, (200, 200, 200), False, path_2d, 1)
 
     # plot the start and end points
     pygame.draw.circle(screen, (0, 255, 0), my_rrt.nodes[0].state[:2], 5)

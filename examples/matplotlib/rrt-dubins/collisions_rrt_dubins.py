@@ -18,14 +18,16 @@ start, end = env.random_free_space(), env.random_free_space()
 my_rrt.set_start(start)
 
 # We run 100 iterations of growth
-my_rrt.grow(end, 200)
+my_rrt.grow(end, 300)
 
 # We plot
 fig, ax = plt.subplots()
 for obstacle in env.obstacles:
     ax.add_patch(Polygon(obstacle.points, closed=True, fill=True, color="black"))
-for edge in my_rrt.edges.values():
-    plt.plot([x[0] for x in edge.path], [x[1] for x in edge.path], c="grey")
+
+for node in my_rrt.nodes.values():
+    for path in node.paths:
+        plt.plot([x[0] for x in path], [x[1] for x in path], c="grey")
 
 if my_rrt.reached_goal:
     path = my_rrt.get_path_to_node(my_rrt.reached_goal[-1])

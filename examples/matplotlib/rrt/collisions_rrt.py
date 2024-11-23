@@ -8,7 +8,7 @@ from rrt import RRT, StaticEnvironment
 
 N_STEPS = 1000
 
-env = StaticEnvironment([(-50, 50), (-50, 50)], 100, 10)
+env = StaticEnvironment([(-50, 50), (-50, 50)], 100, 5)
 my_rrt = RRT(environment=env)
 
 start, end = env.random_free_space(), env.random_free_space()
@@ -24,8 +24,9 @@ fig, ax = plt.subplots()
 for obstacle in env.obstacles:
     ax.add_patch(Polygon(obstacle.points, closed=True, fill=True, color="black"))
 # We plot the rrt
-for edge in my_rrt.edges.values():
-    plt.plot([x[0] for x in edge.path], [x[1] for x in edge.path], c="grey")
+for node in my_rrt.nodes.values():
+    for path in node.paths:
+        ax.plot([x[0] for x in path], [x[1] for x in path], c="grey")
 # We plot the path to the goal if it exists
 if my_rrt.reached_goal:
     path = my_rrt.get_path_to_node(my_rrt.reached_goal[-1])

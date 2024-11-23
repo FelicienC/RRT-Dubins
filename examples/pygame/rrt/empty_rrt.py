@@ -34,7 +34,7 @@ class MyPlanner:
             (new_x, new_y, psi, speed + 1),
         )
 
-        return (state1, min(possible_states, key=lambda x: np.linalg.norm(x - state2)))
+        return [state1, min(possible_states, key=lambda x: np.linalg.norm(x - state2))]
 
 
 # Pygame parameters
@@ -67,10 +67,9 @@ while running:
     pygame.draw.circle(screen, (0, 255, 0), end[:2], 2)  # goal
 
     # Plotting the rrt
-    for edge in my_rrt.edges.values():
-        pygame.draw.lines(
-            screen, (0, 255, 0), False, [edge.path[0][:2], edge.path[-1][:2]]
-        )
+    for node in my_rrt.nodes.values():
+        for path in node.paths:
+            pygame.draw.line(screen, (0, 255, 0), path[0][:2], path[1][:2], 1)
 
     x, y, psi, speed = my_rrt.nodes[my_rrt.root_index].state
     pygame.draw.circle(screen, (255, 255, 255), (x, y), 2)

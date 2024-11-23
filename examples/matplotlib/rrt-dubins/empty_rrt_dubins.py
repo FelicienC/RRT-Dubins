@@ -23,8 +23,9 @@ my_rrt.set_start(start)
 my_rrt.grow(end, N_STEPS)
 
 # We plot the rrt
-for edge in my_rrt.edges.values():
-    plt.plot([x[0] for x in edge.path], [x[1] for x in edge.path], c="grey")
+for node in my_rrt.nodes.values():
+    for path in node.paths:
+        plt.plot([x[0] for x in path], [x[1] for x in path], c="grey")
 
 if my_rrt.reached_goal:
     for goal_index in my_rrt.reached_goal:

@@ -771,7 +771,9 @@ class Dubins:
         # We first need to find the points where the straight segment starts
 
         if abs(path[0]) > 0:
-            angle = start[2] + (abs(path[0]) - np.pi / 2) * np.sign(path[0])
+            angle = (start[2] + (abs(path[0]) - np.pi / 2) * np.sign(path[0])) % (
+                2 * np.pi
+            )
 
             x, y = center_0 + self.radius * np.array([np.cos(angle), np.sin(angle)])
 
@@ -783,7 +785,9 @@ class Dubins:
         # We then identify its end
 
         if abs(path[1]) > 0:
-            angle = end[2] + (-abs(path[1]) - np.pi / 2) * np.sign(path[1])
+            angle = (end[2] + (-abs(path[1]) - np.pi / 2) * np.sign(path[1])) % (
+                2 * np.pi
+            )
 
             x, y = center_2 + self.radius * np.array([np.cos(angle), np.sin(angle)])
 
@@ -796,7 +800,7 @@ class Dubins:
 
         # We can now generate all the points with the desired precision
 
-        angle = np.arctan2((fin[1] - ini[1]), (fin[0] - ini[0]))
+        angle = np.arctan2((fin[1] - ini[1]), (fin[0] - ini[0])) % (2 * np.pi)
 
         points = []
 
@@ -894,7 +898,7 @@ class Dubins:
 
                 a, b = center_1 + self.radius * vect
 
-                points.append((a, b, angle + np.pi / 2))
+                points.append((a, b, (angle + np.pi / 2) % (2 * np.pi)))
         points.append(end)
 
         return np.array(points)
@@ -945,4 +949,4 @@ class Dubins:
 
         x, y = center + self.radius * vect
 
-        return x, y, angle + np.pi / 2 * np.sign(beta)
+        return x, y, (angle + np.pi / 2 * np.sign(beta)) % (2 * np.pi)

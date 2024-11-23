@@ -2,7 +2,6 @@
 Construction of the Rapidely Exploring Random Tree
 """
 
-from collections import deque
 import numpy as np
 from rtree.index import Index as RTreeIndex
 from rtree.index import Property
@@ -32,42 +31,17 @@ class Node:
         "parent_index",
         "index",
         "children_count",
+        "paths",
     ]
 
     def __init__(self, index, state, cost, parent_index=None):
         self.destination_list: List[int] = []
+        self.paths: List[tuple] = []
         self.state: tuple = state
         self.cost: float = cost
         self.parent_index: int = parent_index
         self.index: int = index
         self.children_count = 0
-
-
-class Edge:
-    """
-    Edge of the rapidly exploring random tree.
-
-    Attributes
-    ----------
-    node_from : tuple
-        Id of the starting node of the edge.
-    node_to : tuple
-        Id of the end node of the edge.
-    path : list
-        The successive positions yielded by the local planner representing the
-        path between the nodes.
-    cost : float
-        Cost associated to the transition between the two nodes.
-
-    """
-
-    __slots__ = ["node_from", "node_to", "path", "cost"]
-
-    def __init__(self, node_from, node_to, path, cost):
-        self.node_from = node_from
-        self.node_to = node_to
-        self.path = deque(path)
-        self.cost = cost
 
 
 class RRT:
@@ -115,7 +89,6 @@ class RRT:
         precision=None,
     ) -> None:
         self.nodes: dict = {}
-        self.edges: dict = {}
         self.root_index: int = 0
         self.goal: tuple
         if not local_planner:
@@ -164,7 +137,6 @@ class RRT:
         """
 
         self.nodes = {}
-        self.edges = {}
         self.reached_goal = []
         self.rtree = RTreeIndex(properties=Property(dimension=len(start)))
         self.node_index = 0
@@ -258,7 +230,7 @@ class RRT:
                 # Adding the node to the tree
                 self.add_node(state, parent_index=node.index, path=path)
                 if self.in_goal_region(state):
-                    self.reached_goal.append(self.node_index - 1)
+                    self.reached_goal.append(self.node_index)
 
     def add_node(self, state, parent_index, path) -> None:
         """
@@ -273,8 +245,8 @@ class RRT:
             parent_index=parent_index,
         )
         self.nodes[parent_index].destination_list.append(index)
+        self.nodes[parent_index].paths.append(path)
         self.rtree.add(index, state)
-        self.edges[parent_index, index] = Edge(parent_index, index, path, 1)
         while parent_index != self.root_index:
             self.nodes[parent_index].children_count += 1
             parent_index = self.nodes[parent_index].parent_index
@@ -325,7 +297,7 @@ class RRT:
                 return False
         return True
 
-    def select_largest_subtree(self) -> Edge:
+    def select_largest_subtree(self) -> None:
         """
         Selects the best edge of the tree among the ones leaving from the root.
         Uses the number of children to determine the best option.
@@ -343,9 +315,7 @@ class RRT:
             ],
             key=lambda x: x[1],
         )[0]
-        best_edge = self.edges[(self.root_index, node_index)]
 
-        self.edges.pop((self.root_index, node_index))
         self.nodes[self.root_index].destination_list.remove(node_index)
 
         self.delete_all_children(self.root_index)
@@ -354,7 +324,7 @@ class RRT:
         )
         self.nodes.pop(self.root_index)
         self.root_index = node_index
-        return best_edge
+        self.nodes[node_index].parent_index = None
 
     def delete_all_children(self, node_index) -> None:
         """
@@ -363,7 +333,6 @@ class RRT:
 
         if self.nodes[node_index].destination_list:
             for child_index in self.nodes[node_index].destination_list:
-                self.edges.pop((node_index, child_index))
                 self.delete_all_children(child_index)
                 self.rtree.delete(
                     id=child_index, coordinates=self.nodes[child_index].state
@@ -388,10 +357,34 @@ class RRT:
 
         path = []
         while node_index > self.root_index:
-            path.extend(
-                list(
-                    self.edges[(self.nodes[node_index].parent_index, node_index)].path
-                )[::-1]
-            )
+            parent_index = self.nodes[node_index].parent_index
+            for path_segment in self.nodes[parent_index].paths:
+                if np.array_equal(path_segment[-1], self.nodes[node_index].state):
+                    path.extend(path_segment[::-1])
+                    break
+            node_index = parent_index
+        return path
+
+    def get_path_to_node_vertices_only(self, node_index: int) -> list[tuple]:
+        """
+        Returns the path from the root to the requested node, but only the
+        vertices of the path are returned.
+
+        Parameters
+        ----------
+        node_index : int
+            The index of the node from which the path is requested.
+
+        Returns
+        -------
+        path : list
+            The path from the root to the requested node. It is a list of
+            successive states.
+        """
+
+        path = []
+        while node_index > self.root_index:
+            path.append(self.nodes[node_index].state)
             node_index = self.nodes[node_index].parent_index
+        path.append(self.nodes[node_index].state)
         return path
